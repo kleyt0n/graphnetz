@@ -46,7 +46,7 @@ class GraphLevelWrapper(nn.Module):
 class _DataAdapter(nn.Module):
     """Adapt a ``forward(data)`` encoder to a ``forward(x, edge_index)`` API.
 
-    PyG's :class:`DeepGraphInfomax` calls the encoder with positional
+    PyG's `DeepGraphInfomax` calls the encoder with positional
     ``(x, edge_index)`` but every model in the library accepts a ``Data``
     object. This shim builds a temporary ``Data`` for the inner call.
     """
@@ -62,7 +62,7 @@ class _DataAdapter(nn.Module):
 class DGIWrapper(nn.Module):
     """Wrap any node-level encoder as a Deep Graph Infomax model.
 
-    Mirrors the :class:`graphnetz.models.DGI` interface (``forward(data)``
+    Mirrors the [`DGI`][graphnetz.models.DGI] interface (``forward(data)``
     returning the ``(pos_z, neg_z, summary)`` triple, plus a ``loss(...)``
     helper) so the benchmark trainer does not need to special-case it.
     """

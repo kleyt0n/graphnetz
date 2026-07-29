@@ -1,0 +1,3 @@
+# `graphnetz.training`
+
+::: graphnetz.training

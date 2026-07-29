@@ -1,9 +1,9 @@
 """Dataset registry, organized by research category and task.
 
 Each category exposes thin loader functions that return a ``torch_geometric``
-dataset (PyG built-in or :class:`~graphnetz.datasets.Netz`).  The
-:data:`LOADER_REGISTRY` table maps every loader to its category and the task it can serve, mirroring the structure used by
-:data:`graphnetz.benchmark.BENCHMARK_TASKS` (``[category][task_type] -> [...]``).
+dataset (PyG built-in or [`Netz`][graphnetz.datasets.Netz]).  The
+[`LOADER_REGISTRY`][graphnetz.datasets.LOADER_REGISTRY] table maps every loader to its category and the task it can serve, mirroring the structure used by
+[`BENCHMARK_TASKS`][graphnetz.benchmark.BENCHMARK_TASKS] (``[category][task_type] -> [...]``).
 
 Categories
 ----------
@@ -16,7 +16,7 @@ Categories
 - ``infrastructure``: power grids, road and air networks.
 - ``finance``: product space, board interlocks, patents, Elliptic Bitcoin.
 - ``computing``: AS topology, Skitter, BGP route views.
-- ``vision``: MNIST/CIFAR10 superpixel graphs, ModelNet, ShapeNet.
+- ``vision``: MNIST/CIFAR10 superpixel graphs, ModelNet.
 - ``physics``: QM9, ZINC, Ising lattice.
 - ``security``: terrorist association networks, MalNet-Tiny.
 
@@ -47,6 +47,7 @@ from graphnetz.datasets import (
     vision,
 )
 from graphnetz.datasets._netz import Netz, download_all_networks_netz
+from graphnetz.datasets._validate import validate_loaders
 
 # OGB loaders live directly inside the domain modules (``social.ogbn_arxiv``,
 # ``biology.ogbg_molhiv``, etc.). They raise a clear ``ImportError`` at
@@ -174,7 +175,6 @@ LOADER_REGISTRY: dict[str, dict[str, list[tuple[str, object]]]] = {
             ("modelnet10", vision.modelnet10),
             ("modelnet40", vision.modelnet40),
         ],
-        "node_cls": [("shapenet", vision.shapenet)],
     },
     "physics": {
         "graph_reg": [
@@ -242,5 +242,6 @@ __all__ = [
     "physics",
     "security",
     "social",
+    "validate_loaders",
     "vision",
 ]

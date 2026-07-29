@@ -1,49 +1,148 @@
 ---
-hide-toc: true
+hide:
+  - toc
 ---
 
-# Introduction
+<div class="gn-hero" markdown>
 
-[![GitHub](https://img.shields.io/github/stars/Kleyt0n/graphnetz?style=flat-square&logo=github&logoColor=001233&labelColor=979dac&color=001233)](https://github.com/Kleyt0n/graphnetz)
-[![Build](https://img.shields.io/badge/build-passing-001233?style=flat-square&labelColor=979dac)](https://github.com/Kleyt0n/graphnetz/actions)
-[![Docs](https://img.shields.io/badge/passing-docs-001233?style=flat-square&labelColor=979dac)](https://graphnetz.readthedocs.io/en/latest/)
-[![Python](https://img.shields.io/badge/python-3.10%2B-001233?style=flat-square&labelColor=979dac)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-001233?style=flat-square&labelColor=979dac)](https://github.com/Kleyt0n/graphnetz/blob/main/LICENCE.txt)
-[![Paper](https://img.shields.io/badge/paper-PDF-001233?style=flat-square&labelColor=979dac)](https://arxiv.org/)
+<img class="gn-hero__logo" src="logo.png" alt="GraphNetz logo">
 
-**A GNN benchmark whose default output is a statistical report, not a leaderboard.**
+<h1 class="gn-hero__title">GraphNetz</h1>
 
-Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, GraphNetz turns the usual “train, evaluate, table of accuracies” workflow into a reproducible statistical report. Instead of reporting point estimates alone, it provides confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets using critical-difference diagrams. The goal is not just to crown a leaderboard winner, but to give researchers a principled way to quantify uncertainty, compare methods fairly, and produce the exact evidence reviewers often ask for in graph-learning papers.
+<p class="gn-hero__tagline">
+A GNN benchmark whose default output is a statistical report, not a leaderboard.
+</p>
 
-```{figure} _static/critical_difference.png
-:alt: Demšar critical-difference diagram comparing four GNN architectures by mean rank.
-:class: gn-cd only-light
-:align: center
+[Get started](getting-started/installation.md){ .md-button .md-button--primary }
+[View on GitHub](https://github.com/Kleyt0n/graphnetz){ .md-button }
 
-```
+<figure class="gn-anim__wrap">
 
-```{figure} _static/critical_difference_dark.png
-:alt: Demšar critical-difference diagram comparing four GNN architectures by mean rank.
-:class: gn-cd only-dark
-:align: center
+  <svg class="gn-anim" viewBox="48 28 424 126" role="img"
+       aria-label="Eight seeds per model collapse into a mean with a confidence interval; a clique bar then joins all four models, showing no difference is detected.">
+    <line class="gn-anim__axis" x1="60" y1="124" x2="460" y2="124"/>
+    <g class="gn-anim__model" style="--m: 0">
+      <line class="gn-anim__seed" style="--s: 0" x1="84" y1="40" x2="106" y2="40"/>
+      <line class="gn-anim__seed" style="--s: 1" x1="84" y1="48" x2="106" y2="48"/>
+      <line class="gn-anim__seed" style="--s: 2" x1="84" y1="55" x2="106" y2="55"/>
+      <line class="gn-anim__seed" style="--s: 3" x1="84" y1="60" x2="106" y2="60"/>
+      <line class="gn-anim__seed" style="--s: 4" x1="84" y1="64" x2="106" y2="64"/>
+      <line class="gn-anim__seed" style="--s: 5" x1="84" y1="70" x2="106" y2="70"/>
+      <line class="gn-anim__seed" style="--s: 6" x1="84" y1="78" x2="106" y2="78"/>
+      <line class="gn-anim__seed" style="--s: 7" x1="84" y1="85" x2="106" y2="85"/>
+      <line class="gn-anim__whisker" x1="95" y1="36" x2="95" y2="88"/>
+      <line class="gn-anim__cap" x1="88" y1="36" x2="102" y2="36"/>
+      <line class="gn-anim__cap" x1="88" y1="88" x2="102" y2="88"/>
+      <circle class="gn-anim__mean" cx="95" cy="62" r="4.5"/>
+    </g>
+    <g class="gn-anim__model" style="--m: 1">
+      <line class="gn-anim__seed" style="--s: 0" x1="194" y1="56" x2="216" y2="56"/>
+      <line class="gn-anim__seed" style="--s: 1" x1="194" y1="62" x2="216" y2="62"/>
+      <line class="gn-anim__seed" style="--s: 2" x1="194" y1="68" x2="216" y2="68"/>
+      <line class="gn-anim__seed" style="--s: 3" x1="194" y1="72" x2="216" y2="72"/>
+      <line class="gn-anim__seed" style="--s: 4" x1="194" y1="76" x2="216" y2="76"/>
+      <line class="gn-anim__seed" style="--s: 5" x1="194" y1="81" x2="216" y2="81"/>
+      <line class="gn-anim__seed" style="--s: 6" x1="194" y1="87" x2="216" y2="87"/>
+      <line class="gn-anim__seed" style="--s: 7" x1="194" y1="93" x2="216" y2="93"/>
+      <line class="gn-anim__whisker" x1="205" y1="53" x2="205" y2="95"/>
+      <line class="gn-anim__cap" x1="198" y1="53" x2="212" y2="53"/>
+      <line class="gn-anim__cap" x1="198" y1="95" x2="212" y2="95"/>
+      <circle class="gn-anim__mean" cx="205" cy="74" r="4.5"/>
+    </g>
+    <g class="gn-anim__model" style="--m: 2">
+      <line class="gn-anim__seed" style="--s: 0" x1="304" y1="42" x2="326" y2="42"/>
+      <line class="gn-anim__seed" style="--s: 1" x1="304" y1="52" x2="326" y2="52"/>
+      <line class="gn-anim__seed" style="--s: 2" x1="304" y1="60" x2="326" y2="60"/>
+      <line class="gn-anim__seed" style="--s: 3" x1="304" y1="66" x2="326" y2="66"/>
+      <line class="gn-anim__seed" style="--s: 4" x1="304" y1="71" x2="326" y2="71"/>
+      <line class="gn-anim__seed" style="--s: 5" x1="304" y1="79" x2="326" y2="79"/>
+      <line class="gn-anim__seed" style="--s: 6" x1="304" y1="88" x2="326" y2="88"/>
+      <line class="gn-anim__seed" style="--s: 7" x1="304" y1="96" x2="326" y2="96"/>
+      <line class="gn-anim__whisker" x1="315" y1="38" x2="315" y2="98"/>
+      <line class="gn-anim__cap" x1="308" y1="38" x2="322" y2="38"/>
+      <line class="gn-anim__cap" x1="308" y1="98" x2="322" y2="98"/>
+      <circle class="gn-anim__mean" cx="315" cy="68" r="4.5"/>
+    </g>
+    <g class="gn-anim__model" style="--m: 3">
+      <line class="gn-anim__seed" style="--s: 0" x1="414" y1="62" x2="436" y2="62"/>
+      <line class="gn-anim__seed" style="--s: 1" x1="414" y1="69" x2="436" y2="69"/>
+      <line class="gn-anim__seed" style="--s: 2" x1="414" y1="75" x2="436" y2="75"/>
+      <line class="gn-anim__seed" style="--s: 3" x1="414" y1="79" x2="436" y2="79"/>
+      <line class="gn-anim__seed" style="--s: 4" x1="414" y1="84" x2="436" y2="84"/>
+      <line class="gn-anim__seed" style="--s: 5" x1="414" y1="90" x2="436" y2="90"/>
+      <line class="gn-anim__seed" style="--s: 6" x1="414" y1="97" x2="436" y2="97"/>
+      <line class="gn-anim__seed" style="--s: 7" x1="414" y1="103" x2="436" y2="103"/>
+      <line class="gn-anim__whisker" x1="425" y1="59" x2="425" y2="105"/>
+      <line class="gn-anim__cap" x1="418" y1="59" x2="432" y2="59"/>
+      <line class="gn-anim__cap" x1="418" y1="105" x2="432" y2="105"/>
+      <circle class="gn-anim__mean" cx="425" cy="82" r="4.5"/>
+    </g>
+    <line class="gn-anim__clique" x1="80" y1="148" x2="440" y2="148"/>
+  </svg>
 
-A Demšar critical-difference diagram . Models are ordered by mean Friedman
+<figcaption class="gn-anim__caption">
+  <span class="gn-anim__step" style="--k: 0">every model, every seed</span>
+  <span class="gn-anim__step" style="--k: 1">mean ± confidence interval</span>
+  <span class="gn-anim__step" style="--k: 2">no difference detected</span>
+</figcaption>
+</figure>
+
+</div>
+
+## Why GraphNetz
+
+Whether you are proposing a new GNN architecture, testing a model on a new
+graph domain, or comparing existing methods across graph types, GraphNetz
+turns the usual “train, evaluate, table of accuracies” workflow into a
+reproducible statistical report. Instead of reporting point estimates alone,
+it provides confidence intervals for each result, paired model comparisons
+with multiple-testing correction, and rank-based summaries across datasets
+using critical-difference diagrams. The goal is not just to crown a
+leaderboard winner, but to give researchers a principled way to quantify
+uncertainty, compare methods fairly, and produce the exact evidence reviewers
+often ask for in graph-learning papers.
+
+<div class="gn-cd" markdown>
+![Demšar critical-difference diagram comparing four GNN architectures by mean rank.](img/critical_difference.png#only-light)
+![Demšar critical-difference diagram comparing four GNN architectures by mean rank.](img/critical_difference_dark.png#only-dark)
+</div>
+
+A Demšar critical-difference diagram. Models are ordered by mean Friedman
 rank; the horizontal bar connects groups whose ranks are not significantly
 different at the chosen $\alpha$ under the Nemenyi post-hoc.
-```
 
+## What is inside
 
-## Install
+<div class="gn-grid" markdown>
 
-```bash
-pip install graphnetz
-# or
-uv add graphnetz
-```
+<div class="gn-card" markdown>
+### Honest comparisons by default
+Per-cell Student's-*t* (or percentile-bootstrap) CIs, Holm-adjusted paired
+*t*-tests within each task, Friedman ranks plus Nemenyi CD across tasks —
+no extra bookkeeping.
+</div>
 
-Requires Python ≥ 3.10, PyTorch ≥ 2.6, torch-geometric ≥ 2.6.
+<div class="gn-card" markdown>
+### One call, every metric
+`run_benchmark(category, models, seeds=...)` trains every compatible
+*(task, model, seed)* triple and returns a `BenchmarkReport`.
+</div>
 
-## Quick Start
+<div class="gn-card" markdown>
+### Publication-ready artefacts
+`report.to_latex(...)`, `plot_forest()`, `plot_pairwise()`,
+`plot_critical_difference()`.
+</div>
+
+<div class="gn-card" markdown>
+### Pluggable models
+Decorator, class attribute, or inline tuple — your encoder runs through the
+same statistical pipeline as the built-ins.
+</div>
+
+</div>
+
+## Quickstart
 
 ```python
 from graphnetz import GAT, GCN, GraphSAGE, run_benchmark
@@ -61,87 +160,25 @@ report.plot_critical_difference(alpha=0.05)
 report.to_latex("results.tex")   # publication-ready table
 ```
 
-→ Walk through this end-to-end in **[Getting started](getting-started.md)**.
-
-
-## Why GraphNetz
-
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} Honest comparisons by default
-Per-cell Student's-*t* (or percentile-bootstrap) CIs, Holm-adjusted paired
-*t*-tests within each task, Friedman ranks plus Nemenyi CD across tasks —
-no extra bookkeeping.
-:::
-
-:::{grid-item-card} One call, every metric
-`run_benchmark(category, models, seeds=...)` trains every compatible
-*(task, model, seed)* triple and returns a
-{py:class}`~graphnetz.benchmark.BenchmarkReport`.
-:::
-
-:::{grid-item-card} Publication-ready artefacts
-`report.to_latex(...)`, `plot_forest()`, `plot_pairwise()`,
-`plot_critical_difference()`
-:::
-
-:::{grid-item-card} Pluggable models
-Decorator, class attribute, or inline tuple — your encoder runs through the
-same statistical pipeline as the built-ins.
-:::
-
-::::
-
 ## At a glance
 
 | | |
 |---|---|
 | **Tasks** | `node_cls` · `graph_cls` · `graph_reg` · `link_pred` |
 | **Architectures** | GCN · GAT · GIN · GraphSAGE · GraphTransformer (DGI as a pre-training utility) |
-| **Loaders** | 63 across 10 categories (combinatorial, biology, social, knowledge, infrastructure, finance, computing, vision, physics, security) |
-| **Default report** | per-cell mean ± Student's-*t* CI · Holm-adjusted paired *t* · Demšar/Nemenyi CD |
+| **Loaders** | 62 across 10 categories (combinatorial, biology, social, knowledge, infrastructure, finance, computing, vision, physics, security) |
+| **Default report** | per-cell mean ± Student's-*t* CI · Holm-adjusted paired *t* / Wilcoxon · Demšar–Nemenyi CD |
+| **Adequacy layer** | minimum detectable effect · observed power · TOST equivalence · rank stability |
 | **Source** | [github.com/Kleyt0n/graphnetz](https://github.com/Kleyt0n/graphnetz) |
 
-## Documentation
+!!! tip "New here?"
+    Start with [Installation](getting-started/installation.md), then the
+    [Quickstart](getting-started/quickstart.md). To understand *how* the
+    pieces fit together — the taxonomy, the adapters, and the five-stage
+    pipeline — read the [User guide](guide/datasets.md).
 
-**Start here**
-- [Getting started](getting-started.md) — install and run your first benchmark in five minutes.
-
-**Concepts**
-- [Dataset taxonomy](datasets.md) — the full *category × task* grid and how to pick a loader.
-- [Models & adapters](models.md) — built-in encoders and three ways to plug in your own.
-- [Benchmark protocol](benchmark.md) — the five-stage pipeline that turns raw histories into a publishable report.
-- [Reading the report](report.md) — which view to use for which question.
-
-**Reference**
-- [API reference](api/index) — modules, classes, and functions.
-- [Contributing](contributing.md) — add a loader, a model, or a new task.
-
-```{toctree}
-:maxdepth: 2
-:hidden:
-:caption: Start here
-
-getting-started
-```
-
-```{toctree}
-:maxdepth: 2
-:hidden:
-:caption: Concepts
-
-datasets
-models
-benchmark
-report
-```
-
-```{toctree}
-:maxdepth: 2
-:hidden:
-:caption: Reference
-
-api/index
-contributing
-```
+!!! question "Already have a report?"
+    A benchmark should also say when its own evidence is thin.
+    [Is the evidence sufficient?](guide/adequacy.md) covers the minimum
+    detectable effect, equivalence testing, and how much benchmark breadth a
+    rank ordering would actually need.

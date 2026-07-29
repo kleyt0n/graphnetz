@@ -1,18 +1,18 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-banner-dark.svg">
-    <img src="assets/logo-banner-light.svg" alt="GraphNetz" width="460">
+    <img src="assets/logo-banner.svg" alt="GraphNetz" width="460">
   </picture>
 </p>
 
 <p align="center"><em>Statistically rigorous GNN benchmarking</em></p>
 
 <p align="center">
-  <a href="https://github.com/Kleyt0n/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-001233?style=flat-square&labelColor=979dac"></a>
-  <a href="https://graphnetz.readthedocs.io/en/latest/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-001233?style=flat-square&labelColor=979dac"></a>
-  <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-001233?style=flat-square&labelColor=979dac"></a>
-  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-001233?style=flat-square&labelColor=979dac"></a>
-  <a href="https://arxiv.org/pdf/2605.09099"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-001233?style=flat-square&labelColor=979dac"></a>
+  <a href="https://github.com/Kleyt0n/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://kleyt0n.github.io/graphnetz/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://arxiv.org/pdf/2605.09099"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-212529?style=flat-square&labelColor=e9ecef"></a>
 </p>
 
 ---
@@ -30,7 +30,7 @@ Most GNN benchmarks report point-estimate accuracies on a handful of citation gr
 
 The catalogue is organised along a **category × task** taxonomy: 
 
-- 63 dataset loaders across 10 scientific categories
+- 62 dataset loaders across 10 scientific categories
 - 4 task types (node classification, graph classification, graph regression, link prediction)
 - 5 canonical architectures (GCN, GAT, GIN, GraphSAGE, Graph Transformer) plug into every tasl via a small set of task adapters;
 
@@ -105,7 +105,7 @@ every cell carries a real test-time metric — there is no self-supervised
 | Infrastructure | 6 | LP | power grid, EuroRoad, US roads, EU airlines, London transport, urban streets |
 | Finance | 5 | NC, LP | Elliptic Bitcoin, product space, board of directors, US patents, ogbn-products† |
 | Computing | 4 | LP | Internet AS, Internet topology, AS-Skitter, route views |
-| Vision | 5 | GC, NC | MNIST/CIFAR-10 superpixels, ModelNet10/40, ShapeNet |
+| Vision | 4 | GC | MNIST/CIFAR-10 superpixels, ModelNet10/40 |
 | Physics | 3 | GR, LP | QM9, ZINC, Ising lattice |
 | Security | 3 | GC, LP | MalNet-Tiny, 9/11 terrorists, train terrorists |
 

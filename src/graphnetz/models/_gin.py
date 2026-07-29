@@ -13,7 +13,7 @@ class GIN(torch.nn.Module):
 
     References
     ----------
-    .. [Xu2019] Xu, K. et al. (2019). "How Powerful are Graph Neural Networks?" ICLR.
+    - **Xu2019**: Xu, K. et al. (2019). "How Powerful are Graph Neural Networks?" ICLR.
     """
 
     def __init__(self, in_channels: int, hidden_channels: int, out_channels: int, num_layers: int = 3) -> None:

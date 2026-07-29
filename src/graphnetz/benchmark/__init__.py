@@ -1,7 +1,7 @@
 """Statistically robust benchmarks across a category for one or many models.
 
 The dispatcher trains every compatible (model, task) pair across multiple
-seeds and returns a :class:`BenchmarkReport` that exposes mean ± 95 % t-CI,
+seeds and returns a [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport] that exposes mean ± 95 % t-CI,
 paired t-tests with Holm-Bonferroni correction, publication-ready LaTeX
 tables, and plots.
 
@@ -32,6 +32,7 @@ is dropped).
 """
 
 from graphnetz.benchmark._report import BenchmarkReport
+from graphnetz.benchmark._search import SearchSpace
 from graphnetz.benchmark._runner import (
     _run_task as _run_task,  # documented extension point (docs/contributing.md)
 )
@@ -61,6 +62,7 @@ __all__ = [
     "BENCHMARK_TASKS",
     "TASK_TYPES",
     "BenchmarkReport",
+    "SearchSpace",
     "ModelSpec",
     "Task",
     "iter_benchmark_tasks",

@@ -22,7 +22,7 @@ class DGI(torch.nn.Module):
 
     References
     ----------
-    .. [1] Veličković, P. et al. (2019). "Deep Graph Infomax." ICLR.
+    - **1**: Veličković, P. et al. (2019). "Deep Graph Infomax." ICLR.
     """
 
     def __init__(self, in_channels: int, hidden_channels: int = 512) -> None:

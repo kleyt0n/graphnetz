@@ -15,13 +15,13 @@ def fb15k_237(root: str) -> RelLinkPredDataset:
 
 
 class _WordNet18RRRel:
-    """WN18-RR reshaped to match :class:`RelLinkPredDataset`'s interface.
+    """WN18-RR reshaped to match `RelLinkPredDataset`'s interface.
 
-    PyG's :class:`WordNet18RR` exposes edge-level ``train_mask`` / ``val_mask`` /
+    PyG's `WordNet18RR` exposes edge-level ``train_mask`` / ``val_mask`` /
     ``test_mask`` over a single ``edge_index``; the benchmark dispatcher's
     relational path expects ``train_edge_index`` / ``valid_edge_index`` /
     ``test_edge_index`` (plus matching ``*_edge_type``) and ``num_relations``,
-    as on :class:`RelLinkPredDataset`. This wrapper performs that conversion.
+    as on `RelLinkPredDataset`. This wrapper performs that conversion.
     """
 
     def __init__(self, base: WordNet18RR) -> None:

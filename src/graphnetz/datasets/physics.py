@@ -2,7 +2,7 @@
 
 Coverage:
 - Molecules: PyG ``QM9``, ``ZINC``.
-- Spin systems / lattices: synthetic 2D Ising lattice graphs (:class:`IsingLattice`).
+- Spin systems / lattices: synthetic 2D Ising lattice graphs ([`IsingLattice`][graphnetz.datasets.physics.IsingLattice]).
 
 Feynman diagrams, reaction networks, and large crystal-structure databases lack
 canonical PyG-format datasets and are intentionally omitted.

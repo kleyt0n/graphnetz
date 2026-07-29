@@ -8,7 +8,7 @@ class GAT(torch.nn.Module):
 
     References
     ----------
-    .. [Velickovic2018] Veličković, P. et al. (2018). "Graph Attention Networks." ICLR.
+    - **Velickovic2018**: Veličković, P. et al. (2018). "Graph Attention Networks." ICLR.
     """
 
     def __init__(

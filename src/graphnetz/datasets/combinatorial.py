@@ -3,15 +3,15 @@
 All instances are synthetic; canonical PyG benchmarks do not cover this
 category. The library provides:
 
-- :class:`RandomTSP` / :func:`random_tsp` — Euclidean TSP (k-NN over 2D points).
-- :class:`RandomVRP` / :func:`random_vrp` — Capacitated VRP (multi-depot k-NN).
-- :class:`RandomMaxFlow` / :func:`random_maxflow` — random capacitated networks
+- [`RandomTSP`][graphnetz.datasets.combinatorial.RandomTSP] / `random_tsp` — Euclidean TSP (k-NN over 2D points).
+- [`RandomVRP`][graphnetz.datasets.combinatorial.RandomVRP] / `random_vrp` — Capacitated VRP (multi-depot k-NN).
+- [`RandomMaxFlow`][graphnetz.datasets.combinatorial.RandomMaxFlow] / `random_maxflow` — random capacitated networks
   with a single source/sink, suitable for max-flow / min-cut benchmarks.
-- :class:`RandomBipartiteMatching` / :func:`random_bipartite_matching` —
+- [`RandomBipartiteMatching`][graphnetz.datasets.combinatorial.RandomBipartiteMatching] / `random_bipartite_matching` —
   bipartite assignment instances with random weights.
-- :class:`RandomColoring` / :func:`random_coloring` — random Erdos-Renyi graphs
+- [`RandomColoring`][graphnetz.datasets.combinatorial.RandomColoring] / `random_coloring` — random Erdos-Renyi graphs
   for graph-coloring / max-cut experiments.
-- :class:`RandomMaxCut` / :func:`random_maxcut` — alias of RandomColoring.
+- `RandomMaxCut` / `random_maxcut` — alias of RandomColoring.
 """
 
 from __future__ import annotations

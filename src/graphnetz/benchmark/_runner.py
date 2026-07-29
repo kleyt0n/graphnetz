@@ -13,6 +13,7 @@ from torch_geometric.loader import DataLoader
 from tqdm.auto import tqdm
 
 from graphnetz.benchmark._report import BenchmarkReport
+from graphnetz.benchmark._search import SearchSpace, select
 from graphnetz.benchmark._specs import TASK_TYPES, ModelSpec, Task, _spec_from
 from graphnetz.benchmark._stats import _final_metric
 from graphnetz.benchmark._tasks import BENCHMARK_TASKS, iter_benchmark_tasks
@@ -37,11 +38,29 @@ def _run_task(
     epochs: int,
     verbose: bool = False,
     device: torch.device | str | None = "auto",
+    hyper: Mapping[str, Any] | None = None,
 ) -> dict[str, list[float]]:
+    """Train one (task, model) pair once.
+
+    ``hyper`` optionally overrides the trainer's optimiser defaults and the
+    encoder width; it is how the inner hyperparameter search
+    (`graphnetz.benchmark._search`) varies a candidate. Keys the relevant
+    trainer does not accept are dropped rather than raising, because the
+    searchable surface differs by task type (only node classification takes a
+    weight decay).
+    """
+    hp = dict(hyper or {})
+    hidden = int(hp.pop("hidden_channels", hidden))
+
+    def _opt(*accepted: str) -> dict[str, Any]:
+        return {k: v for k, v in hp.items() if k in accepted}
+
     if task_type.task_type == "node_cls":
         data = ds[0]
         model = spec.build(ds.num_features, hidden, ds.num_classes, task_type="node_cls")
-        return train_node_classification(model, data, epochs=epochs, verbose=verbose, device=device)
+        return train_node_classification(
+            model, data, epochs=epochs, verbose=verbose, device=device, **_opt("lr", "weight_decay")
+        )
 
     if task_type.task_type == "graph_cls":
         shuffled = ds.shuffle()
@@ -50,7 +69,7 @@ def _run_task(
         val_loader = DataLoader(shuffled[split:], batch_size=32)
         model = spec.build(shuffled.num_features, hidden, shuffled.num_classes, task_type="graph_cls")
         return train_graph_classification(
-            model, train_loader, val_loader, epochs=epochs, verbose=verbose, device=device
+            model, train_loader, val_loader, epochs=epochs, verbose=verbose, device=device, **_opt("lr")
         )
 
     if task_type.task_type == "graph_reg":
@@ -81,7 +100,7 @@ def _run_task(
                 return self.inner(batch)
 
         return train_graph_regression(
-            _AtomEmbed(), train_loader, val_loader, epochs=epochs, verbose=verbose, device=device
+            _AtomEmbed(), train_loader, val_loader, epochs=epochs, verbose=verbose, device=device, **_opt("lr")
         )
 
     if task_type.task_type == "link_pred":
@@ -151,6 +170,7 @@ def _run_task(
                 epochs=epochs,
                 verbose=verbose,
                 device=device,
+                **_opt("lr"),
             )
 
         # Detect graph direction from the data itself instead of forcing
@@ -184,7 +204,7 @@ def _run_task(
 
         lp_model = _cast(_LinkPredLike, spec.build(train_data.num_features, hidden, hidden, task_type="link_pred"))
         return train_link_prediction(
-            lp_model, train_data, val_data, test_data, epochs=epochs, verbose=verbose, device=device
+            lp_model, train_data, val_data, test_data, epochs=epochs, verbose=verbose, device=device, **_opt("lr")
         )
 
     msg = f"Unknown task task_type: {task_type.task_type}"
@@ -228,13 +248,14 @@ def run_benchmark(
     task_type: str | None = None,
     tasks: Iterable[Task] | None = None,
     device: torch.device | str | None = "auto",
+    search: SearchSpace | None = None,
 ) -> BenchmarkReport:
     """Run a benchmark across one or more (model, task, seed) combinations.
 
     Two ways to choose tasks:
 
     1. **By category** (default) -- tasks come from
-       :data:`BENCHMARK_TASKS` indexed as
+       [`BENCHMARK_TASKS`][graphnetz.benchmark.BENCHMARK_TASKS] indexed as
        ``[category][task_type] -> list[Task]``. Pass ``category="social"``
        (etc.) and optionally restrict with ``task_type`` and ``only=``.
     2. **Ad-hoc** -- pass ``tasks=[Task(...), ...]`` to bypass the registry
@@ -244,7 +265,16 @@ def run_benchmark(
 
     The runner trains every compatible (model, task) pair across each
     value in ``seeds`` (default ``(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)``) and aggregates the per-seed
-    histories into a :class:`BenchmarkReport`.
+    histories into a [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport].
+
+    ``search`` optionally adds an inner hyperparameter loop (Algorithm 1,
+    line 4a): for every (task, model, seed) the runner trains each candidate in
+    the [`SearchSpace`][graphnetz.benchmark.SearchSpace], scores them on the task's
+    **validation** series, and keeps the winner's history. Candidates are never
+    scored on a held-out metric. The selected configuration and the full search
+    trace land in ``report.config["search_selected"]``, and the cost multiplier
+    is announced before training starts, because a grid of ``G`` candidates
+    multiplies compute by ``G``.
     """
     if models is None:
         msg = "run_benchmark requires `models` (a class, dict, or ModelSpec)"
@@ -285,9 +315,15 @@ def run_benchmark(
     tasks = task_list  # the loop below treats this as the working list
 
     histories: dict[str, dict[str, list[dict[str, list[float]]]]] = {}
-    total_combinations = sum(
-        1 for spec in resolved.values() for task in tasks if task.task_type in spec.task_type
-    ) * len(seed_list)
+    search_selected: dict[str, Any] = {}
+    candidates = search.candidates() if search is not None else [{}]
+    if search is not None and not search.is_empty:
+        print(f"hyperparameter search: {search.describe()} -- multiplies training cost by {len(candidates)}x")
+    total_combinations = (
+        sum(1 for spec in resolved.values() for task in tasks if task.task_type in spec.task_type)
+        * len(seed_list)
+        * len(candidates)
+    )
     overall_pbar = tqdm(
         total=total_combinations,
         desc="Benchmark",
@@ -319,15 +355,51 @@ def run_benchmark(
                     if ds_cache is None:
                         ds_cache = task.loader(f"{root}/{category}/{task.name}")
                     ds = ds_cache
-                history = _run_task(
-                    task, ds, spec, hidden_channels, epochs or task.epochs, verbose=verbose, device=device
-                )
+                if len(candidates) == 1:
+                    history = _run_task(
+                        task,
+                        ds,
+                        spec,
+                        hidden_channels,
+                        epochs or task.epochs,
+                        verbose=verbose,
+                        device=device,
+                        hyper=candidates[0],
+                    )
+                else:
+                    # Inner search: reseed before every candidate so the
+                    # comparison between them is paired too, then keep the one
+                    # that wins on validation.
+                    def _trials(t=task, sp=spec, d=ds, s_=s):
+                        for cand in candidates:
+                            _seed_all(s_)
+                            yield (
+                                cand,
+                                _run_task(
+                                    t,
+                                    d,
+                                    sp,
+                                    hidden_channels,
+                                    epochs or t.epochs,
+                                    verbose=False,
+                                    device=device,
+                                    hyper=cand,
+                                ),
+                            )
+                            overall_pbar.update(1)
+
+                    best_config, history, trace = select(_trials())
+                    search_selected[f"{task.name}/{model_name}/seed{s}"] = {
+                        "selected": best_config,
+                        "trace": trace,
+                    }
                 histories[task.name][model_name].append(history)
                 # Update overall progress with latest metric
                 last_metrics = {k: v[-1] for k, v in history.items() if v}
                 metric_str = " ".join(f"{k[:3]}={v:.3f}" for k, v in last_metrics.items())
                 overall_pbar.set_postfix_str(f"{task.name}/{model_name}/s{s} | {metric_str}", refresh=False)
-                overall_pbar.update(1)
+                if len(candidates) == 1:
+                    overall_pbar.update(1)
     overall_pbar.close()
 
     from graphnetz.training import _resolve_device
@@ -339,8 +411,35 @@ def run_benchmark(
         "epochs": epochs,
         "only": only,
         "device": str(_resolve_device(device)),
+        **_provenance(),
     }
+    if search is not None and not search.is_empty:
+        config["search"] = search.describe()
+        config["search_selected"] = search_selected  # type: ignore[assignment]
     return BenchmarkReport(seeds=seed_list, histories=histories, config=config)
+
+
+def _provenance() -> dict[str, str]:
+    """Record the software stack in the report.
+
+    Determinism is only meaningful relative to a stack (Appendix E), so the
+    report carries its own: a later re-analysis can attribute a drifted number
+    to a library upgrade instead of guessing.
+    """
+    import platform
+    import sys
+
+    out: dict[str, str] = {
+        "python": sys.version.split()[0],
+        "platform": platform.platform(),
+    }
+    for name in ("graphnetz", "torch", "torch_geometric", "scipy", "numpy", "pandas"):
+        try:
+            module = __import__(name)
+            out[f"{name}_version"] = str(getattr(module, "__version__", "unknown"))
+        except ImportError:  # pragma: no cover - optional at analysis time
+            out[f"{name}_version"] = "absent"
+    return out
 
 
 def plot_benchmark(
@@ -353,7 +452,7 @@ def plot_benchmark(
 ) -> tuple[plt.Figure, plt.Axes]:
     """Grouped bar chart with mean ± CI error bars.
 
-    Accepts a :class:`BenchmarkReport` (preferred) or the legacy dict form for
+    Accepts a [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport] (preferred) or the legacy dict form for
     a single seed. ``errors`` overrides the default t-CI half-width.
     """
     if isinstance(results, BenchmarkReport):

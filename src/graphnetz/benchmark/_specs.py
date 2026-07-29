@@ -96,9 +96,9 @@ def _multi_task_factory(encoder_cls: type) -> Callable[..., torch.nn.Module]:
     For ``node_cls`` the encoder is built with the dataset's class count
     as ``out_channels`` and used directly. For ``graph_cls`` and
     ``graph_reg`` the encoder produces ``hidden_channels`` per node and a
-    :class:`GraphLevelWrapper` adds global mean pooling and a head. For
-    ``dgi`` the encoder is wrapped in :class:`DGIWrapper` so it plugs
-    into the same training loop as :class:`graphnetz.models.DGI`.
+    [`GraphLevelWrapper`][graphnetz.models._adapters.GraphLevelWrapper] adds global mean pooling and a head. For
+    ``dgi`` the encoder is wrapped in [`DGIWrapper`][graphnetz.models._adapters.DGIWrapper] so it plugs
+    into the same training loop as [`DGI`][graphnetz.models.DGI].
     """
     from graphnetz.models._adapters import GraphLevelWrapper, LinkPredWrapper
 
@@ -137,7 +137,7 @@ register_model(GIN, task_type={"graph_cls", "graph_reg"})
 
 
 def _spec_from(value: type | tuple[Any, ...] | ModelSpec) -> ModelSpec:
-    """Resolve a ``models`` dict entry to a :class:`ModelSpec`."""
+    """Resolve a ``models`` dict entry to a [`ModelSpec`][graphnetz.benchmark.ModelSpec]."""
     if isinstance(value, ModelSpec):
         return value
     if isinstance(value, tuple):

@@ -1,0 +1,163 @@
+site_name: GraphNetz
+site_description: >-
+  A large-scale database and benchmark for graph learning — statistically
+  rigorous GNN benchmarking whose default output is a statistical report,
+  not a leaderboard.
+site_author: Kleyton da Costa
+site_url: https://kleyt0n.github.io/graphnetz/
+repo_name: Kleyt0n/graphnetz
+repo_url: https://github.com/Kleyt0n/graphnetz
+copyright: Copyright &copy; GraphNetz contributors — MIT License
+
+docs_dir: docs
+
+theme:
+  name: material
+  logo: logo.png
+  favicon: favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    # Google Sans Flex is a variable font with no italic master; Material asks
+    # Google Fonts for italics and the browser synthesises them. Code keeps a
+    # true monospace, which Flex does not provide.
+    text: Google Sans Flex
+    code: IBM Plex Mono
+  palette:
+    # primary/accent are `custom`, so Material defers to the palette defined
+    # in stylesheets/extra.css (mirrored from graphnetz.plotting.BRAND_COLORS).
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Kleyt0n/graphnetz
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/graphnetz/
+  generator: false
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;'
+  - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            docstring_options:
+              ignore_init_summary: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_source: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+            merge_init_into_class: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            filters: ["!^_"]
+            docstring_section_style: table
+            show_if_no_docstring: false
+            show_labels: true
+            annotations_path: brief
+            line_length: 88
+            summary:
+              attributes: true
+              functions: true
+              modules: false
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+            - https://pandas.pydata.org/docs/objects.inv
+            - https://docs.scipy.org/doc/scipy/objects.inv
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+      - Custom models & datasets: getting-started/custom.md
+  - User guide:
+      - Dataset taxonomy: guide/datasets.md
+      - Models & adapters: guide/models.md
+      - Benchmark protocol: guide/benchmark.md
+      - Reading the report: guide/report.md
+      - Is the evidence sufficient?: guide/adequacy.md
+  - API reference:
+      - Overview: reference/index.md
+      - Benchmark: reference/benchmark.md
+      - Datasets: reference/datasets.md
+      - Models: reference/models.md
+      - Training: reference/training.md
+      - Plotting: reference/plotting.md
+  - Project:
+      - Contributing: contributing.md
