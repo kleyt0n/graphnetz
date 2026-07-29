@@ -70,12 +70,12 @@ def _download_without_prompting() -> Iterator[None]:
             continue
         if hasattr(module, "decide_download"):
             patched.append((module, module.decide_download))
-            module.decide_download = approve
+            setattr(module, "decide_download", approve)  # noqa: B010
     try:
         yield
     finally:
         for module, original in patched:
-            module.decide_download = original
+            setattr(module, "decide_download", original)  # noqa: B010
 
 
 @contextlib.contextmanager
