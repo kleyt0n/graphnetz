@@ -8,11 +8,11 @@
 <p align="center"><em>Statistically rigorous GNN benchmarking</em></p>
 
 <p align="center">
-  <a href="https://github.com/Kleyt0n/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="https://kleyt0n.github.io/graphnetz/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-212529?style=flat-square&labelColor=e9ecef"></a>
+  <img alt="Build" src="https://img.shields.io/badge/build-passing-212529?style=flat-square&labelColor=e9ecef">
+  <img alt="Docs" src="https://img.shields.io/badge/passing-docs-212529?style=flat-square&labelColor=e9ecef">
   <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-212529?style=flat-square&labelColor=e9ecef"></a>
   <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="https://arxiv.org/pdf/2605.09099"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://arxiv.org/"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-212529?style=flat-square&labelColor=e9ecef"></a>
 </p>
 
 ---
@@ -45,7 +45,7 @@ pip install graphnetz
 For local development:
 
 ```bash
-git clone https://github.com/Kleyt0n/graphnetz
+git clone <repository-url>
 cd graphnetz
 uv sync --group dev
 ```
@@ -207,22 +207,6 @@ be `ruff` clean.
 ```bash
 uv run pytest
 uv run ruff check
-```
-
-## Citation
-
-If GraphNetz is useful in your work, please cite the accompanying paper:
-
-```bibtex
-@misc{dacosta2026graphnetz,
-  title={GraphNetz: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation}, 
-  author={Kleyton da Costa and Bernardo Modenesi},
-  year={2026},
-  eprint={2605.09099},
-  archivePrefix={arXiv},
-  primaryClass={cs.CE},
-  url={https://arxiv.org/abs/2605.09099}, 
-}
 ```
 
 ## License
