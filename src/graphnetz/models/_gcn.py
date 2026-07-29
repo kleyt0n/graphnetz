@@ -17,7 +17,7 @@ class GCN(torch.nn.Module):
 
     References
     ----------
-    .. [Kipf2017] Kipf, T. N., & Welling, M. (2017).
+    - **Kipf2017**: Kipf, T. N., & Welling, M. (2017).
            "Semi-Supervised Classification with Graph Convolutional Networks."
            arXiv:1609.02907.
     """

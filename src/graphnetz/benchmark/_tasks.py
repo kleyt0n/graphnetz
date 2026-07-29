@@ -187,7 +187,7 @@ def task_from_dataset(
     *,
     epochs: int = 30,
 ) -> Task:
-    """Wrap an already-loaded dataset as a :class:`Task`.
+    """Wrap an already-loaded dataset as a [`Task`][graphnetz.benchmark.Task].
 
     The dataset must satisfy the conventions for ``task``: a PyG dataset or
     any object exposing ``ds[0]`` plus the relevant attributes (``num_features``
@@ -202,10 +202,10 @@ def task_from_dataset(
 
 
 def register_task(category: str, task_type: Task) -> None:
-    """Register ``task`` under ``category`` in :data:`BENCHMARK_TASKS`.
+    """Register ``task`` under ``category`` in [`BENCHMARK_TASKS`][graphnetz.benchmark.BENCHMARK_TASKS].
 
     The task becomes visible to ``run_benchmark(category)`` and to
-    :func:`iter_benchmark_tasks`. Use :func:`unregister_task` to remove it
+    [`iter_benchmark_tasks`][graphnetz.benchmark.iter_benchmark_tasks]. Use [`unregister_task`][graphnetz.benchmark.unregister_task] to remove it
     (e.g. in ``tearDown`` of a test).
     """
     if not isinstance(task_type, Task):

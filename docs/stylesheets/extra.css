@@ -1,0 +1,629 @@
+/* ================================================================== *
+ * GraphNetz docs — Google Sans Flex over Material for MkDocs.          *
+ *                                                                      *
+ * Colours come from one palette, mirrored from                          *
+ * graphnetz.plotting.BRAND_COLORS: a nine-step neutral ramp. Do not     *
+ * hard-code hexes below; reuse a --gn-* token so the site, the logo and  *
+ * the README cannot drift apart. The figure palette (NATURE_COLORS) is   *
+ * separate on purpose — restyling the site must never change a plot.     *
+ *                                                                      *
+ * Role assignment is driven by measured contrast, not taste. Against     *
+ * Bright Snow / Carbon Black respectively:                               *
+ *   carbon 14.6 / --      iron 7.8 / --       gunmetal 10.9 / --         *
+ *   snow   -- / 14.6      platinum -- / 13.0  pale-slate-2 -- / 7.4      *
+ *   slate  4.5 / 3.3  <- the pivot: muted prose in light, UI in dark     *
+ * The four lightest steps are surfaces in light mode, never body text.   *
+ * ================================================================== */
+
+:root {
+  /* Identity palette: nine neutral steps, lightest to darkest. */
+  --gn-snow: #f8f9fa;        /* Bright Snow */
+  --gn-platinum: #e9ecef;    /* Platinum */
+  --gn-alabaster: #dee2e6;   /* Alabaster Grey */
+  --gn-pale: #ced4da;        /* Pale Slate */
+  --gn-pale-2: #adb5bd;      /* Pale Slate 2 */
+  --gn-slate: #6c757d;       /* Slate Grey */
+  --gn-iron: #495057;        /* Iron Grey */
+  --gn-gunmetal: #343a40;    /* Gunmetal */
+  --gn-carbon: #212529;      /* Carbon Black */
+
+  --md-primary-fg-color: var(--gn-carbon);
+  --md-primary-fg-color--light: var(--gn-iron);
+  --md-primary-fg-color--dark: var(--gn-carbon);
+  --md-accent-fg-color: var(--gn-iron);
+  --md-accent-fg-color--transparent: rgba(73, 80, 87, 0.1);
+  --md-default-bg-color: var(--gn-snow);
+  --gn-surface: rgba(233, 236, 239, 0.6);
+  --gn-border: rgba(33, 37, 41, 0.14);
+  --gn-border-strong: rgba(33, 37, 41, 0.3);
+}
+
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--gn-carbon);
+  --md-primary-fg-color--light: var(--gn-iron);
+  --md-primary-fg-color--dark: var(--gn-carbon);
+  --md-primary-bg-color: var(--gn-snow);
+  --md-primary-bg-color--light: rgba(248, 249, 250, 0.7);
+}
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: var(--gn-iron);
+  --md-accent-fg-color--transparent: rgba(73, 80, 87, 0.1);
+  --md-accent-bg-color: var(--gn-snow);
+}
+[data-md-color-scheme="slate"][data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--gn-carbon);
+}
+[data-md-color-scheme="slate"][data-md-color-accent="custom"] {
+  --md-accent-fg-color: var(--gn-pale-2);
+  --md-accent-fg-color--transparent: rgba(173, 181, 189, 0.14);
+  --md-accent-bg-color: var(--gn-carbon);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 210;
+  --md-default-bg-color: var(--gn-carbon);
+  --md-default-bg-color--light: var(--gn-gunmetal);
+  --md-default-bg-color--lighter: #3d444b;
+  --md-default-bg-color--lightest: var(--gn-iron);
+  --md-default-fg-color: var(--gn-snow);
+  --md-default-fg-color--light: var(--gn-alabaster);
+  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.42);
+  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.1);
+  --md-code-bg-color: var(--gn-gunmetal);
+  --md-code-fg-color: var(--gn-snow);
+  --md-footer-bg-color: var(--gn-carbon);
+  --md-footer-bg-color--dark: var(--gn-carbon);
+  --md-typeset-a-color: var(--gn-pale-2);
+  --gn-surface: rgba(173, 181, 189, 0.08);
+  --gn-border: rgba(248, 249, 250, 0.14);
+  --gn-border-strong: rgba(248, 249, 250, 0.26);
+}
+
+/* Google Sans Flex for text and UI. It is a variable font with no italic
+   master, so browsers synthesise oblique for <em>; that is expected. */
+body,
+.md-typeset,
+.md-nav,
+.md-header,
+.md-footer,
+input,
+button {
+  font-family: "Google Sans Flex", system-ui, -apple-system, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
+  font-optical-sizing: auto;
+  font-feature-settings: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Code stays monospace — Google Sans Flex has no fixed-width master. */
+code,
+pre,
+kbd,
+samp,
+.md-typeset code,
+.md-typeset pre,
+.md-typeset kbd,
+.md-clipboard,
+.highlight,
+.linenos,
+.doc-signature {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-feature-settings: normal;
+}
+
+.md-typeset {
+  line-height: 1.7;
+  font-size: 0.76rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * True-black scheme, aligned with the report-figure dark palette.     *
+ * ------------------------------------------------------------------ */
+[data-md-color-scheme="slate"] {
+  --md-hue: 0;
+  --md-default-bg-color: var(--gn-carbon);
+  --md-default-bg-color--light: #101312;
+  --md-default-bg-color--lighter: #171b1c;
+  --md-default-bg-color--lightest: #1d2325;
+  --md-default-fg-color: var(--gn-snow);
+  --md-default-fg-color--light: rgba(248, 249, 250, 0.78);
+  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.42);
+  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.1);
+  --md-code-bg-color: #121618;
+  --md-code-fg-color: var(--gn-snow);
+  --md-footer-bg-color: var(--gn-carbon);
+  --md-footer-bg-color--dark: var(--gn-carbon);
+  --md-typeset-a-color: var(--gn-pale-2);
+}
+
+/* ------------------------------------------------------------------ *
+ * Structural chrome — borders that frame the columns like a TUI.      *
+ * ------------------------------------------------------------------ */
+.md-header {
+  background-color: var(--gn-carbon);
+  border-bottom: 1px solid var(--gn-border);
+  box-shadow: none;
+}
+.md-footer {
+  background-color: var(--gn-carbon);
+  border-top: 1px solid var(--gn-border);
+}
+.md-footer-meta {
+  background-color: var(--gn-carbon);
+  font-size: 0.68rem;
+}
+
+/* Sidebar / TOC column dividers. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    border-right: 1px solid var(--gn-border);
+  }
+  .md-sidebar--secondary {
+    border-left: 1px solid var(--gn-border);
+  }
+}
+
+/* Header title + search, squared off. */
+.md-header__title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.md-search__form {
+  border-radius: 0;
+  border: 1px solid var(--gn-border);
+  background-color: rgba(248, 249, 250, 0.04);
+  box-shadow: none;
+}
+.md-search__input {
+  border-radius: 0;
+}
+[data-md-toggle="search"]:checked ~ .md-header .md-search__output,
+.md-search__output {
+  border-radius: 0;
+}
+
+/* Header logo: thin line-art, so scale it up and add a faint glow. */
+.md-header__button.md-logo {
+  padding: 0.2rem;
+  margin: 0.1rem 0.2rem 0.1rem 0;
+}
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.9rem;
+  width: 1.9rem;
+  /* No glow: the mark is a dense solid, so a halo only softens its edges. */
+  filter: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Navigation — flat labels, boxed active item.                        *
+ * ------------------------------------------------------------------ */
+.md-nav {
+  font-size: 0.72rem;
+}
+.md-nav__title {
+  font-weight: 700;
+}
+
+/* Section labels (Getting started / User guide / API reference). */
+.md-nav__item--section > .md-nav__link,
+.md-nav--primary .md-nav__item--section > label.md-nav__link {
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+/* Links: quieter, squared hover box. */
+.md-nav__link {
+  border-radius: 0;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+.md-nav__link:hover {
+  color: var(--md-default-fg-color);
+  background-color: rgba(248, 249, 250, 0.04);
+}
+.md-nav__link--active,
+.md-nav__link--active:focus,
+.md-nav__link--active:hover,
+.md-nav__item .md-nav__link--active {
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+  background-color: var(--md-default-fg-color--lightest);
+  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
+  padding-left: 0.9rem;
+}
+
+/* TOC ("On this page") heading. */
+.md-nav--secondary .md-nav__title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ *
+ * Typography — mono headings, subtle underlined links.                *
+ * ------------------------------------------------------------------ */
+.md-typeset h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 0;
+  color: var(--md-default-fg-color);
+  margin-bottom: 0.3rem;
+}
+.md-typeset h2 {
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+  margin-top: 2.4em;
+  padding-top: 1em;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset h3 {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+.md-typeset h4 {
+  font-weight: 700;
+}
+
+/* Inline links: thin underline, accent on hover. */
+.md-typeset a {
+  color: var(--md-default-fg-color);
+  text-decoration: underline;
+  text-decoration-color: var(--gn-border-strong);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 100ms ease, text-decoration-color 100ms ease;
+}
+.md-typeset a:hover {
+  color: var(--md-accent-fg-color);
+  text-decoration-color: var(--md-accent-fg-color);
+}
+.md-typeset .headerlink,
+.md-nav__link,
+.md-typeset .md-button {
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Surfaces — everything square and flat.                              *
+ * ------------------------------------------------------------------ */
+.md-typeset pre > code,
+.md-typeset code {
+  border-radius: 0;
+}
+.md-typeset code {
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+}
+[data-md-color-scheme="slate"] .md-typeset .highlight,
+[data-md-color-scheme="slate"] .md-typeset pre > code {
+  border: 1px solid var(--gn-border);
+}
+
+.md-typeset table:not([class]) {
+  border: 1px solid var(--gn-border);
+  border-radius: 0;
+  overflow: hidden;
+  font-size: 0.72rem;
+}
+.md-typeset table:not([class]) th {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background: rgba(248, 249, 250, 0.04);
+}
+
+.md-typeset img {
+  border-radius: 0;
+}
+.md-typeset figure img,
+.md-typeset p > img:not(.gn-hero__logo) {
+  border: 1px solid var(--gn-border);
+  box-shadow: none;
+}
+.md-typeset figcaption {
+  color: var(--md-default-fg-color--light);
+  font-size: 0.7rem;
+  margin-top: 0.4em;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 0;
+  border: 1px solid var(--gn-border);
+  border-left-width: 3px;
+  font-size: 0.72rem;
+  box-shadow: none;
+}
+
+/* Content buttons flat. */
+.md-typeset .md-button {
+  border-radius: 0;
+}
+
+/* mkdocstrings signatures. */
+.md-typeset .doc-signature > pre {
+  border-radius: 0;
+}
+
+/* ================================================================== *
+ * Home hero — flat, monospace, always-dark so the light logo reads.   *
+ * ================================================================== */
+.gn-hero {
+  position: relative;
+  text-align: center;
+  margin: 0.5rem 0 2.5rem;
+  padding: 3.2rem 1.5rem 3rem;
+  overflow: hidden;
+  /* Flat fill, no gradient and no grid texture: the animation is the only
+     thing in here that should attract the eye. */
+  background: var(--gn-carbon);
+  border: 1px solid var(--gn-border);
+}
+
+.gn-hero__logo {
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 0.6rem;
+  border: none !important;
+  box-shadow: none !important;
+  /* Flat ground, so no shadow is needed to separate the mark. */
+  filter: none;
+}
+
+.md-typeset .gn-hero__title {
+  margin: 0.2rem 0 0;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: var(--gn-snow);
+  border-top: none;
+  padding-top: 0;
+}
+.md-typeset .gn-hero__title .headerlink {
+  display: none;
+}
+
+.gn-hero__tagline {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(248, 249, 250, 0.68);
+  max-width: 38rem;
+  margin: 1rem auto 1.5rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Methodology animation.                                              *
+ *                                                                      *
+ * Three beats on one 9s loop, telling the library's actual argument:    *
+ *   1. eight seeds per model, scattered -- a run is a distribution      *
+ *   2. they collapse into a mean with a t-CI -- what the report emits   *
+ *   3. a clique bar joins all four -- no difference is detected         *
+ *                                                                      *
+ * Every element shares the 9s period so the beats stay in phase; the    *
+ * per-element --s / --m / --k custom properties only stagger within a   *
+ * beat. Geometry is chosen so the four intervals genuinely overlap,     *
+ * because the figure must not assert a result the data would not.       *
+ * ------------------------------------------------------------------ */
+.gn-anim__wrap {
+  margin: 2.4rem auto 0;
+  max-width: 30rem;
+  text-align: center;
+}
+.gn-anim {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.gn-anim line,
+.gn-anim circle {
+  vector-effect: non-scaling-stroke;
+}
+.gn-anim__axis {
+  stroke: rgba(248, 249, 250, 0.16);
+  stroke-width: 1;
+}
+.gn-anim__seed {
+  stroke: var(--gn-pale-2);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: gn-seed 9s linear infinite;
+  animation-delay: calc(var(--m) * 0.18s + var(--s) * 0.07s);
+}
+.gn-anim__whisker,
+.gn-anim__cap {
+  stroke: var(--gn-snow);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gn-whisker 9s ease-out infinite;
+  animation-delay: calc(var(--m) * 0.12s);
+}
+.gn-anim__cap {
+  animation-name: gn-cap;
+}
+.gn-anim__mean {
+  fill: var(--gn-snow);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gn-mean 9s cubic-bezier(0.2, 1.6, 0.4, 1) infinite;
+  animation-delay: calc(var(--m) * 0.12s);
+}
+.gn-anim__clique {
+  stroke: var(--gn-pale-2);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: gn-clique 9s ease-out infinite;
+}
+
+/* Seeds: fade in staggered, hold, then hand over to the interval. */
+@keyframes gn-seed {
+  0%, 4%    { opacity: 0; }
+  10%, 24%  { opacity: 0.85; }
+  30%, 100% { opacity: 0; }
+}
+/* Interval: grows from the mean outwards once the seeds have gone. */
+@keyframes gn-whisker {
+  0%, 26%   { transform: scaleY(0); opacity: 0; }
+  36%, 88%  { transform: scaleY(1); opacity: 1; }
+  96%, 100% { transform: scaleY(1); opacity: 0; }
+}
+@keyframes gn-cap {
+  0%, 30%   { transform: scaleX(0); opacity: 0; }
+  40%, 88%  { transform: scaleX(1); opacity: 1; }
+  96%, 100% { transform: scaleX(1); opacity: 0; }
+}
+@keyframes gn-mean {
+  0%, 30%   { opacity: 0; transform: scale(0.2); }
+  40%, 88%  { opacity: 1; transform: scale(1); }
+  96%, 100% { opacity: 0; transform: scale(1); }
+}
+/* Clique bar: sweeps left to right, the last beat. */
+@keyframes gn-clique {
+  0%, 48%   { transform: scaleX(0); opacity: 0; }
+  50%       { opacity: 1; }
+  62%, 88%  { transform: scaleX(1); opacity: 1; }
+  96%, 100% { transform: scaleX(1); opacity: 0; }
+}
+
+/* One caption line, cross-fading through the three beats. */
+.gn-anim__caption {
+  position: relative;
+  display: block;
+  height: 1.2rem;
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: rgba(248, 249, 250, 0.55);
+}
+.gn-anim__step {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: gn-step 9s ease-in-out infinite;
+  animation-delay: calc(var(--k) * 3s);
+}
+@keyframes gn-step {
+  0%       { opacity: 0; }
+  4%, 26%  { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
+/* Respect a stated preference for less motion: show the finished figure,
+   which is the informative state, rather than an empty frame. */
+@media (prefers-reduced-motion: reduce) {
+  .gn-anim__seed { animation: none; opacity: 0.28; }
+  .gn-anim__whisker,
+  .gn-anim__cap,
+  .gn-anim__mean,
+  .gn-anim__clique { animation: none; opacity: 1; transform: none; }
+  .gn-anim__step { animation: none; opacity: 0; }
+  .gn-anim__step:last-child { opacity: 1; }
+}
+
+/* Flat, terminal-style hero buttons. */
+.gn-hero .md-button {
+  margin: 0.3rem 0.35rem;
+  border-radius: 0;
+  font-weight: 700;
+  box-shadow: none;
+  transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
+}
+.gn-hero .md-button--primary {
+  background: var(--gn-pale-2);
+  border-color: var(--gn-pale-2);
+  color: var(--gn-carbon);
+}
+.gn-hero .md-button--primary:hover {
+  background: var(--gn-snow);
+  border-color: var(--gn-snow);
+  color: var(--gn-carbon);
+}
+.gn-hero .md-button:not(.md-button--primary) {
+  color: var(--gn-snow);
+  border-color: rgba(248, 249, 250, 0.32);
+}
+.gn-hero .md-button:not(.md-button--primary):hover {
+  background: var(--gn-snow);
+  border-color: var(--gn-snow);
+  color: var(--gn-carbon);
+}
+
+.gn-hero + h2 {
+  border-top: none;
+  margin-top: 1rem;
+  padding-top: 0;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .gn-hero { padding: 2.4rem 1rem; }
+  .gn-hero__logo { width: 80px; height: 80px; }
+  .gn-anim__wrap { max-width: 100%; margin-top: 1.8rem; }
+  .md-typeset .gn-hero__title { font-size: 2.2rem; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Feature grid — flat bordered cards.                                 *
+ * ------------------------------------------------------------------ */
+.gn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1px;
+  margin: 1.5rem 0;
+  background: var(--gn-border);
+  border: 1px solid var(--gn-border);
+}
+.gn-card {
+  padding: 1.1rem 1.25rem;
+  background: var(--md-default-bg-color);
+  transition: background-color 120ms ease;
+}
+.gn-card:hover {
+  background-color: rgba(248, 249, 250, 0.03);
+}
+[data-md-color-scheme="default"] .gn-card:hover {
+  background-color: rgba(33, 37, 41, 0.02);
+}
+.gn-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.gn-card p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+}
+.gn-card a {
+  text-decoration: none;
+}
+.gn-card a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Critical-difference figures on the home page. */
+.gn-cd {
+  max-width: 46rem;
+  margin: 1.5rem auto;
+}

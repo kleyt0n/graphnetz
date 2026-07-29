@@ -22,9 +22,15 @@ from graphnetz.datasets._netz import Netz
 from graphnetz.datasets._ogb import load_ogb_node
 
 
-def product_space(root: str) -> Netz:
-    """Product space of international trade (economic complexity)."""
-    return Netz(root=root, dataset_name="product_space", network_name="product_space")
+def product_space(root: str, network_name: str = "SITC") -> Netz:
+    """Product space of international trade (economic complexity).
+
+    Netzschleuder publishes this dataset as two networks rather than one:
+    ``SITC`` (Standard International Trade Classification, 774 products) and
+    ``HS`` (Harmonized System, 866 products). ``SITC`` is the default because
+    it is the classification used by the original product-space analysis.
+    """
+    return Netz(root=root, dataset_name="product_space", network_name=network_name)
 
 
 def board_directors(root: str, network_name: str = "net1m_2002-05-01") -> Netz:

@@ -25,7 +25,7 @@ COLUMN_INCHES: dict[str, float] = {
 # Nature-style conventions: soft-black ink (not pure #000), normal-weight
 # left-aligned panel titles, no minor-tick clutter, hairline grids, and
 # generous label/tick padding so nothing touches.
-_INK = "0.15"
+_INK = "#212529"  # BRAND_COLORS["carbon_black"]
 
 NATURE_RC: dict[str, object] = {
     "font.family": "sans-serif",
@@ -61,7 +61,7 @@ NATURE_RC: dict[str, object] = {
     "ytick.direction": "out",
     "lines.linewidth": 1.4,
     "lines.markersize": 4.0,
-    "grid.color": "0.88",
+    "grid.color": "#dee2e6",  # alabaster_grey
     "grid.linewidth": 0.5,
     "legend.frameon": False,
     "legend.handlelength": 1.6,
@@ -78,17 +78,69 @@ NATURE_RC: dict[str, object] = {
     "ps.fonttype": 42,
 }
 
-# Ordered for maximum adjacent contrast (bright / very dark / light / mid)
-# so consecutive series stay distinguishable even in greyscale print.
+BRAND_COLORS: dict[str, str] = {
+    "bright_snow": "#f8f9fa",
+    "platinum": "#e9ecef",
+    "alabaster_grey": "#dee2e6",
+    "pale_slate": "#ced4da",
+    "pale_slate_2": "#adb5bd",
+    "slate_grey": "#6c757d",
+    "iron_grey": "#495057",
+    "gunmetal": "#343a40",
+    "carbon_black": "#212529",
+}
+"""The project's identity palette: a nine-step neutral ramp, light to dark.
+
+Used by the documentation theme and the logo so the website and the repository
+read as one thing.  Being a symmetric ramp, it inverts cleanly between the two
+colour schemes; contrast against the two end steps decides each role:
+
+| Colour | Hex | On `bright_snow` | On `carbon_black` |
+| --- | --- | --: | --: |
+| `carbon_black` | `#212529` | 14.6:1 | — |
+| `gunmetal` | `#343a40` | 10.9:1 | — |
+| `iron_grey` | `#495057` | 7.8:1 | — |
+| `slate_grey` | `#6c757d` | 4.5:1 | 3.3:1 |
+| `pale_slate_2` | `#adb5bd` | 2.0:1 | 7.4:1 |
+| `pale_slate` | `#ced4da` | 1.4:1 | 10.3:1 |
+| `alabaster_grey` | `#dee2e6` | 1.2:1 | 11.9:1 |
+| `platinum` | `#e9ecef` | 1.1:1 | 13.0:1 |
+| `bright_snow` | `#f8f9fa` | — | 14.6:1 |
+
+`slate_grey` is the pivot: the only step that clears 4.5:1 on light *and* 3:1
+on dark, so it serves as muted prose in the light scheme and as borders and
+icons in the dark one.  The three darkest steps are body text on light and the
+four lightest are body text on dark; each is surfaces-only on the other side.
+"""
+
 NATURE_COLORS: tuple[str, ...] = (
-    "#0466c8",  # Smart Blue
-    "#001845",  # Prussian Blue 2
-    "#979dac",  # Lavender Grey
-    "#33415c",  # Twilight Indigo
-    "#5c677d",  # Blue Slate
-    "#023e7d",  # Regal Navy
-    "#7d8597",  # Slate Grey
+    "#212529",  # Carbon Black   14.6:1
+    "#6c757d",  # Slate Grey      4.5:1
+    "#343a40",  # Gunmetal       10.9:1
+    "#495057",  # Iron Grey       7.8:1
+    "#adb5bd",  # Pale Slate 2    2.0:1  -- fills only, see below
+    "#ced4da",  # Pale Slate      1.4:1  -- fills only
+    "#dee2e6",  # Alabaster Grey  1.2:1  -- fills only
 )
+"""Series colours: seven steps of `BRAND_COLORS`, text-safe steps first.
+
+Drawn from the identity ramp so figures, the documentation and the logo read as
+one thing. A monochrome palette gives up hue, which is what normally separates
+series, and the ordering has to earn that back without making anything illegible.
+
+The first four steps all clear 4.5:1 against the page, because a series colour
+is not only a fill: it tints a 4 pt marker and, in a critical-difference diagram,
+the model's own label. The light half of the ramp cannot do either job --- at
+2.0:1 and below a label is unreadable and a marker vanishes --- so those three
+steps come last and are reached only by a plot with five or more series, where
+they appear as bar fills stroked in ink.
+
+Two consequences follow. Fills from the light half need that dark outline or they
+have no boundary on the page, which is why `plot_grouped_bars` strokes in ink
+rather than in white. And luminance is a weaker cue than hue, so anything that
+must be read per-series at a glance should carry a marker or a label as well,
+never colour alone.
+"""
 
 # Human-readable axis/legend labels for the metric keys recorded in
 # training histories.  Unknown keys fall back to a cleaned-up version of
@@ -296,11 +348,14 @@ def plot_grouped_bars(
             width=width,
             label=s,
             color=NATURE_COLORS[j % len(NATURE_COLORS)],
-            edgecolor="white",
-            linewidth=0.4,
+            # Ink, not white: the palette is monochrome, so a bar taken from the
+            # light half of the ramp has almost no contrast with the page and
+            # a white stroke would erase its outline instead of defining it.
+            edgecolor=_INK,
+            linewidth=0.5,
         )
         if any(e > 0 for e in es):
-            ax.errorbar(xs, ys, yerr=es, fmt="none", ecolor="0.2", elinewidth=0.8, capsize=2.0)
+            ax.errorbar(xs, ys, yerr=es, fmt="none", ecolor=_INK, elinewidth=0.8, capsize=2.0)
         if annotate:
             # Place the value above the error-bar cap (not the bar top) so
             # the text never collides with the whiskers, rotated upright so
@@ -370,6 +425,7 @@ def plot_grouped_bars(
 
 
 __all__ = [
+    "BRAND_COLORS",
     "COLUMN_INCHES",
     "NATURE_COLORS",
     "NATURE_RC",

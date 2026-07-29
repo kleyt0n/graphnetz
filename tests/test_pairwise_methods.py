@@ -58,7 +58,9 @@ def test_pairwise_default_is_paired_t() -> None:
     report = _report_with_two_models()
     df = report.pairwise()
     assert isinstance(df, pd.DataFrame)
-    assert set(df.columns) == {"task", "model_a", "model_b", "mean_diff", "p_raw", "p_holm", "significant"}
+    # Required columns, checked as a subset so adding a reported quantity
+    # (e.g. the paired effect size) does not break the contract.
+    assert {"task", "model_a", "model_b", "mean_diff", "p_raw", "p_holm", "significant"} <= set(df.columns)
     # Two tasks x one comparison each.
     assert len(df) == 2
     # A is consistently better than B; mean_diff should be positive on both rows.

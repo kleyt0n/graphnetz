@@ -52,7 +52,7 @@ def celegans(root: str) -> Netz:
     return Netz(root=root, dataset_name="celegans_metabolic", network_name="celegans_metabolic")
 
 
-def budapest_connectome(root: str, network_name: str = "100m_avg") -> Netz:
+def budapest_connectome(root: str, network_name: str = "all_20k") -> Netz:
     """Budapest reference connectome (mean connectivity across 100 subjects)."""
     return Netz(root=root, dataset_name="budapest_connectome", network_name=network_name)
 
@@ -62,9 +62,14 @@ def hospital_contacts(root: str) -> Netz:
     return Netz(root=root, dataset_name="sp_hospital", network_name="sp_hospital")
 
 
-def high_school_contacts(root: str) -> Netz:
-    """Sociopatterns high-school contact network."""
-    return Netz(root=root, dataset_name="sp_high_school", network_name="sp_high_school")
+def high_school_contacts(root: str, network_name: str = "proximity") -> Netz:
+    """Sociopatterns high-school contact network.
+
+    The dataset bundles four relations among the same students; ``proximity`` is
+    the face-to-face contact network, the others being reported diaries, a
+    friendship survey and Facebook ties.
+    """
+    return Netz(root=root, dataset_name="sp_high_school", network_name=network_name)
 
 
 def peptides_func(root: str, split: str = "train") -> LRGBDataset:

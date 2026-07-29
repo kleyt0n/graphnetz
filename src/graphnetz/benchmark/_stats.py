@@ -17,6 +17,27 @@ _METRIC_KEYS: tuple[str, ...] = (
 )
 _LOWER_IS_BETTER: frozenset[str] = frozenset({"val_mae", "train_loss"})
 
+# Reported metric -> the validation metric that may legitimately select its
+# epoch. Only pairs that live on *different* splits appear here: selecting the
+# epoch on the same series that is then reported is optimistic bias, not
+# checkpoint selection, so ``val_acc`` / ``val_mae`` have no entry.
+_SELECTION_SOURCE: dict[str, str] = {
+    "test_acc": "val_acc",
+    "test_auc": "val_auc",
+}
+
+EPOCH_SELECTIONS: frozenset[str] = frozenset({"final", "best_val"})
+"""How to reduce a per-epoch history to one number.
+
+``"final"``
+    The value at the last epoch -- a fixed-epoch protocol, and the default so
+    that existing reports keep their meaning.
+``"best_val"``
+    The value at the epoch that optimises the paired *validation* metric, i.e.
+    honest checkpoint selection. Requires the history to carry both a
+    validation and a held-out series (see `_SELECTION_SOURCE`).
+"""
+
 # --------------------------------------------------------------------------- #
 # Statistical helpers
 # --------------------------------------------------------------------------- #
@@ -140,3 +161,117 @@ def _auto_metric_key(history: Mapping[str, Any]) -> str:
 def _final_metric(history: Mapping[str, list[float]]) -> tuple[str, float]:
     key = _auto_metric_key(history)
     return key, history[key][-1]
+
+
+# --------------------------------------------------------------------------- #
+# Epoch selection
+# --------------------------------------------------------------------------- #
+
+
+def _selection_reason(history: Mapping[str, Any], key: str) -> str | None:
+    """Why ``best_val`` is unavailable for this history, or ``None`` if it is.
+
+    Kept separate from `_selected_index` so callers can *ask* whether a
+    task supports checkpoint selection without triggering an exception.
+    """
+    source = _SELECTION_SOURCE.get(key)
+    if source is None:
+        return (
+            f"metric {key!r} is itself a validation metric; selecting its epoch "
+            f"on the same series and then reporting it would be optimistically "
+            f"biased. The trainer records no held-out series for this task."
+        )
+    if source not in history:
+        return f"history has {sorted(history)} and lacks the {source!r} series needed to select an epoch"
+    return None
+
+
+def _selected_index(history: Mapping[str, list[float]], key: str, selection: str) -> int:
+    """Index into ``history[key]`` chosen by ``selection``.
+
+    ``"best_val"`` picks the epoch optimising the *paired validation* series
+    and returns that index, so the reported value comes from a split that was
+    not used to choose it.
+    """
+    if selection == "final":
+        return -1
+    if selection not in EPOCH_SELECTIONS:
+        msg = f"Unknown epoch_selection {selection!r}; choices: {sorted(EPOCH_SELECTIONS)}"
+        raise ValueError(msg)
+    reason = _selection_reason(history, key)
+    if reason is not None:
+        msg = f"epoch_selection='best_val' unavailable: {reason}"
+        raise ValueError(msg)
+    source = _SELECTION_SOURCE[key]
+    values = np.asarray(history[source], dtype=float)
+    if values.size == 0:
+        msg = f"epoch_selection='best_val' unavailable: {source!r} series is empty"
+        raise ValueError(msg)
+    return int(values.argmin() if source in _LOWER_IS_BETTER else values.argmax())
+
+
+def _selected_value(history: Mapping[str, list[float]], key: str, selection: str) -> tuple[float, int]:
+    """The reduced metric plus the (1-based) epoch it was taken from."""
+    idx = _selected_index(history, key, selection)
+    series = history[key]
+    return float(series[idx]), (len(series) if idx == -1 else idx + 1)
+
+
+# --------------------------------------------------------------------------- #
+# Rank aggregation across tasks
+# --------------------------------------------------------------------------- #
+
+
+def _rank_rows(
+    finals: Mapping[str, Mapping[str, list[float]]],
+    directions: Mapping[str, bool],
+    models: list[str],
+    tasks: list[str],
+) -> np.ndarray:
+    """Per-task ranks of the seed means, rank 1 = best, ties averaged.
+
+    ``directions[task]`` is True when lower is better for that task, so a
+    benchmark mixing accuracy with MAE ranks correctly in one table.
+    """
+    rows: list[np.ndarray] = []
+    for task in tasks:
+        means = np.array([float(np.mean(finals[task][m])) for m in models])
+        sign = 1.0 if directions[task] else -1.0
+        rows.append(stats.rankdata(sign * means, method="average"))
+    return np.asarray(rows, dtype=float)
+
+
+def _nemenyi_cd(k: int, n: int, alpha: float = 0.05) -> float:
+    """Nemenyi critical difference ``q_alpha sqrt(k(k+1)/6N)``."""
+    from scipy.stats import studentized_range
+
+    if k < 2 or n < 1:
+        return float("nan")
+    q = float(studentized_range.ppf(1 - alpha, k, np.inf) / np.sqrt(2))
+    return q * float(np.sqrt(k * (k + 1) / (6 * n)))
+
+
+def _friedman_chi2(ranks: np.ndarray) -> float:
+    """Friedman statistic from a ``[n_tasks, k]`` rank table."""
+    n, k = ranks.shape
+    avg = ranks.mean(axis=0)
+    return float((12.0 * n) / (k * (k + 1)) * (float(np.sum(avg**2)) - k * (k + 1) ** 2 / 4.0))
+
+
+def _normalized_weights(weights: Mapping[str, float] | None, tasks: list[str]) -> np.ndarray:
+    """Task weights as a length-``n_tasks`` array summing to ``n_tasks``.
+
+    Normalising to ``n_tasks`` (not 1) keeps a weighted mean rank on the same
+    scale as the uniform one, so the two are directly comparable on a diagram.
+    """
+    if weights is None:
+        return np.ones(len(tasks), dtype=float)
+    w = np.array([float(weights.get(t, 0.0)) for t in tasks], dtype=float)
+    if np.any(w < 0):
+        msg = "task weights must be non-negative"
+        raise ValueError(msg)
+    total = w.sum()
+    if total <= 0:
+        msg = "task weights must not all be zero"
+        raise ValueError(msg)
+    return w * (len(tasks) / total)

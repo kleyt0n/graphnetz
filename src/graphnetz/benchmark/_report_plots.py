@@ -1,7 +1,7 @@
-"""Plotting methods of :class:`BenchmarkReport`, split out as a mixin.
+"""Plotting methods of [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport], split out as a mixin.
 
 The mixin only references attributes/methods defined by
-:class:`~graphnetz.benchmark._report.BenchmarkReport` (``histories``,
+[`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport] (``histories``,
 ``final_metrics``, ``_ci_half``, ``metric_name``, ``pairwise``); it exists
 purely to keep the statistics and the figure code in separate modules.
 """
@@ -15,7 +15,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
-from graphnetz.benchmark._stats import _LOWER_IS_BETTER, _auto_metric_key
+from graphnetz.benchmark._stats import (
+    _LOWER_IS_BETTER,
+    _auto_metric_key,
+    _friedman_chi2,
+    _nemenyi_cd,
+)
 from graphnetz.plotting import NATURE_COLORS, plot_grouped_bars, set_plot_style
 
 if TYPE_CHECKING:
@@ -24,14 +29,30 @@ if TYPE_CHECKING:
 
 class _ReportPlotsMixin:
     if TYPE_CHECKING:
-        # Provided by :class:`~graphnetz.benchmark._report.BenchmarkReport`,
+        # Provided by [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport],
         # the only class that mixes this in. Declared type-only so mypy can
         # check the plot methods without a runtime dependency on the host.
         seeds: tuple[int, ...]
         histories: dict[str, dict[str, list[dict[str, list[float]]]]]
 
-        def final_metrics(self, key: str | None = ...) -> dict[str, dict[str, list[float]]]: ...
+        def final_metrics(
+            self,
+            key: str | None = ...,
+            *,
+            epoch_selection: str | None = ...,
+            strict: bool = ...,
+        ) -> dict[str, dict[str, list[float]]]: ...
         def metric_name(self) -> str: ...
+        def rank_table(self, *, epoch_selection: str | None = ..., strict: bool = ...) -> pd.DataFrame: ...
+        def mean_ranks(
+            self,
+            *,
+            aggregation: str = ...,
+            weights: Mapping[str, float] | None = ...,
+            groups: Mapping[str, str] | None = ...,
+            epoch_selection: str | None = ...,
+            strict: bool = ...,
+        ) -> pd.Series: ...
         def pairwise(self, alpha: float = ..., method: str | None = ...) -> pd.DataFrame: ...
         def _ci_half(self, values: np.ndarray, ci: float, method: str | None = ...) -> float: ...
 
@@ -483,6 +504,11 @@ class _ReportPlotsMixin:
         *,
         alpha: float = 0.05,
         title: str | None = None,
+        aggregation: str = "uniform",
+        weights: Mapping[str, float] | None = None,
+        groups: Mapping[str, str] | None = None,
+        epoch_selection: str | None = None,
+        strict: bool = True,
     ) -> tuple[plt.Figure, plt.Axes]:
         r"""Demšar critical-difference (CD) diagram.
 
@@ -495,16 +521,22 @@ class _ReportPlotsMixin:
 
         Only models present in *every* task are included.  Requires at
         least two tasks and at least two such models.
-        """
-        from scipy.stats import studentized_range
 
+        ``aggregation`` selects the task weighting (see
+        [`mean_ranks`][graphnetz.benchmark.BenchmarkReport.mean_ranks]).  **Only the default
+        ``"uniform"`` weighting has a Friedman/Nemenyi null**, so any other
+        choice draws the ranks without the ``CD`` reference and clique bars and
+        labels itself as a diagnostic -- a weighted mean rank must not be
+        compared against $CD_\alpha$.
+
+        ``epoch_selection`` overrides the report-level setting, so the diagram
+        can be redrawn under checkpoint selection without retraining.
+        """
         from graphnetz.plotting import COLUMN_INCHES
 
         set_plot_style()
-        finals = self.final_metrics()
-
-        common: set[str] = set.intersection(*[set(per.keys()) for per in finals.values()]) if finals else set()
-        if len(common) < 2 or len(finals) < 2:
+        table = self.rank_table(epoch_selection=epoch_selection, strict=strict)
+        if table.empty or table.shape[0] < 2 or table.shape[1] < 2:
             fig, ax = plt.subplots(figsize=(COLUMN_INCHES["single"], 1.6))
             ax.text(
                 0.5,
@@ -518,38 +550,33 @@ class _ReportPlotsMixin:
             ax.axis("off")
             return fig, ax
 
-        models = sorted(common)
-        tasks = sorted(finals)
-        means = np.array([[float(np.mean(finals[t][m])) for m in models] for t in tasks])
-        # Direction (lower-is-better) is detected *per task* so the CD
-        # diagram is correct on heterogeneous benchmarks where some tasks
-        # use accuracy (higher better) and others use loss (lower better).
-        rows: list[np.ndarray] = []
-        for i, task in enumerate(tasks):
-            sample = next(iter(self.histories[task].values()))[0]
-            task_metric = _auto_metric_key(sample)
-            sign = 1.0 if task_metric in _LOWER_IS_BETTER else -1.0
-            rows.append(stats.rankdata(sign * means[i], method="average"))
-        ranks = np.array(rows)
-        avg_ranks = ranks.mean(axis=0)
-        # Ranks are always lower-is-better by construction.
-
-        k = len(models)
-        n = len(tasks)
+        weighted = aggregation != "uniform"
+        series = self.mean_ranks(
+            aggregation=aggregation,
+            weights=weights,
+            groups=groups,
+            epoch_selection=epoch_selection,
+            strict=strict,
+        )
+        models = list(table.columns)
+        avg_ranks = np.array([float(series[m]) for m in models])
+        ranks = table.to_numpy(dtype=float)
+        n, k = ranks.shape
         # Friedman omnibus: only interpret Nemenyi after the global null is
         # rejected (Demšar, 2006). We compute it from the same rank table.
-        avg_for_chi2 = ranks.mean(axis=0)
-        chi2 = (12.0 * n) / (k * (k + 1)) * (float(np.sum(avg_for_chi2**2)) - k * (k + 1) ** 2 / 4.0)
+        chi2 = _friedman_chi2(ranks)
         friedman_p = float(stats.chi2.sf(chi2, df=k - 1))
         friedman_rejected = friedman_p < alpha
-        q = float(studentized_range.ppf(1 - alpha, k, np.inf) / np.sqrt(2))
-        cd = q * float(np.sqrt(k * (k + 1) / (6 * n)))
+        cd = _nemenyi_cd(k, n, alpha)
 
         order = np.argsort(avg_ranks)
         sorted_models = [models[i] for i in order]
         sorted_ranks = avg_ranks[order]
 
         # Maximal cliques: contiguous runs in rank order whose span < CD.
+        # A weighted aggregation has no Friedman/Nemenyi null, so no clique bar
+        # and no CD reference are drawn -- claiming either would be exactly the
+        # unearned significance this framework exists to prevent.
         cliques_raw: list[tuple[int, int]] = []
         i = 0
         while i < k:
@@ -565,6 +592,8 @@ class _ReportPlotsMixin:
                 continue
             cliques = [(c, d) for c, d in cliques if not (a <= c and d <= b)]
             cliques.append((a, b))
+        if weighted:
+            cliques = []
 
         # Layout coordinates.
         fig_w = COLUMN_INCHES["double"]
@@ -621,35 +650,47 @@ class _ReportPlotsMixin:
             )
             bar_y -= 0.06
 
-        # CD scale at the top.
+        # CD scale at the top -- uniform weighting only.
         cd_y = label_y_top + max(half - 1, 0) * label_y_step + 0.22
-        ax.plot([x_min, x_min + cd], [cd_y, cd_y], color="black", linewidth=1.0)
-        ax.plot([x_min, x_min], [cd_y - 0.025, cd_y + 0.025], color="black", linewidth=1.0)
-        ax.plot(
-            [x_min + cd, x_min + cd],
-            [cd_y - 0.025, cd_y + 0.025],
-            color="black",
-            linewidth=1.0,
-        )
-        ax.text(
-            x_min + cd / 2,
-            cd_y + 0.04,
-            rf"CD = {cd:.3f} (Nemenyi, $\alpha={alpha}$, $k={k}$, $N={n}$)",
-            ha="center",
-            va="bottom",
-            fontsize=8,
-        )
-        friedman_color = "0.15" if friedman_rejected else "0.4"
-        ax.text(
-            x_min + cd / 2,
-            cd_y + 0.18,
-            rf"Friedman $\chi^2_{{{k - 1}}} = {chi2:.2f}$, $p = {friedman_p:.3g}$"
-            + (" (reject)" if friedman_rejected else " (do not reject)"),
-            ha="center",
-            va="bottom",
-            fontsize=7,
-            color=friedman_color,
-        )
+        if weighted:
+            ax.text(
+                (x_min + x_max) / 2,
+                cd_y + 0.04,
+                f"{aggregation}-weighted mean rank -- diagnostic only, "
+                r"no Nemenyi $CD_\alpha$ applies",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                color="0.3",
+            )
+        else:
+            ax.plot([x_min, x_min + cd], [cd_y, cd_y], color="black", linewidth=1.0)
+            ax.plot([x_min, x_min], [cd_y - 0.025, cd_y + 0.025], color="black", linewidth=1.0)
+            ax.plot(
+                [x_min + cd, x_min + cd],
+                [cd_y - 0.025, cd_y + 0.025],
+                color="black",
+                linewidth=1.0,
+            )
+            ax.text(
+                x_min + cd / 2,
+                cd_y + 0.04,
+                rf"CD = {cd:.3f} (Nemenyi, $\alpha={alpha}$, $k={k}$, $N={n}$)",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+            friedman_color = "0.15" if friedman_rejected else "0.4"
+            ax.text(
+                x_min + cd / 2,
+                cd_y + 0.18,
+                rf"Friedman $\chi^2_{{{k - 1}}} = {chi2:.2f}$, $p = {friedman_p:.3g}$"
+                + (" (reject)" if friedman_rejected else " (do not reject)"),
+                ha="center",
+                va="bottom",
+                fontsize=7,
+                color=friedman_color,
+            )
 
         # Direction caption below all clique bars.
         caption_y = bar_y - 0.04

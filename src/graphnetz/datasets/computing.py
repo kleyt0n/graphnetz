@@ -21,8 +21,13 @@ def topology(root: str) -> Netz:
     return Netz(root=root, dataset_name="topology", network_name="topology")
 
 
-def route_views(root: str, network_name: str = "20030701") -> Netz:
-    """Route Views BGP snapshot."""
+def route_views(root: str, network_name: str = "20000102") -> Netz:
+    """Route Views BGP snapshot.
+
+    The catalogue holds 733 daily snapshots spanning 1997-11-08 to 2000-01-02,
+    named by date; the default is the last one (6,474 ASes, 13,895 links). The
+    previous default, ``20030701``, is outside that range and always 404'd.
+    """
     return Netz(root=root, dataset_name="route_views", network_name=network_name)
 
 
