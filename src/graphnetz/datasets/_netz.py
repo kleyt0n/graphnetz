@@ -62,7 +62,7 @@ class Netz(InMemoryDataset):
         self.network_url = f"{NETZ_FILES}/{dataset_name}/files/{network_name}.csv.zip"
         # ``multigraph=True`` preserves parallel edges and self-loops (needed for
         # multiplex / transit / airline networks); the default collapses them
-        # via :class:`networkx.Graph` for compatibility with existing PyG flows.
+        # via `networkx.Graph` for compatibility with existing PyG flows.
         self.multigraph = multigraph
         super().__init__(root, transform, pre_transform)
         self.load(self.processed_paths[0])

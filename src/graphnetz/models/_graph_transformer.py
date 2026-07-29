@@ -8,7 +8,7 @@ class GraphTransformer(torch.nn.Module):
 
     References
     ----------
-    .. [Shi2021] Shi, Y. et al. (2021). "Masked Label Prediction: Unified Message
+    - **Shi2021**: Shi, Y. et al. (2021). "Masked Label Prediction: Unified Message
            Passing Model for Semi-Supervised Classification." IJCAI.
     """
 

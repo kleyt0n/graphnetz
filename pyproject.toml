@@ -37,9 +37,9 @@ chem = ["rdkit>=2023.9"]
 ogb = ["ogb>=1.3"]
 
 [project.urls]
-Documentation = "https://github.com/quant-sci/graphnetz#readme"
-Issues = "https://github.com/quant-sci/graphnetz/issues"
-Source = "https://github.com/quant-sci/graphnetz"
+Documentation = "https://github.com/Kleyt0n/graphnetz#readme"
+Issues = "https://github.com/Kleyt0n/graphnetz/issues"
+Source = "https://github.com/Kleyt0n/graphnetz"
 
 [dependency-groups]
 dev = [
@@ -47,14 +47,17 @@ dev = [
   "pytest-cov>=5.0",
   "ruff>=0.6",
   "mypy>=1.10",
+  # Independent reference for the statistical layer's cross-check tests
+  # (tests/test_stats_reference.py). Optional: those tests skip without it.
+  "statsmodels>=0.14",
 ]
 docs = [
-  "sphinx>=7.3",
-  "furo>=2024.5",
-  "myst-parser>=3.0",
-  "sphinx-copybutton>=0.5",
-  "sphinx-design>=0.6",
-  "linkify-it-py>=2.0",
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.26",
+  "mkdocs-gen-files>=0.5",
+  "mkdocs-literate-nav>=0.6",
+  "pymdown-extensions>=10.9",
 ]
 
 [tool.hatch.version]
@@ -71,7 +74,10 @@ package = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra"
+addopts = "-ra -m 'not network'"
+markers = [
+  "network: needs internet; deselected by default (run with -m network)",
+]
 
 [tool.coverage.run]
 source = ["src/graphnetz"]
@@ -90,6 +96,9 @@ python_version = "3.10"
 strict = false
 ignore_missing_imports = true
 files = ["src/graphnetz"]
+# The usability baseline is illustrative *user* code written the way a
+# practitioner would write it, so it is deliberately untyped.
+exclude = ["paper/experiments/usability_variants/"]
 
 [tool.ruff]
 line-length = 120

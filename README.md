@@ -1,15 +1,18 @@
 <p align="center">
-  <img src="assets/logo-banner.svg" alt="GraphNetz" width="460">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-banner-dark.svg">
+    <img src="assets/logo-banner.svg" alt="GraphNetz" width="460">
+  </picture>
 </p>
 
 <p align="center"><em>Statistically rigorous GNN benchmarking</em></p>
 
 <p align="center">
-  <a href="https://github.com/quant-sci/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-22333B?style=flat-square&labelColor=EAE0D5"></a>
-  <a href="https://graphnetz.readthedocs.io/en/latest/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-22333B?style=flat-square&labelColor=EAE0D5"></a>
-  <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-22333B?style=flat-square&labelColor=EAE0D5"></a>
-  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-22333B?style=flat-square&labelColor=EAE0D5"></a>
-  <a href="https://arxiv.org/"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-22333B?style=flat-square&labelColor=EAE0D5"></a>
+  <a href="https://github.com/Kleyt0n/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://kleyt0n.github.io/graphnetz/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://arxiv.org/pdf/2605.09099"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-212529?style=flat-square&labelColor=e9ecef"></a>
 </p>
 
 ---
@@ -27,7 +30,7 @@ Most GNN benchmarks report point-estimate accuracies on a handful of citation gr
 
 The catalogue is organised along a **category × task** taxonomy: 
 
-- 63 dataset loaders across 10 scientific categories
+- 62 dataset loaders across 10 scientific categories
 - 4 task types (node classification, graph classification, graph regression, link prediction)
 - 5 canonical architectures (GCN, GAT, GIN, GraphSAGE, Graph Transformer) plug into every tasl via a small set of task adapters;
 
@@ -42,7 +45,7 @@ pip install graphnetz
 For local development:
 
 ```bash
-git clone https://github.com/quant-sci/graphnetz
+git clone https://github.com/Kleyt0n/graphnetz
 cd graphnetz
 uv sync --group dev
 ```
@@ -102,7 +105,7 @@ every cell carries a real test-time metric — there is no self-supervised
 | Infrastructure | 6 | LP | power grid, EuroRoad, US roads, EU airlines, London transport, urban streets |
 | Finance | 5 | NC, LP | Elliptic Bitcoin, product space, board of directors, US patents, ogbn-products† |
 | Computing | 4 | LP | Internet AS, Internet topology, AS-Skitter, route views |
-| Vision | 5 | GC, NC | MNIST/CIFAR-10 superpixels, ModelNet10/40, ShapeNet |
+| Vision | 4 | GC | MNIST/CIFAR-10 superpixels, ModelNet10/40 |
 | Physics | 3 | GR, LP | QM9, ZINC, Ising lattice |
 | Security | 3 | GC, LP | MalNet-Tiny, 9/11 terrorists, train terrorists |
 
@@ -194,18 +197,6 @@ Worked examples live under `examples/`:
 - `02_knowledge.ipynb` — relational link prediction on FB15k-237 / WN18-RR
   using the DistMult decoder.
 
-## Reproducing the paper
-
-```bash
-PYTHONPATH=src uv run python paper/experiment.py   # train + cache + figures
-latexmk -pdf paper/main.tex                        # compile PDF
-```
-
-The script trains 5 architectures × 10 seeds across the 10 surviving
-categories, caches the histories under `paper/_cache_*.pkl`, and writes every
-figure (`paper/figures/`) and LaTeX table (`paper/tables/`) referenced by
-`paper/main.tex`. Total runtime on a recent laptop CPU is under 30 minutes.
-
 ## Contributing
 
 Pull requests welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first — the
@@ -216,6 +207,22 @@ be `ruff` clean.
 ```bash
 uv run pytest
 uv run ruff check
+```
+
+## Citation
+
+If GraphNetz is useful in your work, please cite the accompanying paper:
+
+```bibtex
+@misc{dacosta2026graphnetz,
+  title={GraphNetz: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation}, 
+  author={Kleyton da Costa and Bernardo Modenesi},
+  year={2026},
+  eprint={2605.09099},
+  archivePrefix={arXiv},
+  primaryClass={cs.CE},
+  url={https://arxiv.org/abs/2605.09099}, 
+}
 ```
 
 ## License

@@ -23,7 +23,7 @@ loaders and architectures are welcome; new evaluation shortcuts are not.
 ## Quick development loop
 
 ```bash
-git clone https://github.com/quant-sci/graphnetz
+git clone https://github.com/Kleyt0n/graphnetz
 cd graphnetz
 uv sync --group dev
 uv run pytest          # smoke tests
@@ -79,7 +79,7 @@ Adding a new task (e.g. `node_reg`, `temporal`) is a four-step change:
 4. Extend `_run_task` in `benchmark.py` with the dispatch branch.
 
 Then document the new task in [Dataset taxonomy →
-Tasks](datasets.md#task-type).
+Tasks](guide/datasets.md#tasks).
 
 ## Adding a statistical test
 
@@ -96,13 +96,27 @@ Stay inside `BenchmarkReport` (`benchmark.py`). New tests should:
 ## Building the docs
 
 ```bash
-uv sync --group docs
-uv run sphinx-build -W --keep-going -b html docs docs/_build/html
-open docs/_build/html/index.html
+uv sync --group docs --extra ogb
+uv run mkdocs serve            # live-reloading preview on localhost:8000
+uv run mkdocs build --strict   # what CI runs
 ```
 
-The `-W` flag treats warnings as errors; CI also runs the docs build, so
-keep it warning-clean.
+`--strict` turns MkDocs warnings into errors, so a broken cross-reference or a
+link to a page that no longer exists fails the build. CI runs the same command
+on every pull request — keep it warning-clean.
+
+The API reference is generated from docstrings by
+[mkdocstrings](https://mkdocstrings.github.io/), in **numpydoc** style. Two
+things to keep in mind when writing them:
+
+- Cross-reference other documented objects with autorefs syntax,
+  ``[`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport]`` — not Sphinx
+  roles like ``:class:`...` ``, which render as literal text.
+- Docstrings are rendered as Markdown, so use fenced code blocks, Markdown
+  tables and `$math$` rather than RST directives.
+
+The `ogb` extra is needed because mkdocstrings imports the package to read
+signatures, and the registry only exposes the OGB loaders when it is present.
 
 ## Code style
 

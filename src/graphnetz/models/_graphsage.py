@@ -8,7 +8,7 @@ class GraphSAGE(torch.nn.Module):
 
     References
     ----------
-    .. [Hamilton2017] Hamilton, W. L., Ying, R., & Leskovec, J. (2017).
+    - **Hamilton2017**: Hamilton, W. L., Ying, R., & Leskovec, J. (2017).
            "Inductive Representation Learning on Large Graphs." NeurIPS.
     """
 

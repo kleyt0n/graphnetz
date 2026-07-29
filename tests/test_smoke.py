@@ -45,8 +45,15 @@ def test_dataset_registry() -> None:
         "vision",
     }
     assert required.issubset(set(ld))
-    # ``ogb`` is only registered when the optional extra is installed.
-    assert ("ogb" in ld) == (importlib.util.find_spec("ogb") is not None)
+    # ``ogb`` loaders are folded into the registry only when the optional
+    # extra is installed; they live inside the domain categories rather than
+    # under an "ogb" key, so check for the loader names themselves.
+    ogb_loaders = {"ogbn_arxiv", "ogbl_collab", "ogbn_products", "ogbg_molhiv", "ogbg_molpcba"}
+    present = {name for per_cat in ld.values() for names in per_cat.values() for name in names}
+    has_ogb = importlib.util.find_spec("ogb") is not None
+    assert bool(ogb_loaders & present) == has_ogb
+    if has_ogb:
+        assert ogb_loaders <= present
     # Every category should expose at least one loader.
     assert all(ld.values())
 

@@ -14,6 +14,7 @@ _LAZY: dict[str, str] = {
     "BENCHMARK_TASKS": "graphnetz.benchmark",
     "BenchmarkReport": "graphnetz.benchmark",
     "ModelSpec": "graphnetz.benchmark",
+    "SearchSpace": "graphnetz.benchmark",
     "Task": "graphnetz.benchmark",
     "iter_benchmark_tasks": "graphnetz.benchmark",
     "plot_benchmark": "graphnetz.benchmark",
@@ -27,6 +28,7 @@ _LAZY: dict[str, str] = {
     "Netz": "graphnetz.datasets",
     "download_all_networks_netz": "graphnetz.datasets",
     "list_datasets": "graphnetz.datasets",
+    "validate_loaders": "graphnetz.datasets",
     # models
     "DGI": "graphnetz.models",
     "GAT": "graphnetz.models",
@@ -35,6 +37,7 @@ _LAZY: dict[str, str] = {
     "GraphSAGE": "graphnetz.models",
     "GraphTransformer": "graphnetz.models",
     # plotting
+    "BRAND_COLORS": "graphnetz.plotting",
     "figure": "graphnetz.plotting",
     "panel_label": "graphnetz.plotting",
     "plot_grouped_bars": "graphnetz.plotting",
@@ -72,6 +75,7 @@ if TYPE_CHECKING:
         BENCHMARK_TASKS,
         BenchmarkReport,
         ModelSpec,
+        SearchSpace,
         Task,
         iter_benchmark_tasks,
         plot_benchmark,
@@ -81,9 +85,16 @@ if TYPE_CHECKING:
         task_from_dataset,
         unregister_task,
     )
-    from graphnetz.datasets import CATEGORIES, Netz, download_all_networks_netz, list_datasets
+    from graphnetz.datasets import (
+        CATEGORIES,
+        Netz,
+        download_all_networks_netz,
+        list_datasets,
+        validate_loaders,
+    )
     from graphnetz.models import DGI, GAT, GCN, GIN, GraphSAGE, GraphTransformer
     from graphnetz.plotting import (
+        BRAND_COLORS,
         figure,
         panel_label,
         plot_grouped_bars,
@@ -103,6 +114,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "BENCHMARK_TASKS",
+    "BRAND_COLORS",
     "CATEGORIES",
     "DGI",
     "GAT",
@@ -113,6 +125,7 @@ __all__ = [
     "GraphTransformer",
     "ModelSpec",
     "Netz",
+    "SearchSpace",
     "Task",
     "__version__",
     "download_all_networks_netz",
@@ -137,4 +150,5 @@ __all__ = [
     "train_node_degree_regression",
     "train_relational_link_prediction",
     "unregister_task",
+    "validate_loaders",
 ]

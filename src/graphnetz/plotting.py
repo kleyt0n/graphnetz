@@ -1,8 +1,8 @@
 """Publication-ready matplotlib helpers.
 
 The defaults follow figures guidelines: sans-serif Helvetica/Arial,
-single-column width 89 mm and double-column 183 mm, thin axes, no top/right
-spines, restrained categorical palette, vector output at 300 dpi.
+generous single-/double-column widths, thin axes, no top/right spines,
+restrained categorical palette, vector output at 600 dpi.
 """
 
 from __future__ import annotations
@@ -14,63 +14,158 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Single-column = 89 mm; double-column = 183 mm; default golden-ratio aspect.
+# Enlarged from the 89 mm / 183 mm journal columns (3.504"/7.205") by ~1.4x
+# for bigger, higher-resolution figures while keeping the golden-ratio aspect.
 COLUMN_INCHES: dict[str, float] = {
-    "single": 3.504,
-    "double": 7.205,
+    "single": 5.0,
+    "double": 10.0,
 }
 
+
+# Nature-style conventions: soft-black ink (not pure #000), normal-weight
+# left-aligned panel titles, no minor-tick clutter, hairline grids, and
+# generous label/tick padding so nothing touches.
+_INK = "#212529"  # BRAND_COLORS["carbon_black"]
 
 NATURE_RC: dict[str, object] = {
     "font.family": "sans-serif",
     "font.sans-serif": ["Helvetica", "Arial", "DejaVu Sans"],
     "mathtext.fontset": "stixsans",
-    "font.size": 8,
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "axes.titleweight": "bold",
-    "axes.labelpad": 2.5,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
-    "legend.fontsize": 7,
-    "axes.linewidth": 0.6,
+    "font.size": 9.5,
+    "text.color": _INK,
+    "axes.labelsize": 9.5,
+    "axes.titlesize": 10.5,
+    "axes.titleweight": "normal",
+    "axes.titlelocation": "left",
+    "axes.titlepad": 8.0,
+    "axes.labelpad": 4.5,
+    "axes.edgecolor": _INK,
+    "axes.labelcolor": _INK,
+    "xtick.labelsize": 8.5,
+    "ytick.labelsize": 8.5,
+    "xtick.color": _INK,
+    "ytick.color": _INK,
+    "legend.fontsize": 8.5,
+    "axes.linewidth": 0.7,
     "axes.spines.top": False,
     "axes.spines.right": False,
-    "xtick.major.width": 0.6,
-    "ytick.major.width": 0.6,
-    "xtick.minor.width": 0.4,
-    "ytick.minor.width": 0.4,
-    "xtick.major.size": 3,
-    "ytick.major.size": 3,
-    "xtick.minor.size": 1.6,
-    "ytick.minor.size": 1.6,
-    "xtick.minor.visible": True,
-    "ytick.minor.visible": True,
+    "xtick.major.width": 0.7,
+    "ytick.major.width": 0.7,
+    "xtick.major.size": 3.2,
+    "ytick.major.size": 3.2,
+    "xtick.major.pad": 3.0,
+    "ytick.major.pad": 3.0,
+    "xtick.minor.visible": False,
+    "ytick.minor.visible": False,
     "xtick.direction": "out",
     "ytick.direction": "out",
-    "lines.linewidth": 1.2,
-    "lines.markersize": 3.0,
+    "lines.linewidth": 1.4,
+    "lines.markersize": 4.0,
+    "grid.color": "#dee2e6",  # alabaster_grey
+    "grid.linewidth": 0.5,
     "legend.frameon": False,
     "legend.handlelength": 1.6,
     "legend.handletextpad": 0.5,
-    "legend.columnspacing": 1.0,
-    "savefig.dpi": 300,
+    "legend.columnspacing": 1.2,
+    "legend.borderaxespad": 0.6,
+    "savefig.dpi": 600,
     "savefig.bbox": "tight",
-    "savefig.pad_inches": 0.02,
+    "savefig.pad_inches": 0.05,
     "savefig.transparent": False,
-    "figure.dpi": 120,
+    "figure.dpi": 150,
     "figure.figsize": (COLUMN_INCHES["single"], COLUMN_INCHES["single"] / 1.45),
     "pdf.fonttype": 42,
     "ps.fonttype": 42,
 }
 
+BRAND_COLORS: dict[str, str] = {
+    "bright_snow": "#f8f9fa",
+    "platinum": "#e9ecef",
+    "alabaster_grey": "#dee2e6",
+    "pale_slate": "#ced4da",
+    "pale_slate_2": "#adb5bd",
+    "slate_grey": "#6c757d",
+    "iron_grey": "#495057",
+    "gunmetal": "#343a40",
+    "carbon_black": "#212529",
+}
+"""The project's identity palette: a nine-step neutral ramp, light to dark.
+
+Used by the documentation theme and the logo so the website and the repository
+read as one thing.  Being a symmetric ramp, it inverts cleanly between the two
+colour schemes; contrast against the two end steps decides each role:
+
+| Colour | Hex | On `bright_snow` | On `carbon_black` |
+| --- | --- | --: | --: |
+| `carbon_black` | `#212529` | 14.6:1 | — |
+| `gunmetal` | `#343a40` | 10.9:1 | — |
+| `iron_grey` | `#495057` | 7.8:1 | — |
+| `slate_grey` | `#6c757d` | 4.5:1 | 3.3:1 |
+| `pale_slate_2` | `#adb5bd` | 2.0:1 | 7.4:1 |
+| `pale_slate` | `#ced4da` | 1.4:1 | 10.3:1 |
+| `alabaster_grey` | `#dee2e6` | 1.2:1 | 11.9:1 |
+| `platinum` | `#e9ecef` | 1.1:1 | 13.0:1 |
+| `bright_snow` | `#f8f9fa` | — | 14.6:1 |
+
+`slate_grey` is the pivot: the only step that clears 4.5:1 on light *and* 3:1
+on dark, so it serves as muted prose in the light scheme and as borders and
+icons in the dark one.  The three darkest steps are body text on light and the
+four lightest are body text on dark; each is surfaces-only on the other side.
+"""
+
 NATURE_COLORS: tuple[str, ...] = (
-    "#22333B",  # Jet Black
-    "#5E503F",  # Stone Brown
-    "#C6AC8F",  # Khaki Beige
-    "#0A0908",  # Black
-    "#EAE0D5",  # Almond Cream
+    "#212529",  # Carbon Black   14.6:1
+    "#6c757d",  # Slate Grey      4.5:1
+    "#343a40",  # Gunmetal       10.9:1
+    "#495057",  # Iron Grey       7.8:1
+    "#adb5bd",  # Pale Slate 2    2.0:1  -- fills only, see below
+    "#ced4da",  # Pale Slate      1.4:1  -- fills only
+    "#dee2e6",  # Alabaster Grey  1.2:1  -- fills only
 )
+"""Series colours: seven steps of `BRAND_COLORS`, text-safe steps first.
+
+Drawn from the identity ramp so figures, the documentation and the logo read as
+one thing. A monochrome palette gives up hue, which is what normally separates
+series, and the ordering has to earn that back without making anything illegible.
+
+The first four steps all clear 4.5:1 against the page, because a series colour
+is not only a fill: it tints a 4 pt marker and, in a critical-difference diagram,
+the model's own label. The light half of the ramp cannot do either job --- at
+2.0:1 and below a label is unreadable and a marker vanishes --- so those three
+steps come last and are reached only by a plot with five or more series, where
+they appear as bar fills stroked in ink.
+
+Two consequences follow. Fills from the light half need that dark outline or they
+have no boundary on the page, which is why `plot_grouped_bars` strokes in ink
+rather than in white. And luminance is a weaker cue than hue, so anything that
+must be read per-series at a glance should carry a marker or a label as well,
+never colour alone.
+"""
+
+# Human-readable axis/legend labels for the metric keys recorded in
+# training histories.  Unknown keys fall back to a cleaned-up version of
+# the raw key ("my_metric" -> "My metric") instead of leaking snake_case.
+_PRETTY_METRIC: dict[str, str] = {
+    "train_loss": "Training loss",
+    "val_loss": "Validation loss",
+    "test_loss": "Test loss",
+    "train_acc": "Training accuracy",
+    "val_acc": "Validation accuracy",
+    "test_acc": "Test accuracy",
+    "train_auc": "Training AUC",
+    "val_auc": "Validation AUC",
+    "test_auc": "Test AUC",
+    "train_mae": "Training MAE",
+    "val_mae": "Validation MAE",
+    "test_mae": "Test MAE",
+}
+
+
+def pretty_metric(key: str) -> str:
+    """Map a history metric key (``"test_acc"``) to an axis label (``"Test accuracy"``)."""
+    if key in _PRETTY_METRIC:
+        return _PRETTY_METRIC[key]
+    return key.replace("_", " ").strip().capitalize()
 
 
 def set_plot_style() -> None:
@@ -94,8 +189,7 @@ def figure(
     """
     set_plot_style()
     w = COLUMN_INCHES[width] if isinstance(width, str) else float(width)
-    h = w / aspect * (nrows / max(ncols, 1)) ** 0.0  # default height per row
-    h = (w / aspect) * nrows / max(1, 1)
+    h = (w / aspect) * nrows
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(w, h), **kwargs)  # type: ignore[call-overload]
     return fig, axes
 
@@ -107,7 +201,7 @@ def panel_label(ax: plt.Axes, text: str, x: float = -0.18, y: float = 1.05) -> N
         y,
         text,
         transform=ax.transAxes,
-        fontsize=9,
+        fontsize=10,
         fontweight="bold",
         va="bottom",
         ha="left",
@@ -118,7 +212,7 @@ def save_figure(
     fig: plt.Figure,
     path: str | Path,
     formats: Sequence[str] = ("pdf", "png"),
-    dpi: int = 300,
+    dpi: int = 600,
 ) -> list[Path]:
     """Save ``fig`` to one path stem in multiple formats; returns the saved paths."""
     base = Path(path).with_suffix("")
@@ -160,7 +254,7 @@ def plot_history(
 
     def _plot(target: plt.Axes, key: str, color: str, dashed: bool) -> None:
         y = np.asarray(history[key], dtype=float)
-        target.plot(epochs, y, color=color, linestyle=("--" if dashed else "-"), label=key)
+        target.plot(epochs, y, color=color, linestyle=("--" if dashed else "-"), label=pretty_metric(key))
         if std is not None and key in std:
             s = np.asarray(std[key], dtype=float)
             target.fill_between(epochs, y - s, y + s, color=color, alpha=0.15, linewidth=0)
@@ -170,20 +264,39 @@ def plot_history(
     ax.set_xlabel("Epoch")
     if loss_keys:
         ax.set_ylabel("Loss")
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(True)
+    ax.margins(x=0.02)
 
     if metric_keys:
         ax2 = ax.twinx()
         ax2.spines.right.set_visible(True)
+        ax2.tick_params(which="minor", right=False)
         for j, k in enumerate(metric_keys):
             _plot(ax2, k, NATURE_COLORS[(j + len(loss_keys)) % len(NATURE_COLORS)], dashed=True)
-        ax2.set_ylabel("Metric")
+        ax2.set_ylabel(" / ".join(pretty_metric(k) for k in metric_keys))
+        ax2.margins(x=0.02)
         lines = ax.get_lines() + ax2.get_lines()
-        ax.legend(lines, [str(ln.get_label()) for ln in lines], loc=legend_loc, borderaxespad=0.4)
+        # One-row legend above the axes: twin-axis charts have curves in
+        # every corner, so any in-axes placement collides with data.
+        ax.legend(
+            lines,
+            [str(ln.get_label()) for ln in lines],
+            loc="lower center",
+            bbox_to_anchor=(0.5, 1.02),
+            ncol=min(len(lines), 3),
+            frameon=False,
+            handlelength=1.6,
+            handletextpad=0.5,
+            columnspacing=1.2,
+            borderaxespad=0.0,
+        )
     elif loss_keys:
         ax.legend(loc=legend_loc, borderaxespad=0.4)
 
     if title:
-        ax.set_title(title)
+        # Title above the legend row when a twin axis pushed the legend up.
+        ax.set_title(title, pad=22 if metric_keys else 6)
     fig.tight_layout()
     return fig, ax
 
@@ -216,6 +329,7 @@ def plot_grouped_bars(
         fig = ax.figure  # type: ignore[assignment]
 
     width = 0.8 / max(len(series), 1)
+    y_top = 0.0
     for j, s in enumerate(series):
         xs: list[float] = []
         ys: list[float] = []
@@ -234,20 +348,42 @@ def plot_grouped_bars(
             width=width,
             label=s,
             color=NATURE_COLORS[j % len(NATURE_COLORS)],
-            edgecolor="white",
-            linewidth=0.4,
+            # Ink, not white: the palette is monochrome, so a bar taken from the
+            # light half of the ramp has almost no contrast with the page and
+            # a white stroke would erase its outline instead of defining it.
+            edgecolor=_INK,
+            linewidth=0.5,
         )
         if any(e > 0 for e in es):
-            ax.errorbar(xs, ys, yerr=es, fmt="none", ecolor="black", elinewidth=0.6, capsize=1.6)
+            ax.errorbar(xs, ys, yerr=es, fmt="none", ecolor=_INK, elinewidth=0.8, capsize=2.0)
         if annotate:
-            for x, y in zip(xs, ys, strict=False):
-                ax.text(x, y, f"{y:.2f}", ha="center", va="bottom", fontsize=6)
+            # Place the value above the error-bar cap (not the bar top) so
+            # the text never collides with the whiskers, rotated upright so
+            # neighbouring annotations cannot run into each other.
+            for x, y, e in zip(xs, ys, es, strict=False):
+                ax.annotate(
+                    f"{y:.2f}",
+                    xy=(x, y + e),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    fontsize=7.5,
+                    rotation=90 if len(series) > 2 else 0,
+                    color="0.25",
+                )
+        y_top = max(y_top, max((y + e for y, e in zip(ys, es, strict=False)), default=0.0))
 
+    if annotate and y_top > 0:
+        # Headroom so rotated annotations stay inside the axes.
+        ax.set_ylim(top=y_top * (1.14 if len(series) > 2 else 1.08))
     ax.set_xticks(range(len(groups)))
     ax.set_xticklabels(groups, rotation=0, ha="center")
+    ax.tick_params(axis="x", which="both", length=0)
+    ax.tick_params(axis="x", which="minor", bottom=False)
     ax.set_ylabel(ylabel)
     ax.set_axisbelow(True)
-    ax.yaxis.grid(True, linewidth=0.3, alpha=0.4)
+    ax.yaxis.grid(True)
 
     ncol = legend_ncol or min(len(series), 4)
     if legend_loc == "outside top":
@@ -289,6 +425,7 @@ def plot_grouped_bars(
 
 
 __all__ = [
+    "BRAND_COLORS",
     "COLUMN_INCHES",
     "NATURE_COLORS",
     "NATURE_RC",
@@ -296,6 +433,7 @@ __all__ = [
     "panel_label",
     "plot_grouped_bars",
     "plot_history",
+    "pretty_metric",
     "save_figure",
     "set_plot_style",
 ]

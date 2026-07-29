@@ -43,9 +43,9 @@ def pubmed(root: str) -> Planetoid:
     return Planetoid(root=root, name="PubMed")
 
 
-def karate(root: str) -> Netz:
+def karate(root: str, network_name: str = "78") -> Netz:
     """Zachary's karate club (the canonical small social network)."""
-    return Netz(root=root, dataset_name="karate", network_name="karate")
+    return Netz(root=root, dataset_name="karate", network_name=network_name)
 
 
 def facebook_friends(root: str) -> Netz:

@@ -1,7 +1,7 @@
 """Lightweight training loops shared by the example notebooks.
 
 Each function returns a plain ``dict`` of per-epoch metrics, ready to feed into
-:func:`graphnetz.plotting.plot_history`.
+[`plot_history`][graphnetz.plotting.plot_history].
 
 All trainers accept ``device='auto'`` (the default), which dispatches to
 CUDA when available, then Apple-silicon MPS, then CPU. Pass an explicit
@@ -319,7 +319,7 @@ def train_link_prediction(
 
     The model is expected to expose ``encode(data)`` returning per-node
     embeddings and ``decode(z, edge_label_index)`` returning per-edge scores
-    (see :class:`graphnetz.models._adapters.LinkPredWrapper`).
+    (see [`LinkPredWrapper`][graphnetz.models._adapters.LinkPredWrapper]).
     """
     dev = _resolve_device(device)
     if isinstance(model, torch.nn.Module):
@@ -454,7 +454,7 @@ def train_relational_link_prediction(
 
     The model is expected to expose ``encode(data)`` returning per-node
     embeddings and ``decode(z, edge_index, edge_type)`` returning per-edge
-    scores (see :class:`graphnetz.models._adapters.RelationalLinkPredWrapper`).
+    scores (see `graphnetz.models._adapters.RelationalLinkPredWrapper`).
     """
     dev = _resolve_device(device)
     if isinstance(model, torch.nn.Module):

@@ -2,10 +2,18 @@
 
 Coverage:
 - Image-derived superpixel graphs: ``MNISTSuperpixels``, ``CIFAR10`` (GNN benchmark).
-- Meshes / point clouds: PyG ``ModelNet`` (10/40 classes), ``ShapeNet`` part segmentation.
+- Meshes / point clouds: PyG ``ModelNet`` (10/40 classes).
+
+ShapeNet part segmentation was dropped from the catalogue: its only host,
+``shapenet.cs.stanford.edu``, answers neither ICMP nor TCP, upstream PyG still
+points at it, and the alternative its maintainers document requires an account.
+Rather than advertise a loader that cannot fetch its data, or repoint it at an
+unofficial mirror and silently change the dataset's provenance and licence, the
+entry is removed. Restoring it means adding a loader whose source can be
+downloaded.
 """
 
-from torch_geometric.datasets import GNNBenchmarkDataset, MNISTSuperpixels, ModelNet, ShapeNet
+from torch_geometric.datasets import GNNBenchmarkDataset, MNISTSuperpixels, ModelNet
 
 
 def mnist_superpixels(root: str, train: bool = True) -> MNISTSuperpixels:
@@ -28,18 +36,9 @@ def modelnet40(root: str, train: bool = True) -> ModelNet:
     return ModelNet(root=root, name="40", train=train)
 
 
-def shapenet(root: str, categories: list[str] | None = None) -> ShapeNet:
-    """ShapeNet point clouds with part-segmentation labels.
-
-    Pass ``categories=['Chair']`` (etc.) to limit to a subset.
-    """
-    return ShapeNet(root=root, categories=categories)
-
-
 __all__ = [
     "cifar10_superpixels",
     "mnist_superpixels",
     "modelnet10",
     "modelnet40",
-    "shapenet",
 ]
