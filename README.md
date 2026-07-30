@@ -19,7 +19,7 @@
 
 ## Why GraphNetz
 
-Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, GraphNetz turns the usual “train, evaluate, table of accuracies” workflow into a reproducible statistical report. Instead of reporting point estimates alone, it provides confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets using critical-difference diagrams. The goal is not just to crown a leaderboard winner, but to give researchers a principled way to quantify uncertainty, compare methods fairly, and produce the exact evidence reviewers often ask for in graph-learning papers.
+Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, GraphNetz turns the usual "train, evaluate, table of accuracies" workflow into a proper statistical report. It gives you confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets via critical-difference diagrams. The point isn't to crown a leaderboard winner. It's to give researchers a way to quantify uncertainty, compare methods fairly, and produce the evidence reviewers actually ask for in graph-learning papers.
 
 
 Most GNN benchmarks report point-estimate accuracies on a handful of citation graphs and declare a winner without confidence intervals, multiple-comparison correction, or rank aggregation across datasets. GraphNetz's default output is a **structured statistical report**, not a raw accuracy table:
@@ -91,7 +91,7 @@ fig, _ = report.plot_critical_difference(alpha=0.05)
 
 Unlabelled graphs (Netzschleuder, synthetic combinatorial, Ising lattice)
 enter the benchmark through link prediction on a held-out edge split, so
-every cell carries a real test-time metric — there is no self-supervised
+every cell carries a real test-time metric; there is no self-supervised
 *pretext* loss in the headline report.
 
 ## Dataset categories
@@ -192,15 +192,15 @@ run_benchmark(
 
 Worked examples live under `examples/`:
 
-- `01_benchmark.ipynb` — the cross-category dashboard (multi-seed report,
+- `01_benchmark.ipynb`: the cross-category dashboard (multi-seed report,
   bootstrap CIs, custom-model integration).
-- `02_knowledge.ipynb` — relational link prediction on FB15k-237 / WN18-RR
+- `02_knowledge.ipynb`: relational link prediction on FB15k-237 / WN18-RR
   using the DistMult decoder.
 
 ## Contributing
 
-Pull requests welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first — the
-short version is: every benchmark cell must carry a real held-out metric,
+Pull requests welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first. The
+short version: every benchmark cell must carry a real held-out metric,
 every change must thread through the multi-seed pipeline, and every PR must
 be `ruff` clean.
 
@@ -227,4 +227,4 @@ If GraphNetz is useful in your work, please cite the accompanying paper:
 
 ## License
 
-MIT — see [`LICENCE.txt`](LICENCE.txt).
+MIT. See [`LICENCE.txt`](LICENCE.txt).
