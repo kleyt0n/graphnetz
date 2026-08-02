@@ -13,7 +13,9 @@ docs_dir: docs
 
 theme:
   name: material
-  logo: logo.png
+  # Carbon Black ink: the header is light in the default scheme. The
+  # stylesheet swaps in logo.png (Bright Snow ink) under slate.
+  logo: logo-ink.png
   favicon: favicon.png
   icon:
     repo: fontawesome/brands/github
