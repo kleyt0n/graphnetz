@@ -1,14 +1,31 @@
 """Regenerate the CD-diagram figures used on the docs home page.
 
-Produces a light-mode and a dark-mode PNG from the same synthetic
-BenchmarkReport so the two figures share layout/data exactly.
+Produces a light-mode and a dark-mode PNG from the *real* breadth run — the
+ten-category sweep whose per-dataset means live in
+``paper/experiments/_artifacts/breadth_summary.csv`` — so the home page shows
+the same diagram as Figure 3 of the paper rather than an illustrative mock-up.
 
 Run:  ../.venv/bin/python docs/img/_gen_cd_figures.py
+
+The reconstruction is exact for everything the diagram displays. A CD diagram
+is a function of the *rank table* alone: per-task ranks, the Friedman
+:math:`\\chi^2`, and the Nemenyi critical difference. All three follow from the
+per-(dataset, model) means, which are read verbatim from the artefact. The
+per-seed spread inside each cell is not reconstructed — it cannot change a
+rank — so each cell is replayed as a constant series. ``_verify`` asserts the
+resulting statistics against ``headline.json``, so a drift in either the
+artefacts or the ranking code fails the run instead of silently publishing a
+figure that no longer matches the paper.
+
+Only models present in every task enter the diagram (``strict=True``), which
+drops GIN: it is defined for the two graph-classification slots only.
 """
 
 from __future__ import annotations
 
+import json
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,37 +33,40 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import matplotlib as mpl  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
+import pandas as pd  # noqa: E402
 
 from graphnetz.benchmark import BenchmarkReport  # noqa: E402
 
 sys.path.insert(0, str(ROOT))
 from paper.experiments._style import style_cd_axes  # noqa: E402
 
-# Per-task accuracy means engineered to reproduce mean Friedman ranks of
-# GCN=1.67, GraphSAGE=2.00, GraphTransformer=2.67, GAT=3.67 across three
-# tasks (matches the figure that was previously committed to the repo).
-TASK_MEANS = {
-    "task1": {"GCN": 0.90, "GraphSAGE": 0.80, "GraphTransformer": 0.70, "GAT": 0.60},
-    "task2": {"GCN": 0.90, "GraphSAGE": 0.80, "GAT": 0.70, "GraphTransformer": 0.60},
-    "task3": {"GraphTransformer": 0.90, "GraphSAGE": 0.80, "GCN": 0.70, "GAT": 0.60},
-}
+ARTIFACTS = ROOT / "paper" / "experiments" / "_artifacts"
+SUMMARY = ARTIFACTS / "breadth_summary.csv"
+HEADLINE = ARTIFACTS / "headline.json"
+
+ALPHA = 0.05
+N_SEEDS = 10
 
 
-def _histories():
-    histories = {}
-    for task, model_means in TASK_MEANS.items():
-        histories[task] = {model: [{"test_acc": [acc]} for _ in range(5)] for model, acc in model_means.items()}
-    return histories
+def _report() -> BenchmarkReport:
+    """Replay the breadth run's per-cell means as a `BenchmarkReport`."""
+    frame = pd.read_csv(SUMMARY)
+    histories: dict[str, dict[str, list[dict[str, list[float]]]]] = defaultdict(dict)
+    for row in frame.itertuples(index=False):
+        cell = [{row.metric: [float(row.mean)]} for _ in range(N_SEEDS)]
+        histories[str(row.dataset)][str(row.model)] = cell
+    return BenchmarkReport(seeds=tuple(range(N_SEEDS)), histories=dict(histories))
 
 
-def _save_light(out: Path) -> None:
-    report = BenchmarkReport(seeds=(0, 1, 2, 3, 4), histories=_histories())
-    fig, ax = report.plot_critical_difference(alpha=0.05)
-    # Same rank colouring as the paper's figure, so the docs and the manuscript
-    # show the same diagram rather than two conventions.
-    style_cd_axes(ax)
-    fig.savefig(out, dpi=600, bbox_inches="tight", pad_inches=0.05)
-    plt.close(fig)
+def _verify(report: BenchmarkReport) -> None:
+    """Fail loudly if the replay no longer reproduces the published stats."""
+    expected = json.loads(HEADLINE.read_text())
+    ranks = report.mean_ranks(strict=True).round(2).to_dict()
+    published = {m: round(r, 2) for m, r in expected["mean_ranks"].items()}
+    if ranks != published:
+        msg = f"mean ranks drifted from headline.json:\n  got      {ranks}\n  expected {published}"
+        raise SystemExit(msg)
+    print(f"  verified against headline.json: {published}")
 
 
 def _recolor_for_dark(fig: plt.Figure) -> None:
@@ -73,8 +93,7 @@ def _recolor_for_dark(fig: plt.Figure) -> None:
             return muted
         return None  # already light enough for a dark page
 
-    # Transparent canvas so the surrounding page colour (whatever Furo's
-    # current --color-background-primary happens to be) shows through.
+    # Transparent canvas so the surrounding page colour shows through.
     fig.patch.set_alpha(0.0)
     for ax in fig.get_axes():
         ax.patch.set_alpha(0.0)
@@ -94,25 +113,20 @@ def _recolor_for_dark(fig: plt.Figure) -> None:
                 line.set_color(new)
 
 
-def _save_dark(out: Path) -> None:
-    report = BenchmarkReport(seeds=(0, 1, 2, 3, 4), histories=_histories())
-    fig, ax = report.plot_critical_difference(alpha=0.05)
-    _recolor_for_dark(fig)
-    style_cd_axes(ax, on_dark=True)
-    fig.savefig(
-        out,
-        dpi=600,
-        bbox_inches="tight",
-        pad_inches=0.05,
-        transparent=True,
-    )
+def _save(out: Path, *, dark: bool) -> None:
+    fig, ax = _report().plot_critical_difference(alpha=ALPHA)
+    if dark:
+        _recolor_for_dark(fig)
+    # Same rank colouring as the paper's figure, so the docs and the manuscript
+    # show the same diagram rather than two conventions.
+    style_cd_axes(ax, on_dark=dark)
+    fig.savefig(out, dpi=600, bbox_inches="tight", pad_inches=0.05, transparent=dark)
     plt.close(fig)
+    print(f"  wrote {out.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
     static = Path(__file__).resolve().parent
-    _save_light(static / "critical_difference.png")
-    _save_dark(static / "critical_difference_dark.png")
-    print("wrote:")
-    print(" ", static / "critical_difference.png")
-    print(" ", static / "critical_difference_dark.png")
+    _verify(_report())
+    _save(static / "critical_difference.png", dark=False)
+    _save(static / "critical_difference_dark.png", dark=True)

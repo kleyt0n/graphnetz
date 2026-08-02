@@ -36,6 +36,29 @@
   --gn-surface: rgba(233, 236, 239, 0.6);
   --gn-border: rgba(33, 37, 41, 0.14);
   --gn-border-strong: rgba(33, 37, 41, 0.3);
+
+  /* The hero's bottom margin. The stat band cancels it exactly to sit flush
+     against the hero, so the two must read the same number. */
+  --gn-hero-gap: 2.2rem;
+
+  /* "Chrome" = the header bar plus the hero/stat-band block. These follow the
+     colour scheme rather than being pinned dark, so light mode is one light
+     surface end to end. Pure white against the Bright Snow page gives the
+     block an edge without needing a heavier border.
+     Anything drawn on chrome must use these, never --gn-snow/--gn-carbon
+     directly, or it will invert in one scheme and not the other. */
+  --gn-chrome-bg: #ffffff;
+  --gn-chrome-fg: var(--gn-carbon);
+  --gn-chrome-fg-muted: rgba(33, 37, 41, 0.68);
+
+  /* Winning cell in a benchmark table. The one hue-bearing colour on the site,
+     and a deliberate exception to the neutrals-only rule above: it carries the
+     same "green = best rank" meaning as the CD diagram, so the table and the
+     figure agree. Hue is the green end of the CD ramp (paper/experiments
+     /_style.py); lightness is solved to 6:1 against the page rather than the
+     ramp's own maximum, because that lands on near-black #004625, which no
+     longer reads as green at body-text size. 5.66:1 on Bright Snow. */
+  --gn-win: #00733d;
 }
 
 [data-md-color-primary="custom"] {
@@ -77,6 +100,13 @@
   --gn-surface: rgba(173, 181, 189, 0.08);
   --gn-border: rgba(248, 249, 250, 0.14);
   --gn-border-strong: rgba(248, 249, 250, 0.26);
+
+  --gn-chrome-bg: var(--gn-carbon);
+  --gn-chrome-fg: var(--gn-snow);
+  --gn-chrome-fg-muted: rgba(248, 249, 250, 0.68);
+
+  /* Same hue, solved upwards against Carbon Black instead: 6.02:1. */
+  --gn-win: #00ba62;
 }
 
 /* Google Sans Flex for text and UI. It is a variable font with no italic
@@ -140,8 +170,15 @@ samp,
 /* ------------------------------------------------------------------ *
  * Structural chrome — borders that frame the columns like a TUI.      *
  * ------------------------------------------------------------------ */
+/* Redefining --md-primary-bg-color *on the header* re-inks every descendant
+   Material colours with it — title, icons, search placeholder, repo stats —
+   in one declaration. The token itself is left alone globally, because it is
+   also the text colour of .md-button--primary out in the content. */
 .md-header {
-  background-color: var(--gn-carbon);
+  --md-primary-bg-color: var(--gn-chrome-fg);
+  --md-primary-bg-color--light: var(--gn-chrome-fg-muted);
+  background-color: var(--gn-chrome-bg);
+  color: var(--gn-chrome-fg);
   border-bottom: 1px solid var(--gn-border);
   box-shadow: none;
 }
@@ -169,10 +206,12 @@ samp,
   font-weight: 700;
   letter-spacing: 0.02em;
 }
+/* --gn-surface, not a fixed white tint: a 4%-white fill is invisible on the
+   light header. This token already inverts per scheme. */
 .md-search__form {
   border-radius: 0;
   border: 1px solid var(--gn-border);
-  background-color: rgba(248, 249, 250, 0.04);
+  background-color: var(--gn-surface);
   box-shadow: none;
 }
 .md-search__input {
@@ -183,7 +222,8 @@ samp,
   border-radius: 0;
 }
 
-/* Header logo: thin line-art, so scale it up and add a faint glow. */
+/* Header logo. The mark carries ~10% internal padding in its own design box,
+   so it is scaled up here to sit optically level with the wordmark. */
 .md-header__button.md-logo {
   padding: 0.2rem;
   margin: 0.1rem 0.2rem 0.1rem 0;
@@ -192,8 +232,15 @@ samp,
 .md-header__button.md-logo svg {
   height: 1.9rem;
   width: 1.9rem;
-  /* No glow: the mark is a dense solid, so a halo only softens its edges. */
+  /* No glow: it would fill the mark's open counters and close it up. */
   filter: none;
+}
+/* The header follows the scheme, so the mark has to as well. mkdocs.yml points
+   theme.logo at the Carbon Black file (light is the default scheme); slate
+   swaps in the Bright Snow one. `content` is the only hook here — the src is
+   written by the theme, not by this page. */
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  content: url("../logo.png");
 }
 
 /* ------------------------------------------------------------------ *
@@ -225,7 +272,9 @@ samp,
 }
 .md-nav__link:hover {
   color: var(--md-default-fg-color);
-  background-color: rgba(248, 249, 250, 0.04);
+  /* Scheme-aware: a fixed 4%-white wash gave no hover feedback at all against
+     the Bright Snow page in light mode. */
+  background-color: var(--gn-surface);
 }
 .md-nav__link--active,
 .md-nav__link--active:focus,
@@ -353,6 +402,21 @@ samp,
   border-radius: 0;
 }
 
+/* Material paints .md-button in --md-primary-fg-color, which this palette
+   pins to Carbon Black in *both* schemes so the header stays dark. On the
+   slate page that is ink on ink — an invisible button. Buttons in the hero
+   have their own rules; these are the ones in ordinary content. */
+[data-md-color-scheme="slate"] .md-typeset .md-button {
+  color: var(--md-default-fg-color);
+  border-color: var(--gn-border-strong);
+}
+[data-md-color-scheme="slate"] .md-typeset .md-button:hover,
+[data-md-color-scheme="slate"] .md-typeset .md-button:focus {
+  color: var(--gn-carbon);
+  background-color: var(--md-default-fg-color);
+  border-color: var(--md-default-fg-color);
+}
+
 /* mkdocstrings signatures. */
 .md-typeset .doc-signature > pre {
   border-radius: 0;
@@ -364,19 +428,27 @@ samp,
 .gn-hero {
   position: relative;
   text-align: center;
-  margin: 0.5rem 0 2.5rem;
-  padding: 3.2rem 1.5rem 3rem;
+  margin: 0.5rem 0 var(--gn-hero-gap);
+  padding: 1.7rem 1.5rem 1.5rem;
   overflow: hidden;
-  /* Flat fill, no gradient and no grid texture: the animation is the only
-     thing in here that should attract the eye. */
-  background: var(--gn-carbon);
+  /* Flat fill, no gradient and no texture. */
+  background: var(--gn-chrome-bg);
   border: 1px solid var(--gn-border);
 }
 
+/* Mark and wordmark on one line, matching the README banner's lockup. A
+   stacked logo-over-title costs a whole logo's height for no extra meaning. */
+.gn-hero__lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
 .gn-hero__logo {
-  width: 104px;
-  height: 104px;
-  margin: 0 auto 0.6rem;
+  width: 44px;
+  height: 44px;
+  margin: 0;
   border: none !important;
   box-shadow: none !important;
   /* Flat ground, so no shadow is needed to separate the mark. */
@@ -384,12 +456,12 @@ samp,
 }
 
 .md-typeset .gn-hero__title {
-  margin: 0.2rem 0 0;
-  font-size: 3rem;
+  margin: 0;
+  font-size: 2.1rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
-  color: var(--gn-snow);
+  color: var(--gn-chrome-fg);
   border-top: none;
   padding-top: 0;
 }
@@ -398,147 +470,11 @@ samp,
 }
 
 .gn-hero__tagline {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: rgba(248, 249, 250, 0.68);
-  max-width: 38rem;
-  margin: 1rem auto 1.5rem;
-}
-
-/* ------------------------------------------------------------------ *
- * Methodology animation.                                              *
- *                                                                      *
- * Three beats on one 9s loop, telling the library's actual argument:    *
- *   1. eight seeds per model, scattered -- a run is a distribution      *
- *   2. they collapse into a mean with a t-CI -- what the report emits   *
- *   3. a clique bar joins all four -- no difference is detected         *
- *                                                                      *
- * Every element shares the 9s period so the beats stay in phase; the    *
- * per-element --s / --m / --k custom properties only stagger within a   *
- * beat. Geometry is chosen so the four intervals genuinely overlap,     *
- * because the figure must not assert a result the data would not.       *
- * ------------------------------------------------------------------ */
-.gn-anim__wrap {
-  margin: 2.4rem auto 0;
-  max-width: 30rem;
-  text-align: center;
-}
-.gn-anim {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-.gn-anim line,
-.gn-anim circle {
-  vector-effect: non-scaling-stroke;
-}
-.gn-anim__axis {
-  stroke: rgba(248, 249, 250, 0.16);
-  stroke-width: 1;
-}
-.gn-anim__seed {
-  stroke: var(--gn-pale-2);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  opacity: 0;
-  animation: gn-seed 9s linear infinite;
-  animation-delay: calc(var(--m) * 0.18s + var(--s) * 0.07s);
-}
-.gn-anim__whisker,
-.gn-anim__cap {
-  stroke: var(--gn-snow);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: gn-whisker 9s ease-out infinite;
-  animation-delay: calc(var(--m) * 0.12s);
-}
-.gn-anim__cap {
-  animation-name: gn-cap;
-}
-.gn-anim__mean {
-  fill: var(--gn-snow);
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: gn-mean 9s cubic-bezier(0.2, 1.6, 0.4, 1) infinite;
-  animation-delay: calc(var(--m) * 0.12s);
-}
-.gn-anim__clique {
-  stroke: var(--gn-pale-2);
-  stroke-width: 4;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: left center;
-  animation: gn-clique 9s ease-out infinite;
-}
-
-/* Seeds: fade in staggered, hold, then hand over to the interval. */
-@keyframes gn-seed {
-  0%, 4%    { opacity: 0; }
-  10%, 24%  { opacity: 0.85; }
-  30%, 100% { opacity: 0; }
-}
-/* Interval: grows from the mean outwards once the seeds have gone. */
-@keyframes gn-whisker {
-  0%, 26%   { transform: scaleY(0); opacity: 0; }
-  36%, 88%  { transform: scaleY(1); opacity: 1; }
-  96%, 100% { transform: scaleY(1); opacity: 0; }
-}
-@keyframes gn-cap {
-  0%, 30%   { transform: scaleX(0); opacity: 0; }
-  40%, 88%  { transform: scaleX(1); opacity: 1; }
-  96%, 100% { transform: scaleX(1); opacity: 0; }
-}
-@keyframes gn-mean {
-  0%, 30%   { opacity: 0; transform: scale(0.2); }
-  40%, 88%  { opacity: 1; transform: scale(1); }
-  96%, 100% { opacity: 0; transform: scale(1); }
-}
-/* Clique bar: sweeps left to right, the last beat. */
-@keyframes gn-clique {
-  0%, 48%   { transform: scaleX(0); opacity: 0; }
-  50%       { opacity: 1; }
-  62%, 88%  { transform: scaleX(1); opacity: 1; }
-  96%, 100% { transform: scaleX(1); opacity: 0; }
-}
-
-/* One caption line, cross-fading through the three beats. */
-.gn-anim__caption {
-  position: relative;
-  display: block;
-  height: 1.2rem;
-  margin-top: 0.7rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-  color: rgba(248, 249, 250, 0.55);
-}
-.gn-anim__step {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  animation: gn-step 9s ease-in-out infinite;
-  animation-delay: calc(var(--k) * 3s);
-}
-@keyframes gn-step {
-  0%       { opacity: 0; }
-  4%, 26%  { opacity: 1; }
-  30%, 100% { opacity: 0; }
-}
-
-/* Respect a stated preference for less motion: show the finished figure,
-   which is the informative state, rather than an empty frame. */
-@media (prefers-reduced-motion: reduce) {
-  .gn-anim__seed { animation: none; opacity: 0.28; }
-  .gn-anim__whisker,
-  .gn-anim__cap,
-  .gn-anim__mean,
-  .gn-anim__clique { animation: none; opacity: 1; transform: none; }
-  .gn-anim__step { animation: none; opacity: 0; }
-  .gn-anim__step:last-child { opacity: 1; }
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--gn-chrome-fg-muted);
+  max-width: 34rem;
+  margin: 0.75rem auto 1.05rem;
 }
 
 /* Flat, terminal-style hero buttons. */
@@ -549,24 +485,32 @@ samp,
   box-shadow: none;
   transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
 }
-.gn-hero .md-button--primary {
-  background: var(--gn-pale-2);
-  border-color: var(--gn-pale-2);
-  color: var(--gn-carbon);
+/* Inverted against the chrome, so the CTA stays the strongest thing in the
+   hero in either scheme: ink-on-white in light, white-on-ink in dark.
+
+   The [data-md-color-scheme] prefix is load-bearing, not decoration. The
+   generic content-button rule above is written as
+   [data-md-color-scheme="slate"] .md-typeset .md-button — specificity 0-3-0.
+   Without a matching attribute selector here these would be 0-2-0 and lose,
+   repainting the primary CTA white-on-white in dark mode. */
+[data-md-color-scheme] .gn-hero .md-button--primary {
+  background: var(--gn-chrome-fg);
+  border-color: var(--gn-chrome-fg);
+  color: var(--gn-chrome-bg);
 }
-.gn-hero .md-button--primary:hover {
-  background: var(--gn-snow);
-  border-color: var(--gn-snow);
-  color: var(--gn-carbon);
+[data-md-color-scheme] .gn-hero .md-button--primary:hover {
+  background: var(--gn-chrome-fg-muted);
+  border-color: var(--gn-chrome-fg-muted);
+  color: var(--gn-chrome-bg);
 }
-.gn-hero .md-button:not(.md-button--primary) {
-  color: var(--gn-snow);
-  border-color: rgba(248, 249, 250, 0.32);
+[data-md-color-scheme] .gn-hero .md-button:not(.md-button--primary) {
+  color: var(--gn-chrome-fg);
+  border-color: var(--gn-border-strong);
 }
-.gn-hero .md-button:not(.md-button--primary):hover {
-  background: var(--gn-snow);
-  border-color: var(--gn-snow);
-  color: var(--gn-carbon);
+[data-md-color-scheme] .gn-hero .md-button:not(.md-button--primary):hover {
+  background: var(--gn-chrome-fg);
+  border-color: var(--gn-chrome-fg);
+  color: var(--gn-chrome-bg);
 }
 
 .gn-hero + h2 {
@@ -576,22 +520,27 @@ samp,
 }
 
 @media screen and (max-width: 44.9375em) {
-  .gn-hero { padding: 2.4rem 1rem; }
-  .gn-hero__logo { width: 80px; height: 80px; }
-  .gn-anim__wrap { max-width: 100%; margin-top: 1.8rem; }
-  .md-typeset .gn-hero__title { font-size: 2.2rem; }
+  .gn-hero { padding: 1.4rem 1rem 1.3rem; }
+  .gn-hero__logo { width: 34px; height: 34px; }
+  .gn-hero__lockup { gap: 0.45rem; }
+  .md-typeset .gn-hero__title { font-size: 1.65rem; }
 }
 
 /* ------------------------------------------------------------------ *
  * Feature grid — flat bordered cards.                                 *
  * ------------------------------------------------------------------ */
+/* Two columns, not auto-fit: there are exactly four cards, and auto-fit
+   resolves to three at desktop widths, leaving a two-cell hole in the grid. */
 .gn-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   margin: 1.5rem 0;
   background: var(--gn-border);
   border: 1px solid var(--gn-border);
+}
+@media screen and (max-width: 44.9375em) {
+  .gn-grid { grid-template-columns: 1fr; }
 }
 .gn-card {
   padding: 1.1rem 1.25rem;
@@ -626,4 +575,169 @@ samp,
 .gn-cd {
   max-width: 46rem;
   margin: 1.5rem auto;
+}
+
+/* ------------------------------------------------------------------ *
+ * Stat band — the four scale numbers, directly under the hero.        *
+ *                                                                      *
+ * Shares the hairline-gap construction with .gn-grid: a 1px background  *
+ * showing through the gaps is one rule instead of per-cell borders that  *
+ * double up where cells meet.                                            *
+ * ------------------------------------------------------------------ */
+.gn-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  /* Pulled up by the hero's full bottom margin so the band reads as one
+     structure with it, sharing the hero's bottom edge as its own top. */
+  margin: calc(-1 * var(--gn-hero-gap)) 0 2.2rem;
+  background: var(--gn-border);
+  border: 1px solid var(--gn-border);
+  border-top: none;
+}
+.gn-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 1rem 0.5rem;
+  /* Chrome, not page background: the band is flush with the hero and the two
+     must read as one surface. */
+  background: var(--gn-chrome-bg);
+  text-align: center;
+}
+.gn-stat__n {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gn-chrome-fg);
+}
+.gn-stat__l {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gn-chrome-fg-muted);
+}
+
+/* Two-up below the hero's mobile breakpoint: four columns of a 1.9rem
+   numeral do not fit a phone without the labels wrapping to three lines. */
+@media screen and (max-width: 44.9375em) {
+  .gn-stats { grid-template-columns: repeat(2, 1fr); }
+  .gn-stat__n { font-size: 1.55rem; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Result callout — the headline statistics of the breadth run.        *
+ *                                                                      *
+ * A borderless two-column table: the point is the numbers, and the      *
+ * table chrome that suits a data table only competes with them here.    *
+ * ------------------------------------------------------------------ */
+.gn-result {
+  margin: 1.5rem 0;
+  border-left: 3px solid var(--md-default-fg-color);
+  background: var(--gn-surface);
+}
+/* Material wraps every table in an inline-block scroll container, which
+   shrink-wraps to the content and leaves the callout's ground showing to the
+   right. Both the wrapper and the table have to be told to fill the width. */
+.gn-result .md-typeset__table {
+  display: block;
+  width: 100%;
+  /* Material's own bottom margin would otherwise show as a bare strip of the
+     callout's ground below the final row. */
+  margin: 0;
+  padding: 0;
+}
+.md-typeset .gn-result table:not([class]) {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border: none;
+  font-size: 0.73rem;
+}
+.md-typeset .gn-result table:not([class]) thead {
+  display: none; /* the header row is empty: this is a definition list */
+}
+.md-typeset .gn-result table:not([class]) td {
+  border: none;
+  border-top: 1px solid var(--gn-border);
+  padding: 0.5rem 1rem;
+  vertical-align: baseline;
+}
+.md-typeset .gn-result table:not([class]) tr:first-child td {
+  border-top: none;
+}
+.md-typeset .gn-result table:not([class]) td:first-child {
+  width: 34%;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .gn-result table:not([class]) tr:hover {
+  background: none;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .gn-result table:not([class]) td:first-child { width: 45%; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Wide result table — the ten-category sweep.                         *
+ *                                                                      *
+ * Eight columns of "0.000 ± 0.000". Wrapping a value across two lines   *
+ * makes the column unreadable and pushes the last model off the visible  *
+ * area, so cells never wrap and the table scrolls instead. Material's     *
+ * wrapper already provides the scroll; it just needs a reason to use it.  *
+ * ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ *
+ * Benchmark tables — the winning cell is green.                       *
+ *                                                                      *
+ * Scoped to .gn-bench, never to tables generally: bold also marks the   *
+ * aggregate column in the adequacy table and the verdicts in the result  *
+ * callout, and neither of those is a "best", so colouring every <strong>  *
+ * would assert a winner where there is none.                              *
+ * ------------------------------------------------------------------ */
+.md-typeset .gn-bench table:not([class]) strong {
+  color: var(--gn-win);
+}
+
+/* Material's scroll wrapper is injected by JS only for tables that are direct
+   children of .md-typeset. These are nested in a div, so they never get
+   wrapped and would overflow the column instead of scrolling. The div has to
+   be its own scroll container. */
+.gn-bench,
+.gn-wide {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.md-typeset .gn-wide table:not([class]) {
+  font-size: 0.64rem;
+}
+.md-typeset .gn-wide table:not([class]) th,
+.md-typeset .gn-wide table:not([class]) td {
+  white-space: nowrap;
+  padding: 0.45em 0.5em;
+}
+/* The metric columns are the ones under pressure; the two label columns can
+   give up their trailing space without becoming harder to read. */
+.md-typeset .gn-wide table:not([class]) th:nth-child(-n + 2),
+.md-typeset .gn-wide table:not([class]) td:nth-child(-n + 2) {
+  padding-right: 0.9em;
+}
+/* Numerals align on the decimal point when they share an advance width. */
+.md-typeset .gn-wide table:not([class]) td:nth-child(n + 3) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Paired call-to-action buttons sitting on their own line. */
+.md-typeset .gn-cd + p .md-button {
+  margin-right: 0.4rem;
+}
+
+/* The legend word, inked like the cells it describes, so the key is literally
+   a sample of the thing rather than a description of it. */
+.md-typeset .gn-win-key {
+  color: var(--gn-win);
+  font-weight: 700;
 }

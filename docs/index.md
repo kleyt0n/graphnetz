@@ -1,13 +1,13 @@
----
-hide:
-  - toc
----
-
 <div class="gn-hero" markdown>
 
-<img class="gn-hero__logo" src="logo.png" alt="GraphNetz logo">
-
-<h1 class="gn-hero__title">GraphNetz</h1>
+<div class="gn-hero__lockup">
+  <!-- Material hides whichever does not match the active scheme, via the
+       #only-light / #only-dark src suffixes. The hero ground follows the
+       scheme, so a single-ink mark would disappear in one of them. -->
+  <img class="gn-hero__logo" src="logo-ink.png#only-light" alt="">
+  <img class="gn-hero__logo" src="logo.png#only-dark" alt="">
+  <h1 class="gn-hero__title">GraphNetz</h1>
+</div>
 
 <p class="gn-hero__tagline">
 A GNN benchmark whose default output is a statistical report, not a leaderboard.
@@ -16,102 +16,20 @@ A GNN benchmark whose default output is a statistical report, not a leaderboard.
 [Get started](getting-started/installation.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/Kleyt0n/graphnetz){ .md-button }
 
-<figure class="gn-anim__wrap">
+</div>
 
-  <svg class="gn-anim" viewBox="48 28 424 126" role="img"
-       aria-label="Eight seeds per model collapse into a mean with a confidence interval; a clique bar then joins all four models, showing no difference is detected.">
-    <line class="gn-anim__axis" x1="60" y1="124" x2="460" y2="124"/>
-    <g class="gn-anim__model" style="--m: 0">
-      <line class="gn-anim__seed" style="--s: 0" x1="84" y1="40" x2="106" y2="40"/>
-      <line class="gn-anim__seed" style="--s: 1" x1="84" y1="48" x2="106" y2="48"/>
-      <line class="gn-anim__seed" style="--s: 2" x1="84" y1="55" x2="106" y2="55"/>
-      <line class="gn-anim__seed" style="--s: 3" x1="84" y1="60" x2="106" y2="60"/>
-      <line class="gn-anim__seed" style="--s: 4" x1="84" y1="64" x2="106" y2="64"/>
-      <line class="gn-anim__seed" style="--s: 5" x1="84" y1="70" x2="106" y2="70"/>
-      <line class="gn-anim__seed" style="--s: 6" x1="84" y1="78" x2="106" y2="78"/>
-      <line class="gn-anim__seed" style="--s: 7" x1="84" y1="85" x2="106" y2="85"/>
-      <line class="gn-anim__whisker" x1="95" y1="36" x2="95" y2="88"/>
-      <line class="gn-anim__cap" x1="88" y1="36" x2="102" y2="36"/>
-      <line class="gn-anim__cap" x1="88" y1="88" x2="102" y2="88"/>
-      <circle class="gn-anim__mean" cx="95" cy="62" r="4.5"/>
-    </g>
-    <g class="gn-anim__model" style="--m: 1">
-      <line class="gn-anim__seed" style="--s: 0" x1="194" y1="56" x2="216" y2="56"/>
-      <line class="gn-anim__seed" style="--s: 1" x1="194" y1="62" x2="216" y2="62"/>
-      <line class="gn-anim__seed" style="--s: 2" x1="194" y1="68" x2="216" y2="68"/>
-      <line class="gn-anim__seed" style="--s: 3" x1="194" y1="72" x2="216" y2="72"/>
-      <line class="gn-anim__seed" style="--s: 4" x1="194" y1="76" x2="216" y2="76"/>
-      <line class="gn-anim__seed" style="--s: 5" x1="194" y1="81" x2="216" y2="81"/>
-      <line class="gn-anim__seed" style="--s: 6" x1="194" y1="87" x2="216" y2="87"/>
-      <line class="gn-anim__seed" style="--s: 7" x1="194" y1="93" x2="216" y2="93"/>
-      <line class="gn-anim__whisker" x1="205" y1="53" x2="205" y2="95"/>
-      <line class="gn-anim__cap" x1="198" y1="53" x2="212" y2="53"/>
-      <line class="gn-anim__cap" x1="198" y1="95" x2="212" y2="95"/>
-      <circle class="gn-anim__mean" cx="205" cy="74" r="4.5"/>
-    </g>
-    <g class="gn-anim__model" style="--m: 2">
-      <line class="gn-anim__seed" style="--s: 0" x1="304" y1="42" x2="326" y2="42"/>
-      <line class="gn-anim__seed" style="--s: 1" x1="304" y1="52" x2="326" y2="52"/>
-      <line class="gn-anim__seed" style="--s: 2" x1="304" y1="60" x2="326" y2="60"/>
-      <line class="gn-anim__seed" style="--s: 3" x1="304" y1="66" x2="326" y2="66"/>
-      <line class="gn-anim__seed" style="--s: 4" x1="304" y1="71" x2="326" y2="71"/>
-      <line class="gn-anim__seed" style="--s: 5" x1="304" y1="79" x2="326" y2="79"/>
-      <line class="gn-anim__seed" style="--s: 6" x1="304" y1="88" x2="326" y2="88"/>
-      <line class="gn-anim__seed" style="--s: 7" x1="304" y1="96" x2="326" y2="96"/>
-      <line class="gn-anim__whisker" x1="315" y1="38" x2="315" y2="98"/>
-      <line class="gn-anim__cap" x1="308" y1="38" x2="322" y2="38"/>
-      <line class="gn-anim__cap" x1="308" y1="98" x2="322" y2="98"/>
-      <circle class="gn-anim__mean" cx="315" cy="68" r="4.5"/>
-    </g>
-    <g class="gn-anim__model" style="--m: 3">
-      <line class="gn-anim__seed" style="--s: 0" x1="414" y1="62" x2="436" y2="62"/>
-      <line class="gn-anim__seed" style="--s: 1" x1="414" y1="69" x2="436" y2="69"/>
-      <line class="gn-anim__seed" style="--s: 2" x1="414" y1="75" x2="436" y2="75"/>
-      <line class="gn-anim__seed" style="--s: 3" x1="414" y1="79" x2="436" y2="79"/>
-      <line class="gn-anim__seed" style="--s: 4" x1="414" y1="84" x2="436" y2="84"/>
-      <line class="gn-anim__seed" style="--s: 5" x1="414" y1="90" x2="436" y2="90"/>
-      <line class="gn-anim__seed" style="--s: 6" x1="414" y1="97" x2="436" y2="97"/>
-      <line class="gn-anim__seed" style="--s: 7" x1="414" y1="103" x2="436" y2="103"/>
-      <line class="gn-anim__whisker" x1="425" y1="59" x2="425" y2="105"/>
-      <line class="gn-anim__cap" x1="418" y1="59" x2="432" y2="59"/>
-      <line class="gn-anim__cap" x1="418" y1="105" x2="432" y2="105"/>
-      <circle class="gn-anim__mean" cx="425" cy="82" r="4.5"/>
-    </g>
-    <line class="gn-anim__clique" x1="80" y1="148" x2="440" y2="148"/>
-  </svg>
-
-<figcaption class="gn-anim__caption">
-  <span class="gn-anim__step" style="--k: 0">every model, every seed</span>
-  <span class="gn-anim__step" style="--k: 1">mean ± confidence interval</span>
-  <span class="gn-anim__step" style="--k: 2">no difference detected</span>
-</figcaption>
-</figure>
-
+<!-- No markdown="1" on the cells: the spans carry no markdown, and the
+     extension would wrap each pair in a <p>, collapsing the flex column. -->
+<div class="gn-stats">
+  <div class="gn-stat"><span class="gn-stat__n">62</span><span class="gn-stat__l">dataset loaders</span></div>
+  <div class="gn-stat"><span class="gn-stat__n">10</span><span class="gn-stat__l">categories</span></div>
+  <div class="gn-stat"><span class="gn-stat__n">4</span><span class="gn-stat__l">task types</span></div>
+  <div class="gn-stat"><span class="gn-stat__n">5</span><span class="gn-stat__l">architectures</span></div>
 </div>
 
 ## Why GraphNetz
 
-Whether you are proposing a new GNN architecture, testing a model on a new
-graph domain, or comparing existing methods across graph types, GraphNetz
-turns the usual “train, evaluate, table of accuracies” workflow into a
-reproducible statistical report. Instead of reporting point estimates alone,
-it provides confidence intervals for each result, paired model comparisons
-with multiple-testing correction, and rank-based summaries across datasets
-using critical-difference diagrams. The goal is not just to crown a
-leaderboard winner, but to give researchers a principled way to quantify
-uncertainty, compare methods fairly, and produce the exact evidence reviewers
-often ask for in graph-learning papers.
-
-<div class="gn-cd" markdown>
-![Demšar critical-difference diagram comparing four GNN architectures by mean rank.](img/critical_difference.png#only-light)
-![Demšar critical-difference diagram comparing four GNN architectures by mean rank.](img/critical_difference_dark.png#only-dark)
-</div>
-
-A Demšar critical-difference diagram. Models are ordered by mean Friedman
-rank; the horizontal bar connects groups whose ranks are not significantly
-different at the chosen $\alpha$ under the Nemenyi post-hoc.
-
-## What is inside
+Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, GraphNetz turns the usual "train, evaluate, table of accuracies" workflow into a proper statistical report. It gives you confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets via critical-difference diagrams. The point isn't to crown a leaderboard winner. It's to give researchers a way to quantify uncertainty, compare methods fairly, and produce the evidence reviewers actually ask for in graph-learning papers.
 
 <div class="gn-grid" markdown>
 
@@ -142,6 +60,111 @@ same statistical pipeline as the built-ins.
 
 </div>
 
+## Benchmark results
+
+Every number on this page comes from the repository's own experiment pipeline
+(`paper/experiments/`), at **10 seeds per cell** under the fixed-epoch
+protocol. Nothing here is illustrative.
+
+### One protocol, ten categories
+
+One representative dataset per category, all four general-purpose encoders.
+Values are mean ± Student's-*t* CI half-width, higher is better throughout.
+<strong class="gn-win-key">Bold green</strong> is the best cell in the row; *italic* marks a model whose
+interval overlaps the best one, so the two are not distinguishable. Task tags: **NC**
+node classification and **GC** graph classification, both scored by accuracy;
+**LP** link prediction, scored by AUC.
+
+<div class="gn-wide gn-bench" markdown>
+
+| Category | Dataset | GCN | GAT | SAGE | GT |
+|---|---|---|---|---|---|
+| Combinatorial | TSP-random · LP | *0.864 ± 0.025* | 0.832 ± 0.028 | **0.890 ± 0.023** | *0.872 ± 0.019* |
+| Biology | MUTAG · GC&nbsp;† | 0.705 ± 0.060 | 0.637 ± 0.038 | 0.700 ± 0.060 | **0.721 ± 0.050** |
+| Social | Cora · NC | **0.811 ± 0.001** | 0.797 ± 0.009 | 0.799 ± 0.004 | 0.792 ± 0.004 |
+| Knowledge | FB15k-237 · LP | **0.675 ± 0.008** | 0.523 ± 0.008 | 0.572 ± 0.027 | 0.537 ± 0.008 |
+| Infrastructure | Euroroad · LP | 0.524 ± 0.019 | **0.593 ± 0.022** | 0.540 ± 0.028 | 0.519 ± 0.042 |
+| Finance | Board-directors · LP | 0.968 ± 0.007 | **0.989 ± 0.002** | 0.901 ± 0.012 | 0.853 ± 0.015 |
+| Computing | Internet AS · LP | **0.967 ± 0.001** | 0.655 ± 0.013 | 0.745 ± 0.013 | 0.598 ± 0.068 |
+| Vision | MNIST-superpixels · GC&nbsp;† | 0.105 ± 0.011 | 0.106 ± 0.012 | 0.120 ± 0.021 | **0.142 ± 0.027** |
+| Physics | Ising-lattice · LP | **0.676 ± 0.030** | *0.616 ± 0.034* | *0.630 ± 0.020* | 0.620 ± 0.018 |
+| Security | 9/11 terrorists · LP | *0.685 ± 0.096* | **0.738 ± 0.065** | *0.730 ± 0.093* | *0.704 ± 0.081* |
+
+</div>
+
+† GIN is defined only for the two graph-classification slots, so it has no
+value in the other eight rows and is left out of the table. On both rows it
+beats every model shown: **0.847 ± 0.044** on MUTAG and **0.273 ± 0.049** on
+MNIST-superpixels.
+
+Read down a column and no architecture wins everywhere: GCN takes four
+categories, GAT three, GraphTransformer two, GraphSAGE one — and GIN, where
+it can run at all, takes both. That is the point, and it is exactly what a
+single-dataset benchmark cannot show you.
+
+### What the statistics actually say
+
+<div class="gn-cd" markdown>
+![Demšar critical-difference diagram over ten categories. Mean ranks: GraphSAGE 2.10, GCN 2.20, GAT 2.80, GraphTransformer 2.90. All four are joined by one clique bar.](img/critical_difference.png#only-light)
+![Demšar critical-difference diagram over ten categories. Mean ranks: GraphSAGE 2.10, GCN 2.20, GAT 2.80, GraphTransformer 2.90. All four are joined by one clique bar.](img/critical_difference_dark.png#only-dark)
+</div>
+
+Aggregate the ten per-category rankings and the honest answer is a negative
+result:
+
+<div class="gn-result" markdown>
+
+| | |
+|---|---|
+| Friedman omnibus | $\chi^2_3 = 3.00$, $p = 0.392$ — **do not reject** |
+| Nemenyi critical difference | $CD = 1.483$ ($\alpha = 0.05$, $k = 4$, $N = 10$) |
+| Observed mean ranks | GraphSAGE 2.10 · GCN 2.20 · GAT 2.80 · GraphTransformer 2.90 |
+| Largest rank gap | 0.80 — well inside $CD$ |
+| Cliques | **one**: no architecture separates from any other |
+
+</div>
+
+Ten categories are not enough evidence to order these four architectures. A
+benchmark that reported only the means would have declared a winner anyway.
+
+### Where differences *do* appear
+
+Zoom in on a single task family and the resolution improves. Node
+classification on the three Planetoid citation graphs, 10 seeds:
+
+<div class="gn-bench" markdown>
+
+| Model | Cora | CiteSeer | PubMed |
+|---|---|---|---|
+| GCN | **0.811 ± 0.001** | 0.683 ± 0.002 | **0.791 ± 0.002** |
+| GAT | 0.795 ± 0.010 | 0.655 ± 0.013 | 0.752 ± 0.015 |
+| GraphSAGE | 0.799 ± 0.004 | 0.683 ± 0.012 | 0.767 ± 0.002 |
+| GraphTransformer | 0.792 ± 0.004 | **0.700 ± 0.006** | 0.759 ± 0.006 |
+
+</div>
+
+Here **11 of 18** pairwise comparisons survive Holm–Bonferroni correction — a
+real signal that the cross-category view washes out. Note also that the
+per-task winner flips: GCN on Cora and PubMed, GraphTransformer on CiteSeer.
+
+### Is the evidence sufficient?
+
+The report also grades itself. Across the same 18 comparisons:
+
+| | Cora | CiteSeer | PubMed | All |
+|---|---:|---:|---:|---:|
+| Median minimum detectable effect | 0.0114 | 0.0169 | 0.0150 | **0.0137** |
+| Comparisons resolved at 10 seeds | 3/6 | 5/6 | 3/6 | **11/18** |
+| Seeds needed for a 0.01 gap | 13 | 25 | 23 | **17** |
+| Seeds needed for a 0.005 gap | 44 | 93 | 84 | **62** |
+
+And a jackknife over the ten categories shows how fragile the rank ordering
+is: the six pairwise rank gaps separate in only **0.1 %–11.3 %** of task
+resamples. No pair is stable.
+
+[Read the adequacy guide](guide/adequacy.md){ .md-button }
+[How the report is built](guide/report.md){ .md-button }
+
 ## Quickstart
 
 ```python
@@ -159,6 +182,75 @@ print(report.pairwise())         # Holm-corrected paired t-tests
 report.plot_critical_difference(alpha=0.05)
 report.to_latex("results.tex")   # publication-ready table
 ```
+
+## Bring your own model
+
+The contract is two methods: `__init__(in_channels, hidden_channels,
+out_channels)` and `forward(data)` taking a PyG `Data`. Declare which task
+your model supports and it runs through the *same* pipeline as the built-ins
+— same seeds, same splits, same Holm correction, same CD diagram.
+
+```python
+import torch
+import torch.nn.functional as F
+from torch_geometric.nn import GCNConv
+
+from graphnetz import GAT, GCN, register_model, run_benchmark
+
+
+@register_model(task_type="node_cls")  # (1)!
+class ResGCN(torch.nn.Module):
+    """Three-layer GCN with a residual hop — your model goes here."""
+
+    def __init__(self, in_channels, hidden_channels, out_channels, *, dropout=0.5):
+        super().__init__()
+        self.inp = GCNConv(in_channels, hidden_channels)
+        self.mid = GCNConv(hidden_channels, hidden_channels)
+        self.out = GCNConv(hidden_channels, out_channels)
+        self.dropout = dropout
+
+    def forward(self, data):  # (2)!
+        x, edge_index = data.x, data.edge_index
+        x = F.relu(self.inp(x, edge_index))
+        x = F.relu(self.mid(x, edge_index)) + x
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        return self.out(x, edge_index)
+
+
+report = run_benchmark(
+    "social",
+    {"GCN": GCN, "GAT": GAT, "ResGCN": ResGCN},  # (3)!
+    only=["cora"],
+    task_type="node_cls",
+    seeds=range(10),
+)
+print(report.summary())     # mean ± t-CI, your model beside the baselines
+print(report.pairwise())    # is it *really* better, after Holm correction?
+```
+
+1. Or set `task_types = {"node_cls"}` as a class attribute, or pass an inline
+   tuple `(cls, task_type, factory)` for one-shot variants — handy for a
+   hyperparameter sweep where each candidate is a separate "model".
+2. `data` is a PyG `Data` object. Read what you need from it; the runner owns
+   the split, the optimiser, and the seeding.
+3. Baselines are ordinary entries in the same dict. Nothing about your model
+   takes a different code path.
+
+The payoff is the second `print`: a difference in means that does not survive
+Holm correction never becomes a claim.
+
+<div class="gn-result" markdown>
+
+| | |
+|---|---|
+| Different task? | Swap `task_type` for `graph_cls`, `graph_reg` or `link_pred` |
+| Custom dataset? | Pass `tasks=[Task(...)]` and skip the built-in catalogue |
+| Sweeping hyperparameters? | One dict entry per variant, or hand `run_benchmark` a `SearchSpace` |
+
+</div>
+
+[Custom models & datasets](getting-started/custom.md){ .md-button }
+[Models & adapters](guide/models.md){ .md-button }
 
 ## At a glance
 

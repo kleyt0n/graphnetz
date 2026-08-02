@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-banner-dark.svg">
-    <img src="assets/logo-banner.svg" alt="GraphNetz" width="460">
+    <img src="assets/logo-banner.svg" alt="GraphNetz" width="320">
   </picture>
 </p>
 
@@ -151,27 +151,88 @@ Node-level encoders enter every task through three small adapters:
 graph-level pooling head, dot-product link-prediction head, and the DGI
 self-supervised wrapper for optional unsupervised pre-training.
 
-## Custom models
+## Bring your own model
+
+The contract is two methods: `__init__(in_channels, hidden_channels,
+out_channels)` and `forward(data)` taking a PyG `Data`. Declare which task
+your model supports and it becomes a first-class citizen of the benchmark —
+same seeds, same splits, same corrections as the built-ins.
 
 ```python
-from graphnetz import register_model
+import torch
+import torch.nn.functional as F
+from torch_geometric.nn import GCNConv
 
-# 1. Decorator
+from graphnetz import GAT, GCN, register_model, run_benchmark
+
+
 @register_model(task_type="node_cls")
-class MyGNN(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels): ...
+class ResGCN(torch.nn.Module):
+    """Three-layer GCN with a residual hop — your model goes here."""
 
-# 2. Class attribute (no decorator)
+    def __init__(self, in_channels, hidden_channels, out_channels, *, dropout=0.5):
+        super().__init__()
+        self.inp = GCNConv(in_channels, hidden_channels)
+        self.mid = GCNConv(hidden_channels, hidden_channels)
+        self.out = GCNConv(hidden_channels, out_channels)
+        self.dropout = dropout
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = F.relu(self.inp(x, edge_index))
+        x = F.relu(self.mid(x, edge_index)) + x          # residual hop
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        return self.out(x, edge_index)
+
+
+report = run_benchmark(
+    "social",
+    {"GCN": GCN, "GAT": GAT, "ResGCN": ResGCN},
+    only=["cora"],
+    task_type="node_cls",
+    seeds=range(10),
+)
+print(report.summary())     # mean ± t-CI, your model beside the baselines
+print(report.pairwise())    # is it *really* better, after Holm correction?
+```
+
+`summary()` returns one row per (task, model); `pairwise()` returns every
+comparison with its raw and Holm-adjusted *p*-value, so a claim like "ResGCN
+beats GCN" either survives correction or it does not:
+
+```
+             n_seeds      mean       std       sem    ci_low   ci_high
+task model
+cora GAT           3  0.802333  0.013013  0.007513  0.770008  0.834659
+     GCN           3  0.790667  0.003215  0.001856  0.782681  0.798652
+     ResGCN        3  0.790667  0.011150  0.006438  0.762967  0.818366
+```
+
+Three ways to declare the task, depending on how permanent the model is:
+
+```python
+# 1. Decorator — permanent registration at import time.
+@register_model(task_type="node_cls")
+class MyGNN(torch.nn.Module): ...
+
+# 2. Class attribute — same effect, no import-time dependency on graphnetz.
 class MyGNN(torch.nn.Module):
     task_types = {"node_cls", "graph_cls"}
 
-# 3. Inline tuple at run-time
+# 3. Inline tuple — one-shot variants, e.g. a hyperparameter sweep. The third
+#    slot is a factory (in_channels, hidden_channels, out_channels) -> Module.
 run_benchmark(
     "social",
-    {"MyGNN": (MyGNN, "node_cls",
-               lambda i, h, o: MyGNN(i, h, o, dropout=0.3))},
+    {
+        "MyGNN-d0.3": (MyGNN, "node_cls", lambda i, h, o: MyGNN(i, h, o, dropout=0.3)),
+        "MyGNN-d0.5": (MyGNN, "node_cls", lambda i, h, o: MyGNN(i, h, o, dropout=0.5)),
+    },
 )
 ```
+
+Custom **datasets** follow the same pattern — pass `tasks=[Task(...)]` to
+`run_benchmark` to bypass the built-in catalogue entirely. See
+[Custom models & datasets](https://kleyt0n.github.io/graphnetz/getting-started/custom/).
 
 ## The statistical report
 
