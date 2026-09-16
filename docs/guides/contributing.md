@@ -79,7 +79,7 @@ Adding a new task (e.g. `node_reg`, `temporal`) is a four-step change:
 4. Extend `_run_task` in `benchmark.py` with the dispatch branch.
 
 Then document the new task in [Dataset taxonomy →
-Tasks](guide/datasets.md#tasks).
+Tasks](../concepts/tasks.md).
 
 ## Adding a statistical test
 

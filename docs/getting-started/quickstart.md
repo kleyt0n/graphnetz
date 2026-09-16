@@ -56,7 +56,7 @@ The same call works for any category and task family: pass
    `link_pred`. The runner skips models that don't declare support for the
    chosen task.
 3. **Pick architectures.** Any subset of the five built-ins, or your own —
-   see [Models & adapters](../guide/models.md#custom-models).
+   see [Custom models](../guides/custom-models.md).
 4. **Run.** `run_benchmark(category, models, task_type=..., seeds=...)`. Use
    `seeds=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)` for the default reproducible 10-seed sweep.
 5. **Report.** Call `summary`, `pairwise`, `plot_critical_difference`,
@@ -66,10 +66,10 @@ The same call works for any category and task family: pass
 
 ## Next steps
 
-- Bring your own encoder or dataset: [Custom models & datasets](custom.md).
-- Browse the [dataset taxonomy](../guide/datasets.md) to find loaders that
+- Bring your own encoder or dataset: [Custom models](../guides/custom-models.md) and [Custom datasets](../guides/custom-datasets.md).
+- Browse the [dataset taxonomy](../guides/datasets.md) to find loaders that
   match your domain.
-- Read [Reading the report](../guide/report.md) to learn which plot or table
+- Read [Reading the report](../guides/report.md) to learn which plot or table
   answers which question.
-- Skim [Contributing](../contributing.md) before adding a new loader, model,
+- Skim [Contributing](../guides/contributing.md) before adding a new loader, model,
   or task so your additions thread through the same pipeline.

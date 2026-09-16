@@ -10,7 +10,7 @@ those runs return.
     [`BenchmarkReport`][graphnetz.benchmark.BenchmarkReport] whose methods are
     the statistical layer: per-cell intervals, corrected pairwise tests, the
     quantities that say when those tests are uninformative, and rank
-    aggregation across tasks. See [Reading the report](../guide/report.md).
+    aggregation across tasks. See [Reading the report](../guides/report.md).
 
 ## Running a benchmark
 

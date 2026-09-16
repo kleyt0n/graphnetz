@@ -1,13 +1,14 @@
 site_name: GraphNetz
 site_description: >-
-  A large-scale database and benchmark for graph learning — statistically
+  A large-scale database and benchmark for graph learning: statistically
   rigorous GNN benchmarking whose default output is a statistical report,
   not a leaderboard.
 site_author: Kleyton da Costa
 site_url: https://kleyt0n.github.io/graphnetz/
 repo_name: Kleyt0n/graphnetz
 repo_url: https://github.com/Kleyt0n/graphnetz
-copyright: Copyright &copy; GraphNetz contributors — MIT License
+edit_uri: edit/main/docs/
+copyright: MIT License
 
 docs_dir: docs
 
@@ -28,44 +29,77 @@ theme:
   palette:
     # primary/accent are `custom`, so Material defers to the palette defined
     # in stylesheets/extra.css (mirrored from graphnetz.plotting.BRAND_COLORS).
+    #
+    # The "follow system" entry needs the custom colours too: Material renders
+    # the FIRST entry's palette server-side and only swaps to the matching
+    # light/dark entry once its JS runs. Without these, a cold load flashes
+    # Material's default indigo before settling on Bright Snow and Carbon Black.
+    - media: "(prefers-color-scheme)"
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-auto
+        name: Follow system
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: custom
       accent: custom
       toggle:
-        icon: material/weather-night
+        icon: material/weather-sunny
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: custom
       accent: custom
       toggle:
-        icon: material/weather-sunny
+        icon: material/weather-night
         name: Switch to light mode
   features:
+    - announce.dismiss
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    # Section landing pages: `concepts/index.md` etc. become the clickable
+    # section itself rather than a stray "Overview" child.
+    - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
-    - navigation.tracking
     - navigation.sections
     - navigation.top
+    - navigation.tracking
     - navigation.footer
-    - toc.follow
-    - search.suggest
     - search.highlight
-    - content.code.copy
-    - content.code.annotate
-    - content.tabs.link
+    - search.suggest
+    - toc.follow
 
 extra_css:
   - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Kleyt0n/graphnetz
+      name: GraphNetz on GitHub
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/graphnetz/
+      name: GraphNetz on PyPI
   generator: false
+
+# Sources that live next to the docs but should not be published: the figure
+# generator is run by hand and its output is committed beside it.
+exclude_docs: |
+  img/_gen_cd_figures.py
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
 
 markdown_extensions:
   - abbr
@@ -78,6 +112,7 @@ markdown_extensions:
   - toc:
       permalink: true
       title: On this page
+      toc_depth: 3
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.betterem
@@ -92,12 +127,19 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.tilde
 
 plugins:
   - search:
@@ -110,24 +152,29 @@ plugins:
           paths: [src]
           options:
             docstring_style: numpy
+            docstring_section_style: table
             docstring_options:
               ignore_init_summary: true
-            show_root_heading: true
-            show_root_full_path: false
-            show_source: true
-            show_signature_annotations: true
-            separate_signature: true
-            signature_crossrefs: true
-            merge_init_into_class: true
-            show_symbol_type_heading: true
-            show_symbol_type_toc: true
-            members_order: source
+              trim_doctest_flags: true
             filters: ["!^_"]
-            docstring_section_style: table
+            heading_level: 3
+            inherited_members: false
+            line_length: 88
+            members_order: source
+            merge_init_into_class: true
+            parameter_headings: false
+            separate_signature: true
+            show_bases: true
             show_if_no_docstring: false
             show_labels: true
-            annotations_path: brief
-            line_length: 88
+            show_root_full_path: false
+            show_root_heading: true
+            show_signature_annotations: true
+            show_source: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            unwrap_annotated: true
             summary:
               attributes: true
               functions: true
@@ -138,28 +185,42 @@ plugins:
             - https://pandas.pydata.org/docs/objects.inv
             - https://docs.scipy.org/doc/scipy/objects.inv
 
-extra_javascript:
-  - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
-
 nav:
   - Home: index.md
   - Getting started:
       - Installation: getting-started/installation.md
       - Quickstart: getting-started/quickstart.md
-      - Custom models & datasets: getting-started/custom.md
-  - User guide:
-      - Dataset taxonomy: guide/datasets.md
-      - Models & adapters: guide/models.md
-      - Benchmark protocol: guide/benchmark.md
-      - Reading the report: guide/report.md
-      - Is the evidence sufficient?: guide/adequacy.md
+      - Conventions: getting-started/conventions.md
+  - Concepts:
+      - concepts/index.md
+      - Tasks and metrics: concepts/tasks.md
+      - Uncertainty: concepts/uncertainty.md
+      - Comparison: concepts/comparison.md
+      - Adequacy: concepts/adequacy.md
+      - Reproducibility: concepts/reproducibility.md
+  - Models:
+      - models/index.md
+      - GCN: models/gcn.md
+      - GAT: models/gat.md
+      - GIN: models/gin.md
+      - GraphSAGE: models/graphsage.md
+      - GraphTransformer: models/graph-transformer.md
+      - DGI: models/dgi.md
+      - Adapters: models/adapters.md
+  - Guides:
+      - Benchmark protocol: guides/benchmark.md
+      - Datasets: guides/datasets.md
+      - Reading the report: guides/report.md
+      - Custom models: guides/custom-models.md
+      - Custom datasets: guides/custom-datasets.md
+      - Hyperparameter search: guides/search.md
+      - Figures and tables: guides/figures.md
+      - Contributing: guides/contributing.md
+  - Findings: findings.md
   - API reference:
-      - Overview: reference/index.md
-      - Benchmark: reference/benchmark.md
-      - Datasets: reference/datasets.md
-      - Models: reference/models.md
-      - Training: reference/training.md
-      - Plotting: reference/plotting.md
-  - Project:
-      - Contributing: contributing.md
+      - reference/index.md
+      - graphnetz.benchmark: reference/benchmark.md
+      - graphnetz.datasets: reference/datasets.md
+      - graphnetz.models: reference/models.md
+      - graphnetz.training: reference/training.md
+      - graphnetz.plotting: reference/plotting.md

@@ -8,8 +8,6 @@ we go.
 
 ```bash
 uv add graphnetz
-# or, in an existing environment:
-pip install graphnetz
 ```
 
 Requires **Python ≥ 3.10**, **PyTorch ≥ 2.6**, and **torch-geometric ≥ 2.6**.
@@ -18,8 +16,8 @@ Requires **Python ≥ 3.10**, **PyTorch ≥ 2.6**, and **torch-geometric ≥ 2.6
 
 | Extra | Install | Unlocks |
 |---|---|---|
-| `ogb` | `pip install graphnetz[ogb]` | OGB loaders (`ogbn-arxiv`, `ogbl-collab`, `ogbn-products`, `ogbg-molhiv`, `ogbg-molpcba`) |
-| `chem` | `pip install graphnetz[chem]` | RDKit — required by OGB molecular loaders such as `ogbg-molhiv` |
+| `ogb` | `uv add "graphnetz[ogb]"` | OGB loaders (`ogbn-arxiv`, `ogbl-collab`, `ogbn-products`, `ogbg-molhiv`, `ogbg-molpcba`) |
+| `chem` | `uv add "graphnetz[chem]"` | RDKit — required by OGB molecular loaders such as `ogbg-molhiv` |
 
 ## Development install
 

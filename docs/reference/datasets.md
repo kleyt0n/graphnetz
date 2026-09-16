@@ -11,7 +11,7 @@ can be handed straight to [`run_benchmark`][graphnetz.benchmark.run_benchmark].
     how many currently **load end to end**; and a subset is promoted to
     **curated benchmark tasks** in
     [`BENCHMARK_TASKS`][graphnetz.benchmark.BENCHMARK_TASKS]. See
-    [Dataset taxonomy](../guide/datasets.md).
+    [Dataset taxonomy](../guides/datasets.md).
 
 ## Registry
 

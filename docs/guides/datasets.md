@@ -45,7 +45,7 @@ report headlines:
 
 !!! note
     Loaders marked with † come from OGB and require the optional `ogb`
-    extra (`pip install graphnetz[ogb]`): `ogbn-arxiv` and `ogbl-collab`
+    extra (`uv add "graphnetz[ogb]"`): `ogbn-arxiv` and `ogbl-collab`
     in **Social**, `ogbn-products` in **Finance**, and `ogbg-molhiv` and
     `ogbg-molpcba` in **Biology**. They are folded into their domain
     categories rather than exposed as a separate `ogb` category, so they
@@ -69,7 +69,7 @@ ds_pep  = peptides_func("data/peptides_func")     # LRGB graph_cls
 ds_inet = internet_as("data/internet_as")         # link_pred
 
 # Optional OGB loaders live in their domain modules
-# (require `pip install graphnetz[ogb]`):
+# (require `uv add "graphnetz[ogb]"`):
 from graphnetz.datasets.social import ogbn_arxiv, ogbl_collab
 from graphnetz.datasets.biology import ogbg_molhiv
 
@@ -163,7 +163,7 @@ for an empty or zero-byte download, rather than on hopeful string matching.
 
 ## Adding a new loader
 
-See [Contributing → Adding a dataset loader](../contributing.md#adding-a-dataset-loader).
+See [Contributing → Adding a dataset loader](contributing.md#adding-a-dataset-loader).
 The short version:
 
 1. Write a thin loader function under the right category module.

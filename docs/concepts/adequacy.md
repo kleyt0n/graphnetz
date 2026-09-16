@@ -1,4 +1,4 @@
-# Is the evidence sufficient?
+# Adequacy
 
 A non-significant paired test is compatible with two very different states of
 the world:
@@ -144,6 +144,6 @@ whether one number exceeded another.
 
 ## See also
 
-- [Reading the report](report.md) — the other views and the export helpers.
-- [Benchmark protocol](benchmark.md) — how the seed-paired data is produced.
+- [Reading the report](../guides/report.md) — the other views and the export helpers.
+- [Benchmark protocol](../guides/benchmark.md) — how the seed-paired data is produced.
 - [`graphnetz.benchmark`](../reference/benchmark.md) — full API reference.

@@ -38,8 +38,6 @@ The catalogue is organised along a **category × task** taxonomy:
 
 ```bash
 uv add graphnetz
-# or, in an existing environment:
-pip install graphnetz
 ```
 
 For local development:
@@ -109,7 +107,7 @@ every cell carries a real test-time metric; there is no self-supervised
 | Physics | 3 | GR, LP | QM9, ZINC, Ising lattice |
 | Security | 3 | GC, LP | MalNet-Tiny, 9/11 terrorists, train terrorists |
 
-† Requires the optional `ogb` extra (`pip install graphnetz[ogb]`). The
+† Requires the optional `ogb` extra (`uv add "graphnetz[ogb]"`). The
 five OGB loaders are folded into their domain categories rather than
 exposed as a separate `ogb` category, so they appear in
 `run_benchmark(category, ...)` alongside the curated built-ins.
@@ -119,7 +117,7 @@ from graphnetz.datasets.social import cora, roman_empire
 from graphnetz.datasets.biology import peptides_func
 from graphnetz.datasets.computing import internet_as
 
-# Optional OGB loaders live in their domain modules (require `pip install graphnetz[ogb]`):
+# Optional OGB loaders live in their domain modules (require `uv add "graphnetz[ogb]"`):
 from graphnetz.datasets.social import ogbn_arxiv     # node_cls
 from graphnetz.datasets.biology import ogbg_molhiv   # graph_cls
 
@@ -258,17 +256,11 @@ Worked examples live under `examples/`:
 - `02_knowledge.ipynb`: relational link prediction on FB15k-237 / WN18-RR
   using the DistMult decoder.
 
-## Contributing
+## Contributors
 
-Pull requests welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first. The
-short version: every benchmark cell must carry a real held-out metric,
-every change must thread through the multi-seed pipeline, and every PR must
-be `ruff` clean.
-
-```bash
-uv run pytest
-uv run ruff check
-```
+<a href="https://github.com/kleyt0n/graphnetz/graphs/contributors">
+  <img alt="Contributors to graphnetz" src="https://contrib.rocks/image?repo=kleyt0n/graphnetz">
+</a>
 
 ## Citation
 

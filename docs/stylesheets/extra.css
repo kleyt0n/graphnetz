@@ -1,113 +1,156 @@
-/* ================================================================== *
- * GraphNetz docs — Google Sans Flex over Material for MkDocs.          *
- *                                                                      *
- * Colours come from one palette, mirrored from                          *
- * graphnetz.plotting.BRAND_COLORS: a nine-step neutral ramp. Do not     *
- * hard-code hexes below; reuse a --gn-* token so the site, the logo and  *
- * the README cannot drift apart. The figure palette (NATURE_COLORS) is   *
- * separate on purpose — restyling the site must never change a plot.     *
- *                                                                      *
- * Role assignment is driven by measured contrast, not taste. Against     *
- * Bright Snow / Carbon Black respectively:                               *
- *   carbon 14.6 / --      iron 7.8 / --       gunmetal 10.9 / --         *
- *   snow   -- / 14.6      platinum -- / 13.0  pale-slate-2 -- / 7.4      *
- *   slate  4.5 / 3.3  <- the pivot: muted prose in light, UI in dark     *
- * The four lightest steps are surfaces in light mode, never body text.   *
- * ================================================================== */
+/* ==========================================================================
+   GraphNetz docs theme.
+
+   The neutrals are the project's own, mirrored from
+   graphnetz.plotting.BRAND_COLORS: a nine-step ramp from Bright Snow #F8F9FA
+   to Carbon Black #212529. Those nine are the anchors of the 50-950 ramp
+   below; nothing here invents a neutral, so the site, the logo and the figures
+   cannot drift apart. The figure series palette (NATURE_COLORS) orders the
+   same steps and is not touched by anything in this file.
+
+   The accent is the project's green, the one hue-bearing colour in the
+   identity. It already carries a meaning in the figures -- green is the best
+   rank in a critical-difference diagram -- and that meaning generalises
+   cleanly to "the thing worth looking at", so links, rules and the winning
+   cell in a benchmark table all draw from the same ramp rather than
+   introducing a second hue that would have to be justified separately.
+
+   Contrast decides which step of the accent gets used where. Accent-500
+   (#009A52) is strong enough for a rule, a mark or an underline but not for
+   text, so link text takes accent-600 (5.66:1 on Bright Snow) in light and
+   accent-400 (6.02:1 on Carbon Black) in dark, and accent-500 is kept for the
+   marks.
+
+   Geometry: one radius token at 6px, and the 1:4 radius-to-size ratio that
+   every rounded surface here reuses.
+   ========================================================================== */
 
 :root {
-  /* Identity palette: nine neutral steps, lightest to darkest. */
-  --gn-snow: #f8f9fa;        /* Bright Snow */
-  --gn-platinum: #e9ecef;    /* Platinum */
-  --gn-alabaster: #dee2e6;   /* Alabaster Grey */
-  --gn-pale: #ced4da;        /* Pale Slate */
-  --gn-pale-2: #adb5bd;      /* Pale Slate 2 */
-  --gn-slate: #6c757d;       /* Slate Grey */
-  --gn-iron: #495057;        /* Iron Grey */
-  --gn-gunmetal: #343a40;    /* Gunmetal */
-  --gn-carbon: #212529;      /* Carbon Black */
+  /* Identity palette: nine neutral steps, lightest to darkest. Mirrored whole
+     from BRAND_COLORS even where a step has no consumer here -- a partial copy
+     is how the site and the figures start to drift. */
+  --gn-50:  #f8f9fa;  /* Bright Snow */
+  --gn-100: #e9ecef;  /* Platinum */
+  --gn-200: #dee2e6;  /* Alabaster Grey */
+  --gn-300: #ced4da;  /* Pale Slate */
+  --gn-400: #adb5bd;  /* Pale Slate 2 */
+  --gn-600: #6c757d;  /* Slate Grey */
+  --gn-700: #495057;  /* Iron Grey */
+  --gn-800: #343a40;  /* Gunmetal */
+  --gn-950: #212529;  /* Carbon Black */
 
-  --md-primary-fg-color: var(--gn-carbon);
-  --md-primary-fg-color--light: var(--gn-iron);
-  --md-primary-fg-color--dark: var(--gn-carbon);
-  --md-accent-fg-color: var(--gn-iron);
-  --md-accent-fg-color--transparent: rgba(73, 80, 87, 0.1);
-  --md-default-bg-color: var(--gn-snow);
-  --gn-surface: rgba(233, 236, 239, 0.6);
-  --gn-border: rgba(33, 37, 41, 0.14);
-  --gn-border-strong: rgba(33, 37, 41, 0.3);
+  /* The dark scheme's ground. Carbon Black is the identity's darkest step but
+     it is a dark grey, not a black, and at full-page scale it reads as one --
+     so the dark scheme grounds on true black and uses the ramp above it for
+     the surfaces that have to separate from it. */
+  --gn-black: #000000;
+  --gn-black-raised: #0b0d0e;   /* inline code, the footer meta bar */
 
-  /* The hero's bottom margin. The stat band cancels it exactly to sit flush
-     against the hero, so the two must read the same number. */
-  --gn-hero-gap: 2.2rem;
+  /* Accent, around #009A52 (accent-500). The steps either side of it exist
+     only so that text can clear 4.5:1 in both schemes without changing hue. */
+  --gn-accent-400: #00ba62;
+  --gn-accent-500: #009a52;
+  --gn-accent-600: #00733d;
+  --gn-accent-700: #005c31;
 
-  /* "Chrome" = the header bar plus the hero/stat-band block. These follow the
-     colour scheme rather than being pinned dark, so light mode is one light
-     surface end to end. Pure white against the Bright Snow page gives the
-     block an edge without needing a heavier border.
-     Anything drawn on chrome must use these, never --gn-snow/--gn-carbon
-     directly, or it will invert in one scheme and not the other. */
-  --gn-chrome-bg: #ffffff;
-  --gn-chrome-fg: var(--gn-carbon);
-  --gn-chrome-fg-muted: rgba(33, 37, 41, 0.68);
-
-  /* Winning cell in a benchmark table. The one hue-bearing colour on the site,
-     and a deliberate exception to the neutrals-only rule above: it carries the
-     same "green = best rank" meaning as the CD diagram, so the table and the
-     figure agree. Hue is the green end of the CD ramp (paper/experiments
-     /_style.py); lightness is solved to 6:1 against the page rather than the
-     ramp's own maximum, because that lands on near-black #004625, which no
-     longer reads as green at body-text size. 5.66:1 on Bright Snow. */
-  --gn-win: #00733d;
+  --gn-radius: 6px;
 }
+
+/* --- light ----------------------------------------------------------------
+   Keyed on the primary rather than the scheme, so these hold for the light
+   scheme AND for the server-rendered first paint in "follow system" mode. The
+   slate block below overrides them; equal specificity, so source order decides.
+
+   The header takes the page ground and ink text, so Material's primary is the
+   background here and its "bg" token is the text.
+   -------------------------------------------------------------------------- */
 
 [data-md-color-primary="custom"] {
-  --md-primary-fg-color: var(--gn-carbon);
-  --md-primary-fg-color--light: var(--gn-iron);
-  --md-primary-fg-color--dark: var(--gn-carbon);
-  --md-primary-bg-color: var(--gn-snow);
-  --md-primary-bg-color--light: rgba(248, 249, 250, 0.7);
+  --md-primary-fg-color:          var(--gn-50);
+  --md-primary-fg-color--light:   var(--gn-100);
+  --md-primary-fg-color--dark:    var(--gn-200);
+  --md-primary-bg-color:          var(--gn-950);
+  --md-primary-bg-color--light:   rgba(33, 37, 41, 0.62);
+
+  --md-accent-fg-color:           var(--gn-accent-600);
+  --md-accent-fg-color--transparent: rgba(0, 154, 82, 0.1);
+
+  --md-typeset-a-color:           var(--gn-accent-text);
+
+  /* The page ground is Bright Snow, not white: a rendered figure, a code block
+     and the prose around them all sit on one surface. */
+  --md-default-bg-color:          var(--gn-50);
+  --md-default-bg-color--light:   rgba(248, 249, 250, 0.7);
+  --md-default-bg-color--lighter: rgba(248, 249, 250, 0.3);
+  --md-default-bg-color--lightest: rgba(248, 249, 250, 0.12);
+  --md-default-fg-color:          rgba(33, 37, 41, 0.87);
+  --md-default-fg-color--light:   rgba(33, 37, 41, 0.6);
+  --md-default-fg-color--lighter: rgba(33, 37, 41, 0.34);
+  --md-default-fg-color--lightest: rgba(33, 37, 41, 0.13);
+  --md-code-bg-color:             var(--gn-100);
+  --md-code-hl-color:             rgba(0, 154, 82, 0.12);
+
+  --md-footer-bg-color:           var(--gn-950);
+  --md-footer-bg-color--dark:     #15181a;
+
+  --gn-surface:                   var(--gn-100);
+  --gn-border:                    rgba(108, 117, 125, 0.32);
+  --gn-muted:                     var(--gn-700);
+  --gn-strong:                    var(--gn-950);
+
+  --gn-accent:                    var(--gn-accent-500);
+  --gn-accent-text:               var(--gn-accent-600);
+  --gn-rule:                      rgba(0, 154, 82, 0.42);
 }
-[data-md-color-accent="custom"] {
-  --md-accent-fg-color: var(--gn-iron);
-  --md-accent-fg-color--transparent: rgba(73, 80, 87, 0.1);
-  --md-accent-bg-color: var(--gn-snow);
-}
-[data-md-color-scheme="slate"][data-md-color-primary="custom"] {
-  --md-primary-fg-color: var(--gn-carbon);
-}
-[data-md-color-scheme="slate"][data-md-color-accent="custom"] {
-  --md-accent-fg-color: var(--gn-pale-2);
-  --md-accent-fg-color--transparent: rgba(173, 181, 189, 0.14);
-  --md-accent-bg-color: var(--gn-carbon);
-}
+
+/* --- dark -----------------------------------------------------------------
+   The ramp is inverted around the same two anchors rather than handed to
+   Material's blue-grey slate: Carbon Black becomes the ground, Bright Snow the
+   text.
+   -------------------------------------------------------------------------- */
 
 [data-md-color-scheme="slate"] {
   --md-hue: 210;
-  --md-default-bg-color: var(--gn-carbon);
-  --md-default-bg-color--light: var(--gn-gunmetal);
-  --md-default-bg-color--lighter: #3d444b;
-  --md-default-bg-color--lightest: var(--gn-iron);
-  --md-default-fg-color: var(--gn-snow);
-  --md-default-fg-color--light: var(--gn-alabaster);
-  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.42);
-  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.1);
-  --md-code-bg-color: var(--gn-gunmetal);
-  --md-code-fg-color: var(--gn-snow);
-  --md-footer-bg-color: var(--gn-carbon);
-  --md-footer-bg-color--dark: var(--gn-carbon);
-  --md-typeset-a-color: var(--gn-pale-2);
-  --gn-surface: rgba(173, 181, 189, 0.08);
-  --gn-border: rgba(248, 249, 250, 0.14);
-  --gn-border-strong: rgba(248, 249, 250, 0.26);
 
-  --gn-chrome-bg: var(--gn-carbon);
-  --gn-chrome-fg: var(--gn-snow);
-  --gn-chrome-fg-muted: rgba(248, 249, 250, 0.68);
+  /* The header and footer take the page ground, so the bar is black too and
+     only its hairline border separates it from the content. */
+  --md-primary-fg-color:          var(--gn-black);
+  --md-primary-fg-color--light:   var(--gn-black-raised);
+  --md-primary-fg-color--dark:    var(--gn-black);
+  --md-primary-bg-color:          var(--gn-50);
+  --md-primary-bg-color--light:   rgba(248, 249, 250, 0.62);
 
-  /* Same hue, solved upwards against Carbon Black instead: 6.02:1. */
-  --gn-win: #00ba62;
+  --md-accent-fg-color:           var(--gn-accent-400);
+  --md-accent-fg-color--transparent: rgba(0, 186, 98, 0.12);
+
+  --md-typeset-a-color:           var(--gn-accent-text);
+
+  --md-default-bg-color:          var(--gn-black);
+  --md-default-bg-color--light:   rgba(0, 0, 0, 0.54);
+  --md-default-bg-color--lighter: rgba(0, 0, 0, 0.26);
+  --md-default-bg-color--lightest: rgba(0, 0, 0, 0.07);
+  --md-default-fg-color:          rgba(248, 249, 250, 0.9);
+  --md-default-fg-color--light:   rgba(248, 249, 250, 0.62);
+  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.32);
+  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.14);
+  --md-code-bg-color:             var(--gn-black-raised);
+  --md-code-fg-color:             rgba(248, 249, 250, 0.86);
+  --md-code-hl-color:             rgba(0, 186, 98, 0.16);
+
+  --md-footer-bg-color:           var(--gn-black);
+  --md-footer-bg-color--dark:     var(--gn-black-raised);
+
+  --gn-surface:                   rgba(248, 249, 250, 0.05);
+  --gn-border:                    rgba(248, 249, 250, 0.2);
+  --gn-muted:                     var(--gn-400);
+  --gn-strong:                    var(--gn-50);
+
+  --gn-accent:                    var(--gn-accent-400);
+  --gn-accent-text:               var(--gn-accent-400);
+  --gn-rule:                      rgba(0, 186, 98, 0.45);
 }
+
+/* --- typography ---------------------------------------------------------- */
 
 /* Google Sans Flex for text and UI. It is a variable font with no italic
    master, so browsers synthesise oblique for <em>; that is expected. */
@@ -121,12 +164,11 @@ button {
   font-family: "Google Sans Flex", system-ui, -apple-system, "Segoe UI",
                Roboto, Helvetica, Arial, sans-serif;
   font-optical-sizing: auto;
-  font-feature-settings: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Code stays monospace — Google Sans Flex has no fixed-width master. */
+/* Code stays monospace: Google Sans Flex has no fixed-width master. */
 code,
 pre,
 kbd,
@@ -143,297 +185,236 @@ samp,
 }
 
 .md-typeset {
+  font-feature-settings: "kern", "liga", "calt", "tnum";
   line-height: 1.7;
-  font-size: 0.76rem;
 }
 
-/* ------------------------------------------------------------------ *
- * True-black scheme, aligned with the report-figure dark palette.     *
- * ------------------------------------------------------------------ */
-[data-md-color-scheme="slate"] {
-  --md-hue: 0;
-  --md-default-bg-color: var(--gn-carbon);
-  --md-default-bg-color--light: #101312;
-  --md-default-bg-color--lighter: #171b1c;
-  --md-default-bg-color--lightest: #1d2325;
-  --md-default-fg-color: var(--gn-snow);
-  --md-default-fg-color--light: rgba(248, 249, 250, 0.78);
-  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.42);
-  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.1);
-  --md-code-bg-color: #121618;
-  --md-code-fg-color: var(--gn-snow);
-  --md-footer-bg-color: var(--gn-carbon);
-  --md-footer-bg-color--dark: var(--gn-carbon);
-  --md-typeset-a-color: var(--gn-pale-2);
+.md-typeset h1 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--md-default-fg-color);
 }
 
-/* ------------------------------------------------------------------ *
- * Structural chrome — borders that frame the columns like a TUI.      *
- * ------------------------------------------------------------------ */
-/* Redefining --md-primary-bg-color *on the header* re-inks every descendant
-   Material colours with it — title, icons, search placeholder, repo stats —
-   in one declaration. The token itself is left alone globally, because it is
-   also the text colour of .md-button--primary out in the content. */
+/* A rule under the heading rather than over it: the line belongs to the
+   section it opens, and hanging it above leaves the last paragraph of the
+   previous section sitting on a border it has nothing to do with. */
+.md-typeset h2 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-top: 2.2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset h3,
+.md-typeset h4 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* --- header -------------------------------------------------------------- */
+
 .md-header {
-  --md-primary-bg-color: var(--gn-chrome-fg);
-  --md-primary-bg-color--light: var(--gn-chrome-fg-muted);
-  background-color: var(--gn-chrome-bg);
-  color: var(--gn-chrome-fg);
-  border-bottom: 1px solid var(--gn-border);
   box-shadow: none;
-}
-.md-footer {
-  background-color: var(--gn-carbon);
-  border-top: 1px solid var(--gn-border);
-}
-.md-footer-meta {
-  background-color: var(--gn-carbon);
-  font-size: 0.68rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
 }
 
-/* Sidebar / TOC column dividers. */
-@media screen and (min-width: 76.25em) {
-  .md-sidebar--primary {
-    border-right: 1px solid var(--gn-border);
-  }
-  .md-sidebar--secondary {
-    border-left: 1px solid var(--gn-border);
-  }
-}
-
-/* Header title + search, squared off. */
 .md-header__title {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-/* --gn-surface, not a fixed white tint: a 4%-white fill is invisible on the
-   light header. This token already inverts per scheme. */
-.md-search__form {
-  border-radius: 0;
-  border: 1px solid var(--gn-border);
-  background-color: var(--gn-surface);
-  box-shadow: none;
-}
-.md-search__input {
-  border-radius: 0;
-}
-[data-md-toggle="search"]:checked ~ .md-header .md-search__output,
-.md-search__output {
-  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* Header logo. The mark carries ~10% internal padding in its own design box,
-   so it is scaled up here to sit optically level with the wordmark. */
-.md-header__button.md-logo {
-  padding: 0.2rem;
-  margin: 0.1rem 0.2rem 0.1rem 0;
+.md-header__button.md-logo :is(img, svg) {
+  height: 1.6rem;
+  width: 1.6rem;
 }
-.md-header__button.md-logo img,
-.md-header__button.md-logo svg {
-  height: 1.9rem;
-  width: 1.9rem;
-  /* No glow: it would fill the mark's open counters and close it up. */
-  filter: none;
-}
-/* The header follows the scheme, so the mark has to as well. mkdocs.yml points
-   theme.logo at the Carbon Black file (light is the default scheme); slate
-   swaps in the Bright Snow one. `content` is the only hook here — the src is
-   written by the theme, not by this page. */
+
+/* mkdocs.yml points theme.logo at the Carbon Black mark, because light is the
+   default scheme. Slate swaps in the Bright Snow file; `content` is the only
+   hook, since the src is written by the theme rather than by the page. */
 [data-md-color-scheme="slate"] .md-header__button.md-logo img {
   content: url("../logo.png");
 }
 
-/* ------------------------------------------------------------------ *
- * Navigation — flat labels, boxed active item.                        *
- * ------------------------------------------------------------------ */
+.md-tabs {
+  border-bottom: none;
+}
+
+/* --- navigation ---------------------------------------------------------- */
+
 .md-nav {
   font-size: 0.72rem;
 }
+
 .md-nav__title {
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* Section labels (Getting started / User guide / API reference). */
+/* Section labels (Getting started / Concepts / Models / Guides). */
 .md-nav__item--section > .md-nav__link,
 .md-nav--primary .md-nav__item--section > label.md-nav__link {
   color: var(--md-default-fg-color);
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.66rem;
-  opacity: 0.9;
-  margin-top: 0.5rem;
+  font-size: 0.64rem;
+  opacity: 0.8;
+  margin-top: 0.6rem;
 }
 
-/* Links: quieter, squared hover box. */
 .md-nav__link {
-  border-radius: 0;
-  transition: background-color 100ms ease, color 100ms ease;
-}
-.md-nav__link:hover {
-  color: var(--md-default-fg-color);
-  /* Scheme-aware: a fixed 4%-white wash gave no hover feedback at all against
-     the Bright Snow page in light mode. */
-  background-color: var(--gn-surface);
-}
-.md-nav__link--active,
-.md-nav__link--active:focus,
-.md-nav__link--active:hover,
-.md-nav__item .md-nav__link--active {
-  color: var(--md-default-fg-color);
-  font-weight: 700;
-  background-color: var(--md-default-fg-color--lightest);
-  box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
-  padding-left: 0.9rem;
+  border-radius: var(--gn-radius);
+  transition: color 125ms;
 }
 
-/* TOC ("On this page") heading. */
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: var(--gn-accent-text);
+  font-weight: 600;
+}
+
 .md-nav--secondary .md-nav__title {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.66rem;
-  font-weight: 700;
+  font-size: 0.64rem;
+  font-weight: 600;
 }
 
-/* ------------------------------------------------------------------ *
- * Typography — mono headings, subtle underlined links.                *
- * ------------------------------------------------------------------ */
-.md-typeset h1 {
-  font-weight: 700;
-  font-size: 2rem;
-  letter-spacing: 0;
-  color: var(--md-default-fg-color);
-  margin-bottom: 0.3rem;
-}
-.md-typeset h2 {
-  font-weight: 700;
-  font-size: 1.35rem;
-  letter-spacing: 0;
-  margin-top: 2.4em;
-  padding-top: 1em;
-  border-top: 1px solid var(--md-default-fg-color--lightest);
-}
-.md-typeset h3 {
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0;
-}
-.md-typeset h4 {
-  font-weight: 700;
-}
+/* --- links ----------------------------------------------------------------
+   Accent-coloured, underlined at 2px offset with the rule at partial strength
+   going to full on hover. The colour is accent-600 rather than #009A52
+   because this is text and has to clear 4.5:1. Only body prose gets the
+   underline: nav, tables of contents and cards are already distinguished by
+   position, and underlining them would turn the page into a grid of rules. */
 
-/* Inline links: thin underline, accent on hover. */
-.md-typeset a {
-  color: var(--md-default-fg-color);
+.md-typeset a:not(.md-button):not(.headerlink):not(.footnote-backref) {
   text-decoration: underline;
-  text-decoration-color: var(--gn-border-strong);
-  text-underline-offset: 3px;
+  text-decoration-color: var(--gn-rule);
+  text-underline-offset: 2px;
   text-decoration-thickness: 1px;
-  transition: color 100ms ease, text-decoration-color 100ms ease;
+  transition: text-decoration-color 125ms;
 }
-.md-typeset a:hover {
-  color: var(--md-accent-fg-color);
-  text-decoration-color: var(--md-accent-fg-color);
+
+.md-typeset a:not(.md-button):not(.headerlink):hover {
+  text-decoration-color: var(--gn-accent);
 }
-.md-typeset .headerlink,
-.md-nav__link,
-.md-typeset .md-button {
+
+/* Cards, signposts and figure links carry their own frame; an underline inside
+   one reads as a second border. */
+.md-typeset :is(.grid.cards, .gn-signpost, figure) a {
   text-decoration: none;
 }
 
-/* ------------------------------------------------------------------ *
- * Surfaces — everything square and flat.                              *
- * ------------------------------------------------------------------ */
-.md-typeset pre > code,
+.md-typeset .md-button {
+  border-radius: 999px;
+  border-color: var(--gn-border);
+}
+
+.md-typeset .md-button--primary {
+  background: var(--gn-accent-600);
+  border-color: var(--gn-accent-600);
+  color: #ffffff;
+}
+
+.md-typeset .md-button--primary:is(:hover, :focus) {
+  background: var(--gn-accent-700);
+  border-color: var(--gn-accent-700);
+  color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .md-button--primary {
+  background: var(--gn-accent-600);
+  border-color: var(--gn-accent-600);
+}
+
+/* --- rounded surfaces, at the 1:4 ratio ---------------------------------- */
+
+.md-typeset :is(pre, .highlight > pre, .highlighttable, .admonition, details,
+                .tabbed-set > .tabbed-content, table:not([class])) {
+  border-radius: var(--gn-radius);
+}
+
+.md-typeset .highlight > pre > code,
+.md-typeset pre > code {
+  border-radius: var(--gn-radius);
+}
+
 .md-typeset code {
-  border-radius: 0;
+  border-radius: 4px;
+  font-size: 0.82em;
 }
-.md-typeset code {
-  font-size: 0.86em;
-  padding: 0.1em 0.35em;
-}
-[data-md-color-scheme="slate"] .md-typeset .highlight,
-[data-md-color-scheme="slate"] .md-typeset pre > code {
-  border: 1px solid var(--gn-border);
-}
+
+/* --- tables -------------------------------------------------------------- */
 
 .md-typeset table:not([class]) {
-  border: 1px solid var(--gn-border);
-  border-radius: 0;
-  overflow: hidden;
-  font-size: 0.72rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: none;
+  font-size: 0.74rem;
 }
+
 .md-typeset table:not([class]) th {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 0.68rem;
-}
-
-[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
-  background: rgba(248, 249, 250, 0.04);
-}
-
-.md-typeset img {
-  border-radius: 0;
-}
-.md-typeset figure img,
-.md-typeset p > img:not(.gn-hero__logo) {
-  border: 1px solid var(--gn-border);
-  box-shadow: none;
-}
-.md-typeset figcaption {
-  color: var(--md-default-fg-color--light);
-  font-size: 0.7rem;
-  margin-top: 0.4em;
-}
-
-.md-typeset .admonition,
-.md-typeset details {
-  border-radius: 0;
-  border: 1px solid var(--gn-border);
-  border-left-width: 3px;
-  font-size: 0.72rem;
-  box-shadow: none;
-}
-
-/* Content buttons flat. */
-.md-typeset .md-button {
-  border-radius: 0;
-}
-
-/* Material paints .md-button in --md-primary-fg-color, which this palette
-   pins to Carbon Black in *both* schemes so the header stays dark. On the
-   slate page that is ink on ink — an invisible button. Buttons in the hero
-   have their own rules; these are the ones in ordinary content. */
-[data-md-color-scheme="slate"] .md-typeset .md-button {
+  background: var(--gn-surface);
   color: var(--md-default-fg-color);
-  border-color: var(--gn-border-strong);
-}
-[data-md-color-scheme="slate"] .md-typeset .md-button:hover,
-[data-md-color-scheme="slate"] .md-typeset .md-button:focus {
-  color: var(--gn-carbon);
-  background-color: var(--md-default-fg-color);
-  border-color: var(--md-default-fg-color);
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* mkdocstrings signatures. */
-.md-typeset .doc-signature > pre {
-  border-radius: 0;
+.md-typeset table:not([class]) td {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  vertical-align: top;
 }
 
-/* ================================================================== *
- * Home hero — flat, monospace, always-dark so the light logo reads.   *
- * ================================================================== */
+.md-typeset table:not([class]) tr:hover {
+  background: var(--md-accent-fg-color--transparent);
+}
+
+/* --- admonitions: hairline, not candy ------------------------------------ */
+
+.md-typeset :is(.admonition, details) {
+  border-width: 1px;
+  border-left-width: 3px;
+  box-shadow: none;
+  font-size: 0.76rem;
+}
+
+.md-typeset :is(.note, .info, .abstract) {
+  border-color: var(--gn-border);
+}
+
+.md-typeset :is(.note, .info, .abstract) > :is(.admonition-title, summary) {
+  background: var(--gn-surface);
+}
+
+/* --- code blocks --------------------------------------------------------- */
+
+.md-typeset .highlight {
+  --md-code-bg-color: var(--md-default-bg-color);
+}
+
+.md-typeset .highlight > pre,
+.md-typeset .highlighttable {
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset .highlight code {
+  font-variant-ligatures: none;
+}
+
+/* --- home: hero -----------------------------------------------------------
+   No ground of its own: the hero sits directly on the page, and the lockup,
+   kicker and tagline carry it. Nothing here paints a background, so the block
+   inherits --md-default-bg-color in both schemes. */
+
 .gn-hero {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 4rem 0 3.4rem;
   text-align: center;
-  margin: 0.5rem 0 var(--gn-hero-gap);
-  padding: 1.7rem 1.5rem 1.5rem;
-  overflow: hidden;
-  /* Flat fill, no gradient and no texture. */
-  background: var(--gn-chrome-bg);
-  border: 1px solid var(--gn-border);
 }
 
 /* Mark and wordmark on one line, matching the README banner's lockup. A
@@ -442,238 +423,189 @@ samp,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
 }
 
 .gn-hero__logo {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   margin: 0;
   border: none !important;
   box-shadow: none !important;
-  /* Flat ground, so no shadow is needed to separate the mark. */
-  filter: none;
 }
 
-.md-typeset .gn-hero__title {
-  margin: 0;
-  font-size: 2.1rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+.gn-hero__word {
+  font-size: 3rem;
+  font-weight: 650;
+  letter-spacing: -0.045em;
   line-height: 1;
-  color: var(--gn-chrome-fg);
-  border-top: none;
-  padding-top: 0;
+  color: var(--gn-strong);
 }
-.md-typeset .gn-hero__title .headerlink {
-  display: none;
+
+.gn-hero__kicker {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gn-muted);
 }
 
 .gn-hero__tagline {
-  font-size: 0.84rem;
-  line-height: 1.5;
-  color: var(--gn-chrome-fg-muted);
   max-width: 34rem;
-  margin: 0.75rem auto 1.05rem;
-}
-
-/* Flat, terminal-style hero buttons. */
-.gn-hero .md-button {
-  margin: 0.3rem 0.35rem;
-  border-radius: 0;
-  font-weight: 700;
-  box-shadow: none;
-  transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
-}
-/* Inverted against the chrome, so the CTA stays the strongest thing in the
-   hero in either scheme: ink-on-white in light, white-on-ink in dark.
-
-   The [data-md-color-scheme] prefix is load-bearing, not decoration. The
-   generic content-button rule above is written as
-   [data-md-color-scheme="slate"] .md-typeset .md-button — specificity 0-3-0.
-   Without a matching attribute selector here these would be 0-2-0 and lose,
-   repainting the primary CTA white-on-white in dark mode. */
-[data-md-color-scheme] .gn-hero .md-button--primary {
-  background: var(--gn-chrome-fg);
-  border-color: var(--gn-chrome-fg);
-  color: var(--gn-chrome-bg);
-}
-[data-md-color-scheme] .gn-hero .md-button--primary:hover {
-  background: var(--gn-chrome-fg-muted);
-  border-color: var(--gn-chrome-fg-muted);
-  color: var(--gn-chrome-bg);
-}
-[data-md-color-scheme] .gn-hero .md-button:not(.md-button--primary) {
-  color: var(--gn-chrome-fg);
-  border-color: var(--gn-border-strong);
-}
-[data-md-color-scheme] .gn-hero .md-button:not(.md-button--primary):hover {
-  background: var(--gn-chrome-fg);
-  border-color: var(--gn-chrome-fg);
-  color: var(--gn-chrome-bg);
-}
-
-.gn-hero + h2 {
-  border-top: none;
-  margin-top: 1rem;
-  padding-top: 0;
-}
-
-@media screen and (max-width: 44.9375em) {
-  .gn-hero { padding: 1.4rem 1rem 1.3rem; }
-  .gn-hero__logo { width: 34px; height: 34px; }
-  .gn-hero__lockup { gap: 0.45rem; }
-  .md-typeset .gn-hero__title { font-size: 1.65rem; }
-}
-
-/* ------------------------------------------------------------------ *
- * Feature grid — flat bordered cards.                                 *
- * ------------------------------------------------------------------ */
-/* Two columns, not auto-fit: there are exactly four cards, and auto-fit
-   resolves to three at desktop widths, leaving a two-cell hole in the grid. */
-.gn-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  margin: 1.5rem 0;
-  background: var(--gn-border);
-  border: 1px solid var(--gn-border);
-}
-@media screen and (max-width: 44.9375em) {
-  .gn-grid { grid-template-columns: 1fr; }
-}
-.gn-card {
-  padding: 1.1rem 1.25rem;
-  background: var(--md-default-bg-color);
-  transition: background-color 120ms ease;
-}
-.gn-card:hover {
-  background-color: rgba(248, 249, 250, 0.03);
-}
-[data-md-color-scheme="default"] .gn-card:hover {
-  background-color: rgba(33, 37, 41, 0.02);
-}
-.gn-card h3 {
-  margin: 0 0 0.4rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-.gn-card p {
   margin: 0;
-  font-size: 0.72rem;
-  color: var(--md-default-fg-color--light);
-}
-.gn-card a {
-  text-decoration: none;
-}
-.gn-card a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--gn-muted);
 }
 
-/* Critical-difference figures on the home page. */
-.gn-cd {
-  max-width: 46rem;
-  margin: 1.5rem auto;
+.gn-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-/* ------------------------------------------------------------------ *
- * Stat band — the four scale numbers, directly under the hero.        *
- *                                                                      *
- * Shares the hairline-gap construction with .gn-grid: a 1px background  *
- * showing through the gaps is one rule instead of per-cell borders that  *
- * double up where cells meet.                                            *
- * ------------------------------------------------------------------ */
+.md-typeset .gn-hero + h2 {
+  margin-top: 1.4em;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .gn-hero { padding: 2.6rem 0 2.4rem; }
+  .gn-hero__logo { width: 38px; height: 38px; }
+  .gn-hero__lockup { gap: 0.5rem; }
+  .gn-hero__word { font-size: 2.2rem; }
+}
+
+/* --- home: the four scale numbers ---------------------------------------- */
+
 .gn-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  /* Pulled up by the hero's full bottom margin so the band reads as one
-     structure with it, sharing the hero's bottom edge as its own top. */
-  margin: calc(-1 * var(--gn-hero-gap)) 0 2.2rem;
-  background: var(--gn-border);
-  border: 1px solid var(--gn-border);
-  border-top: none;
+  margin: 1.6rem 0 2rem;
+  overflow: hidden;
+  background: var(--md-default-fg-color--lightest);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--gn-radius);
 }
+
 .gn-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
+  gap: 0.2rem;
   padding: 1rem 0.5rem;
-  /* Chrome, not page background: the band is flush with the hero and the two
-     must read as one surface. */
-  background: var(--gn-chrome-bg);
+  background: var(--md-default-bg-color);
   text-align: center;
 }
+
 .gn-stat__n {
-  font-size: 1.9rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 650;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
-  color: var(--gn-chrome-fg);
+  color: var(--gn-strong);
 }
+
 .gn-stat__l {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: var(--gn-chrome-fg-muted);
+  color: var(--gn-muted);
 }
 
-/* Two-up below the hero's mobile breakpoint: four columns of a 1.9rem
-   numeral do not fit a phone without the labels wrapping to three lines. */
+/* Four columns of a 1.7rem numeral do not fit a phone without the labels
+   wrapping to three lines. */
 @media screen and (max-width: 44.9375em) {
   .gn-stats { grid-template-columns: repeat(2, 1fr); }
-  .gn-stat__n { font-size: 1.55rem; }
+  .gn-stat__n { font-size: 1.45rem; }
 }
 
-/* ------------------------------------------------------------------ *
- * Result callout — the headline statistics of the breadth run.        *
- *                                                                      *
- * A borderless two-column table: the point is the numbers, and the      *
- * table chrome that suits a data table only competes with them here.    *
- * ------------------------------------------------------------------ */
+/* --- grid cards ---------------------------------------------------------- */
+
+.md-typeset .grid.cards > :is(ul, ol) > li,
+.md-typeset .grid > .card {
+  border-radius: var(--gn-radius);
+  border-color: var(--md-default-fg-color--lightest);
+  box-shadow: none;
+  transition: border-color 125ms, background-color 125ms;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li:hover {
+  border-color: var(--gn-border);
+  background: var(--gn-surface);
+  box-shadow: none;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li > hr {
+  margin: 0.6em 0;
+  border-color: var(--md-default-fg-color--lightest);
+}
+
+/* --- signposts: the two-line "what / where" rows ------------------------- */
+
+.gn-signpost {
+  display: block;
+  padding: 0.55rem 0.8rem;
+  margin: 0.35rem 0;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 3px solid var(--gn-strong);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  font-size: 0.76rem;
+}
+
+/* --- result callout: a borderless two-column definition table ------------ */
+
 .gn-result {
   margin: 1.5rem 0;
-  border-left: 3px solid var(--md-default-fg-color);
+  border-left: 3px solid var(--gn-accent);
+  border-radius: var(--gn-radius);
   background: var(--gn-surface);
+  overflow: hidden;
 }
+
 /* Material wraps every table in an inline-block scroll container, which
    shrink-wraps to the content and leaves the callout's ground showing to the
    right. Both the wrapper and the table have to be told to fill the width. */
 .gn-result .md-typeset__table {
   display: block;
   width: 100%;
-  /* Material's own bottom margin would otherwise show as a bare strip of the
-     callout's ground below the final row. */
   margin: 0;
   padding: 0;
 }
+
 .md-typeset .gn-result table:not([class]) {
   display: table;
   width: 100%;
   margin: 0;
   border: none;
+  border-radius: 0;
   font-size: 0.73rem;
 }
+
 .md-typeset .gn-result table:not([class]) thead {
   display: none; /* the header row is empty: this is a definition list */
 }
+
 .md-typeset .gn-result table:not([class]) td {
   border: none;
-  border-top: 1px solid var(--gn-border);
+  border-top: 1px solid var(--md-default-fg-color--lightest);
   padding: 0.5rem 1rem;
   vertical-align: baseline;
 }
+
 .md-typeset .gn-result table:not([class]) tr:first-child td {
   border-top: none;
 }
+
 .md-typeset .gn-result table:not([class]) td:first-child {
   width: 34%;
   color: var(--md-default-fg-color--light);
 }
+
 .md-typeset .gn-result table:not([class]) tr:hover {
   background: none;
 }
@@ -682,24 +614,14 @@ samp,
   .md-typeset .gn-result table:not([class]) td:first-child { width: 45%; }
 }
 
-/* ------------------------------------------------------------------ *
- * Wide result table — the ten-category sweep.                         *
- *                                                                      *
- * Eight columns of "0.000 ± 0.000". Wrapping a value across two lines   *
- * makes the column unreadable and pushes the last model off the visible  *
- * area, so cells never wrap and the table scrolls instead. Material's     *
- * wrapper already provides the scroll; it just needs a reason to use it.  *
- * ------------------------------------------------------------------ */
-/* ------------------------------------------------------------------ *
- * Benchmark tables — the winning cell is green.                       *
- *                                                                      *
- * Scoped to .gn-bench, never to tables generally: bold also marks the   *
- * aggregate column in the adequacy table and the verdicts in the result  *
- * callout, and neither of those is a "best", so colouring every <strong>  *
- * would assert a winner where there is none.                              *
- * ------------------------------------------------------------------ */
+/* --- benchmark tables -----------------------------------------------------
+   The winning cell is accent-coloured, scoped to .gn-bench and never to tables
+   generally: bold also marks the aggregate column in the adequacy table and
+   the verdicts in the result callout, and neither of those is a "best", so
+   colouring every <strong> would assert a winner where there is none. */
+
 .md-typeset .gn-bench table:not([class]) strong {
-  color: var(--gn-win);
+  color: var(--gn-accent-text);
 }
 
 /* Material's scroll wrapper is injected by JS only for tables that are direct
@@ -711,33 +633,126 @@ samp,
   max-width: 100%;
   overflow-x: auto;
 }
+
 .md-typeset .gn-wide table:not([class]) {
-  font-size: 0.64rem;
+  font-size: 0.66rem;
 }
+
 .md-typeset .gn-wide table:not([class]) th,
 .md-typeset .gn-wide table:not([class]) td {
   white-space: nowrap;
   padding: 0.45em 0.5em;
 }
+
 /* The metric columns are the ones under pressure; the two label columns can
    give up their trailing space without becoming harder to read. */
 .md-typeset .gn-wide table:not([class]) th:nth-child(-n + 2),
 .md-typeset .gn-wide table:not([class]) td:nth-child(-n + 2) {
   padding-right: 0.9em;
 }
+
 /* Numerals align on the decimal point when they share an advance width. */
 .md-typeset .gn-wide table:not([class]) td:nth-child(n + 3) {
   font-variant-numeric: tabular-nums;
 }
 
-/* Paired call-to-action buttons sitting on their own line. */
-.md-typeset .gn-cd + p .md-button {
-  margin-right: 0.4rem;
-}
-
 /* The legend word, inked like the cells it describes, so the key is literally
    a sample of the thing rather than a description of it. */
 .md-typeset .gn-win-key {
-  color: var(--gn-win);
-  font-weight: 700;
+  color: var(--gn-accent-text);
+  font-weight: 600;
+}
+
+/* --- api reference ------------------------------------------------------- */
+
+.md-typeset .doc-heading {
+  scroll-margin-top: 4rem;
+}
+
+.md-typeset h2.doc-heading code,
+.md-typeset h3.doc-heading code,
+.md-typeset h4.doc-heading code {
+  background: none;
+  padding: 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: inherit;
+}
+
+.md-typeset .doc-symbol-heading,
+.md-typeset .doc-symbol-toc {
+  border-radius: 4px;
+}
+
+.md-typeset .doc-symbol-parameter,
+.md-typeset .doc-symbol-attribute {
+  font-weight: 500;
+}
+
+.md-typeset .doc-contents {
+  border-left: 1px solid var(--md-default-fg-color--lightest);
+  padding-left: 1rem;
+  margin-left: 0.1rem;
+}
+
+.md-typeset .doc-children > div > .doc-contents {
+  margin-bottom: 1.6rem;
+}
+
+.md-typeset .doc-label {
+  border-radius: 3px;
+}
+
+.md-typeset .doc-signature > pre {
+  border-radius: var(--gn-radius);
+}
+
+/* --- figures ------------------------------------------------------------- */
+
+.md-typeset figure {
+  margin: 1.4em auto;
+}
+
+.md-typeset figure img {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--gn-radius);
+}
+
+.md-typeset figcaption {
+  max-width: 34rem;
+  margin: 0.6em auto 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--gn-muted);
+}
+
+/* The critical-difference figures carry no border, because the dark one is
+   saved transparent (_gen_cd_figures.py passes transparent=dark) and sits
+   straight on the black page. A frame would draw a box around nothing. */
+.gn-cd {
+  max-width: 46rem;
+  margin: 1.5rem auto;
+}
+
+/* --- footer -------------------------------------------------------------- */
+
+.md-footer {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-footer-meta {
+  font-size: 0.7rem;
+}
+
+/* --- search -------------------------------------------------------------- */
+
+.md-search__form,
+.md-search__output {
+  border-radius: var(--gn-radius);
+}
+
+/* --- math ---------------------------------------------------------------- */
+
+.md-typeset mjx-container {
+  font-size: 1.02em;
 }

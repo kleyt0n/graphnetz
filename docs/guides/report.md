@@ -22,7 +22,7 @@ designed to answer a different question.
 | What if I score at the best epoch instead of the last? | `epoch_selection` | re-derives every statistic |
 | How would a different task weighting rank them? | `mean_ranks(aggregation=…)` | weighted mean ranks |
 
-The last four are covered in [Is the evidence sufficient?](adequacy.md) and
+The last four are covered in [Adequacy](../concepts/adequacy.md) and
 below.
 
 ## Summary table
