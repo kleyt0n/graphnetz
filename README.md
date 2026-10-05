@@ -1,280 +1,197 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-banner-dark.svg">
-    <img src="assets/logo-banner.svg" alt="graphnetz" width="320">
+    <img src="assets/logo-banner.svg" alt="graphnetz" width="300">
   </picture>
 </p>
 
-<p align="center"><em>Statistically rigorous GNN benchmarking</em></p>
+<p align="center">Statistically rigorous benchmarking for graph neural networks.</p>
 
 <p align="center">
-  <a href="https://github.com/Kleyt0n/graphnetz/actions"><img alt="Build" src="https://img.shields.io/badge/build-passing-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="https://kleyt0n.github.io/graphnetz/"><img alt="Docs" src="https://img.shields.io/badge/passing-docs-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-212529?style=flat-square&labelColor=e9ecef"></a>
-  <a href="https://arxiv.org/pdf/2605.09099"><img alt="Paper" src="https://img.shields.io/badge/paper-PDF-212529?style=flat-square&labelColor=e9ecef"></a>
+  <a href="https://github.com/kleyt0n/graphnetz/actions/workflows/ci.yaml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/kleyt0n/graphnetz/ci.yaml?branch=main&style=flat-square&label=ci"></a>
+  <a href="https://pypi.org/project/graphnetz/"><img alt="PyPI" src="https://img.shields.io/pypi/v/graphnetz?style=flat-square&color=8da9c4"></a>
+  <a href="https://kleyt0n.github.io/graphnetz/"><img alt="Docs" src="https://img.shields.io/badge/docs-online-8da9c4?style=flat-square"></a>
+  <a href="https://arxiv.org/abs/2605.09099"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2605.09099-8da9c4?style=flat-square"></a>
+  <a href="LICENCE.txt"><img alt="License" src="https://img.shields.io/badge/license-MIT-8da9c4?style=flat-square"></a>
 </p>
 
 ---
 
-## Why graphnetz
+graphnetz trains every *(task, model, seed)* triple through one pipeline and
+returns a statistical report instead of an accuracy table:
 
-Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, graphnetz turns the usual "train, evaluate, table of accuracies" workflow into a proper statistical report. It gives you confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets via critical-difference diagrams. The point isn't to crown a leaderboard winner. It's to give researchers a way to quantify uncertainty, compare methods fairly, and produce the evidence reviewers actually ask for in graph-learning papers.
+- a Student's *t* confidence interval for every cell,
+- paired *t*-tests or Wilcoxon signed-rank tests within each task, Holm-corrected,
+- Friedman ranks and a Nemenyi critical difference across tasks,
+- power, minimum detectable effect and equivalence tests, so a
+  non-significant result can be read as "tied" or "underpowered".
 
+The catalogue holds 62 dataset loaders across 10 domains and 4 task types,
+with 5 architectures and a DGI pre-training utility.
 
-Most GNN benchmarks report point-estimate accuracies on a handful of citation graphs and declare a winner without confidence intervals, multiple-comparison correction, or rank aggregation across datasets. graphnetz's default output is a **structured statistical report**, not a raw accuracy table:
-
-- multi-seed Student's *t* confidence intervals per cell,
-- Holm–Bonferroni paired *t*-tests (or Wilcoxon signed-rank) within each task,
-- Demšar critical-difference diagrams from Friedman ranks with a Nemenyi post-hoc.
-
-The catalogue is organised along a **category × task** taxonomy: 
-
-- 62 dataset loaders across 10 scientific categories
-- 4 task types (node classification, graph classification, graph regression, link prediction)
-- 5 canonical architectures (GCN, GAT, GIN, GraphSAGE, Graph Transformer) plug into every tasl via a small set of task adapters;
+**Documentation:** [kleyt0n.github.io/graphnetz](https://kleyt0n.github.io/graphnetz/)
 
 ## Install
 
 ```bash
-uv add graphnetz
+uv add graphnetz                # core
+uv add "graphnetz[ogb]"         # plus the OGB loaders
+uv add "graphnetz[chem]"        # plus RDKit, for the molecular loaders
 ```
 
-For local development:
+Requires Python 3.10+, `torch` 2.6+ and `torch-geometric` 2.6+.
+
+For development:
 
 ```bash
-git clone https://github.com/Kleyt0n/graphnetz
+git clone https://github.com/kleyt0n/graphnetz
 cd graphnetz
 uv sync --group dev
 ```
 
-graphnetz requires Python ≥ 3.10, `torch ≥ 2.6`, and `torch-geometric ≥ 2.6`.
-
 ## Quick start
 
 ```python
-from graphnetz import GCN, train_node_classification, plot_history
-from graphnetz.datasets.social import cora
-
-ds = cora("data/cora")
-model = GCN(ds.num_features, 64, ds.num_classes)
-history = train_node_classification(model, ds[0], epochs=200)
-fig, ax = plot_history(history, title="GCN on Cora")
-```
-
-For a full benchmark run with the default statistical report:
-
-```python
-from graphnetz import GAT, GCN, GraphSAGE, GraphTransformer, run_benchmark
+from graphnetz import GAT, GCN, GraphSAGE, run_benchmark
 
 report = run_benchmark(
     "social",
-    {"GCN": GCN, "GAT": GAT, "GraphSAGE": GraphSAGE, "GraphTransformer": GraphTransformer},
-    seeds=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-    task_type="node_cls",          # restrict to one task family
+    {"GCN": GCN, "GAT": GAT, "GraphSAGE": GraphSAGE},
+    seeds=range(10),
+    task_type="node_cls",
 )
-print(report.summary())       # per-(task, model) mean ± t-CI
-print(report.pairwise())      # Holm-corrected paired t-tests (or Wilcoxon)
-fig, _ = report.plot_critical_difference(alpha=0.05)
+
+report.summary()                        # mean and t-CI per (task, model)
+report.pairwise()                       # Holm-corrected paired tests
+report.friedman()                       # omnibus test on ranks across tasks
+report.power()                          # what this design could detect
+report.plot_critical_difference()       # Demšar diagram
+report.to_latex("results.tex")          # booktabs table, row-best in bold
 ```
+
+## The report
+
+`run_benchmark` returns a `BenchmarkReport`. Every method reads the same
+`X[task, model, seed]` tensor, so nothing downstream retrains.
+
+| Method | Returns |
+|---|---|
+| `summary(ci=0.95)` | mean, std, sem and CI bounds per (task, model) |
+| `pairwise(alpha=0.05)` | paired *t* or Wilcoxon tests within each task, raw and Holm *p*-values |
+| `friedman(alpha=0.05)` | Friedman omnibus statistic and *p*-value across tasks |
+| `power(alpha=0.05)` | minimum detectable effect and observed power per comparison |
+| `equivalence(margin)` | two one-sided tests (TOST) with a verdict per comparison |
+| `plot_critical_difference()` | Demšar diagram from Friedman ranks and the Nemenyi CD |
+| `plot_pairwise(layout="matrix")` | pairwise significance, as a matrix or a list |
+| `plot_forest()` | per-task forest plot of mean and CI |
+| `plot_learning_curves()` | learning curves with CI bands |
+| `to_latex(path)` | publication table, best per row in bold |
+| `pairwise_to_latex(path)` | pairwise test table |
+| `to_json(path)` | the full report, reloadable with `BenchmarkReport.from_json` |
+
+See [Reading the report](https://kleyt0n.github.io/graphnetz/guides/report/).
 
 ## Tasks
 
-| Kind | Symbol | Metric | Examples |
-|---|---|---|---|
-| Node classification | `node_cls` | test accuracy | Cora, Roman-empire |
-| Graph classification | `graph_cls` | val accuracy | MUTAG, MNIST-superpixels |
-| Graph regression | `graph_reg` | val MAE | ZINC, QM9 |
-| Link prediction | `link_pred` | test AUC | FB15k-237, Internet AS |
+| Task | Symbol | Metric |
+|---|---|---|
+| Node classification | `node_cls` | test accuracy |
+| Graph classification | `graph_cls` | validation accuracy |
+| Graph regression | `graph_reg` | validation MAE (lower is better) |
+| Link prediction | `link_pred` | test ROC-AUC |
 
 Unlabelled graphs (Netzschleuder, synthetic combinatorial, Ising lattice)
-enter the benchmark through link prediction on a held-out edge split, so
-every cell carries a real test-time metric; there is no self-supervised
-*pretext* loss in the headline report.
+enter through link prediction on a held-out edge split, so every cell carries
+a held-out metric.
 
-## Dataset categories
+## Datasets
 
-| Category | # | Tasks | Loaders |
+| Category | Loaders | Tasks | Examples |
 |---|---:|---|---|
-| Combinatorial | 6 | LP | random TSP, VRP, max-flow, bipartite matching, coloring, max-cut |
-| Biology | 12 | GC, GR, LP | MUTAG, PROTEINS, ENZYMES, Peptides-func/struct, PPI, C. elegans, Budapest connectome, hospital/high-school contacts, ogbg-molhiv†, ogbg-molpcba† |
-| Social | 16 | NC, LP | Cora, CiteSeer, PubMed, WikiCS, Roman-empire, Amazon-ratings, Minesweeper, Tolokers, Questions, MovieLens-100k, Karate, Facebook friends, DBLP coauthor, DNC emails, ogbn-arxiv†, ogbl-collab† |
-| Knowledge | 3 | LP | FB15k-237, WordNet18-RR, WordNet (Netz) |
-| Infrastructure | 6 | LP | power grid, EuroRoad, US roads, EU airlines, London transport, urban streets |
-| Finance | 5 | NC, LP | Elliptic Bitcoin, product space, board of directors, US patents, ogbn-products† |
-| Computing | 4 | LP | Internet AS, Internet topology, AS-Skitter, route views |
-| Vision | 4 | GC | MNIST/CIFAR-10 superpixels, ModelNet10/40 |
+| Combinatorial | 6 | LP | random TSP, VRP, max-flow, matching, coloring, max-cut |
+| Biology | 12 | GC, GR, LP | MUTAG, PROTEINS, ENZYMES, Peptides, PPI, C. elegans, ogbg-molhiv† |
+| Social | 16 | NC, LP | Cora, CiteSeer, PubMed, WikiCS, Roman-empire, Tolokers, ogbn-arxiv† |
+| Knowledge | 3 | LP | FB15k-237, WordNet18-RR, WordNet |
+| Infrastructure | 6 | LP | power grid, EuroRoad, US roads, EU airlines, London transport |
+| Finance | 5 | NC, LP | Elliptic Bitcoin, product space, board interlocks, ogbn-products† |
+| Computing | 4 | LP | Internet AS, AS-Skitter, route views |
+| Vision | 4 | GC | MNIST and CIFAR-10 superpixels, ModelNet10/40 |
 | Physics | 3 | GR, LP | QM9, ZINC, Ising lattice |
-| Security | 3 | GC, LP | MalNet-Tiny, 9/11 terrorists, train terrorists |
+| Security | 3 | GC, LP | MalNet-Tiny, terrorist networks |
 
-† Requires the optional `ogb` extra (`uv add "graphnetz[ogb]"`). The
-five OGB loaders are folded into their domain categories rather than
-exposed as a separate `ogb` category, so they appear in
-`run_benchmark(category, ...)` alongside the curated built-ins.
-
-```python
-from graphnetz.datasets.social import cora, roman_empire
-from graphnetz.datasets.biology import peptides_func
-from graphnetz.datasets.computing import internet_as
-
-# Optional OGB loaders live in their domain modules (require `uv add "graphnetz[ogb]"`):
-from graphnetz.datasets.social import ogbn_arxiv     # node_cls
-from graphnetz.datasets.biology import ogbg_molhiv   # graph_cls
-
-ds_cora = cora("data/cora")
-ds_rom  = roman_empire("data/roman_empire")        # heterophilic
-ds_pep  = peptides_func("data/peptides_func")      # LRGB
-ds_inet = internet_as("data/internet_as")          # Netzschleuder
-```
-
-For arbitrary [Netzschleuder](https://networks.skewed.de/) networks:
+† Requires the `ogb` extra. OGB loaders live in their domain category.
 
 ```python
 from graphnetz import Netz
-ds = Netz(root="data", dataset_name="urban_streets", network_name="brasilia")
+from graphnetz.datasets.social import cora
+
+ds = cora("data/cora")
+streets = Netz(root="data", dataset_name="urban_streets", network_name="brasilia")
 ```
+
+`Netz` loads any network from the [Netzschleuder](https://networks.skewed.de/)
+archive. See [Datasets](https://kleyt0n.github.io/graphnetz/guides/datasets/).
 
 ## Models
 
-| Model | Kinds | Source |
+| Model | Tasks | Reference |
 |---|---|---|
-| `GCN`  | all four | Kipf & Welling, ICLR 2017 |
-| `GAT`  | all four | Veličković et al., ICLR 2018 |
-| `GIN`  | `graph_cls`, `graph_reg` | Xu et al., ICLR 2019 |
+| `GCN` | all four | Kipf & Welling, ICLR 2017 |
+| `GAT` | all four | Veličković et al., ICLR 2018 |
+| `GIN` | `graph_cls`, `graph_reg` | Xu et al., ICLR 2019 |
 | `GraphSAGE` | all four | Hamilton et al., NeurIPS 2017 |
-| `GraphTransformer` | all four | Shi et al., 2021 |
-| `DGI` | *(utility)* | Veličković et al., ICLR 2019 |
+| `GraphTransformer` | all four | Shi et al., IJCAI 2021 |
+| `DGI` | pre-training utility | Veličković et al., ICLR 2019 |
 
-Node-level encoders enter every task through three small adapters:
-graph-level pooling head, dot-product link-prediction head, and the DGI
-self-supervised wrapper for optional unsupervised pre-training.
+Node-level encoders reach graph-level and link tasks through adapters the
+runner attaches automatically.
 
-## Bring your own model
+## Custom models
 
-The contract is two methods: `__init__(in_channels, hidden_channels,
-out_channels)` and `forward(data)` taking a PyG `Data`. Declare which task
-your model supports and it becomes a first-class citizen of the benchmark —
-same seeds, same splits, same corrections as the built-ins.
+A model needs `__init__(in_channels, hidden_channels, out_channels)`,
+`forward(data)` and a declared task type. It then runs with the same seeds,
+splits and corrections as the built-ins.
 
 ```python
 import torch
-import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
-
-from graphnetz import GAT, GCN, register_model, run_benchmark
+from graphnetz import GCN, register_model, run_benchmark
 
 
 @register_model(task_type="node_cls")
-class ResGCN(torch.nn.Module):
-    """Three-layer GCN with a residual hop — your model goes here."""
-
-    def __init__(self, in_channels, hidden_channels, out_channels, *, dropout=0.5):
-        super().__init__()
-        self.inp = GCNConv(in_channels, hidden_channels)
-        self.mid = GCNConv(hidden_channels, hidden_channels)
-        self.out = GCNConv(hidden_channels, out_channels)
-        self.dropout = dropout
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        x = F.relu(self.inp(x, edge_index))
-        x = F.relu(self.mid(x, edge_index)) + x          # residual hop
-        x = F.dropout(x, p=self.dropout, training=self.training)
-        return self.out(x, edge_index)
-
-
-report = run_benchmark(
-    "social",
-    {"GCN": GCN, "GAT": GAT, "ResGCN": ResGCN},
-    only=["cora"],
-    task_type="node_cls",
-    seeds=range(10),
-)
-print(report.summary())     # mean ± t-CI, your model beside the baselines
-print(report.pairwise())    # is it *really* better, after Holm correction?
-```
-
-`summary()` returns one row per (task, model); `pairwise()` returns every
-comparison with its raw and Holm-adjusted *p*-value, so a claim like "ResGCN
-beats GCN" either survives correction or it does not:
-
-```
-             n_seeds      mean       std       sem    ci_low   ci_high
-task model
-cora GAT           3  0.802333  0.013013  0.007513  0.770008  0.834659
-     GCN           3  0.790667  0.003215  0.001856  0.782681  0.798652
-     ResGCN        3  0.790667  0.011150  0.006438  0.762967  0.818366
-```
-
-Three ways to declare the task, depending on how permanent the model is:
-
-```python
-# 1. Decorator — permanent registration at import time.
-@register_model(task_type="node_cls")
-class MyGNN(torch.nn.Module): ...
-
-# 2. Class attribute — same effect, no import-time dependency on graphnetz.
 class MyGNN(torch.nn.Module):
-    task_types = {"node_cls", "graph_cls"}
+    def __init__(self, in_channels, hidden_channels, out_channels): ...
+    def forward(self, data): ...
 
-# 3. Inline tuple — one-shot variants, e.g. a hyperparameter sweep. The third
-#    slot is a factory (in_channels, hidden_channels, out_channels) -> Module.
-run_benchmark(
-    "social",
-    {
-        "MyGNN-d0.3": (MyGNN, "node_cls", lambda i, h, o: MyGNN(i, h, o, dropout=0.3)),
-        "MyGNN-d0.5": (MyGNN, "node_cls", lambda i, h, o: MyGNN(i, h, o, dropout=0.5)),
-    },
-)
+
+report = run_benchmark("social", {"GCN": GCN, "MyGNN": MyGNN}, seeds=range(10))
 ```
 
-Custom **datasets** follow the same pattern — pass `tasks=[Task(...)]` to
-`run_benchmark` to bypass the built-in catalogue entirely. See
-[Custom models & datasets](https://kleyt0n.github.io/graphnetz/getting-started/custom/).
+Task types can also be declared with a `task_types` class attribute or an
+inline `(cls, task, factory)` tuple. Custom datasets go in through
+`run_benchmark(tasks=[Task(...)])`. See
+[Custom models](https://kleyt0n.github.io/graphnetz/guides/custom-models/) and
+[Custom datasets](https://kleyt0n.github.io/graphnetz/guides/custom-datasets/).
 
-## The statistical report
+## Examples
 
-`run_benchmark(...)` returns a `BenchmarkReport` with the following methods:
-
-| Method | Output |
+| Notebook | Covers |
 |---|---|
-| `report.summary(ci=0.95)` | per-(task, model) mean ± *t*-CI half-width DataFrame |
-| `report.pairwise(alpha=0.05)` | Holm-corrected paired *t*-tests or Wilcoxon signed-rank tests within each task |
-| `report.plot_critical_difference()` | Demšar / Nemenyi CD diagram across tasks |
-| `report.plot_pairwise(layout=...)` | matrix or list view of pairwise significance |
-| `report.plot_forest()` | per-task forest plot of mean ± CI |
-| `report.plot_learning_curves()` | shared-y learning curves with t-CI bands |
-| `report.to_latex(path)` | publication-ready bold-best LaTeX table |
-| `report.pairwise_to_latex(path)` | Holm pairwise LaTeX table (parametric or non-parametric) |
-
-## Notebooks
-
-Worked examples live under `examples/`:
-
-- `01_benchmark.ipynb`: the cross-category dashboard (multi-seed report,
-  bootstrap CIs, custom-model integration).
-- `02_knowledge.ipynb`: relational link prediction on FB15k-237 / WN18-RR
-  using the DistMult decoder.
-
-## Contributors
-
-<a href="https://github.com/kleyt0n/graphnetz/graphs/contributors">
-  <img alt="Contributors to graphnetz" src="https://contrib.rocks/image?repo=kleyt0n/graphnetz">
-</a>
+| [`01_benchmark.ipynb`](examples/01_benchmark.ipynb) | cross-category benchmark and report |
+| [`02_knowledge.ipynb`](examples/02_knowledge.ipynb) | relational link prediction on FB15k-237 and WN18-RR |
+| [`03_custom_artifacts.ipynb`](examples/03_custom_artifacts.ipynb) | your own model and dataset in the same pipeline |
+| [`04_ogb.ipynb`](examples/04_ogb.ipynb) | the OGB loaders |
 
 ## Citation
 
-If graphnetz is useful in your work, please cite the accompanying paper:
-
 ```bibtex
 @misc{dacosta2026graphnetz,
-  title={graphnetz: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation}, 
-  author={Kleyton da Costa and Bernardo Modenesi},
-  year={2026},
-  eprint={2605.09099},
-  archivePrefix={arXiv},
-  primaryClass={cs.CE},
-  url={https://arxiv.org/abs/2605.09099}, 
+  title         = {{GraphNetz}: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation},
+  author        = {Kleyton da Costa and Bernardo Modenesi},
+  year          = {2026},
+  eprint        = {2605.09099},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CE},
+  url           = {https://arxiv.org/abs/2605.09099}
 }
 ```
 
