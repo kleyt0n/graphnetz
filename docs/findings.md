@@ -1,6 +1,6 @@
 ---
 title: Findings
-description: Every number GraphNetz claims, including the negative ones.
+description: Every number graphnetz claims, including the negative ones.
 ---
 
 # Findings
@@ -18,7 +18,7 @@ winner anyway.
 
 One representative dataset per category, all four general-purpose encoders.
 Values are mean ± Student's-*t* CI half-width, higher is better throughout.
-<strong class="gn-win-key">Bold green</strong> is the best cell in the row;
+<strong class="gn-win-key">Bold blue</strong> is the best cell in the row;
 *italic* marks a model whose interval overlaps the best one, so the two are
 not distinguishable. Task tags: **NC** node classification and **GC** graph
 classification, both scored by accuracy; **LP** link prediction, scored by

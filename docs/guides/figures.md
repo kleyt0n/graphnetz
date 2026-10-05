@@ -1,6 +1,6 @@
 # Figures and tables
 
-Every figure and table in a GraphNetz paper is one method call on a
+Every figure and table in a graphnetz paper is one method call on a
 [`BenchmarkReport`](report.md), drawn on a palette the library owns. This
 page covers the output side: which artefact to emit, how the palette is
 constructed, and how to keep a figure and its table from disagreeing.
@@ -71,8 +71,9 @@ dozen models on a dozen tasks still fits one column.
 ## The two palettes
 
 [`BRAND_COLORS`][graphnetz.plotting.BRAND_COLORS] is the identity palette — a
-nine-step neutral ramp, light to dark — shared by this site, the logo and the
-figures. [`NATURE_COLORS`][graphnetz.plotting.NATURE_COLORS] selects and
+nine-step neutral ramp, light to dark — used by the
+figures. The docs site uses Material's
+default palette. [`NATURE_COLORS`][graphnetz.plotting.NATURE_COLORS] selects and
 **orders** seven of those steps for plot series.
 
 The two used to be independent, so that restyling the site could not change a

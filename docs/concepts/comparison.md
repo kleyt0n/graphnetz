@@ -6,7 +6,7 @@ procedures:
 - **within a task** — is model A better than model B *on this dataset*?
 - **across tasks** — does one model win *in general*?
 
-GraphNetz answers the first with Holm-corrected paired tests and the second
+graphnetz answers the first with Holm-corrected paired tests and the second
 with Friedman ranks and a Nemenyi critical difference. Using either
 procedure for the other question is a mistake the library tries hard to make
 difficult.
@@ -57,7 +57,7 @@ six, and at $\alpha = 0.05$ the chance of at least one false positive among
 six independent tests is about 26 %. Reporting raw *p*-values across a table
 of comparisons is how benchmarks manufacture significance for free.
 
-GraphNetz applies **Holm step-down** within each task, controlling the
+graphnetz applies **Holm step-down** within each task, controlling the
 family-wise error rate:
 
 $$p_i^{\text{adj}} \;=\; \min\!\big(p_{(i)}\,(k - i),\, 1\big)$$

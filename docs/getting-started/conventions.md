@@ -78,7 +78,7 @@ defaults to `"custom"` and is used only to namespace cache directories.
 
 ## Where state lives
 
-GraphNetz keeps two global registries, and both have explicit escape hatches
+graphnetz keeps two global registries, and both have explicit escape hatches
 because global state in a benchmark is a reproducibility hazard:
 
 | registry | holds | mutated by | bypassed by |

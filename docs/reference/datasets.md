@@ -13,29 +13,31 @@ can be handed straight to [`run_benchmark`][graphnetz.benchmark.run_benchmark].
     [`BENCHMARK_TASKS`][graphnetz.benchmark.BENCHMARK_TASKS]. See
     [Dataset taxonomy](../guides/datasets.md).
 
-## Registry
+## Overview
 
 ::: graphnetz.datasets
     options:
-      members:
-        - LOADER_REGISTRY
-        - CATEGORIES
-        - list_datasets
+      members: false
+      show_root_heading: false
+      show_root_toc_entry: false
+
+## Registry
+
+::: graphnetz.datasets.LOADER_REGISTRY
+
+::: graphnetz.datasets.CATEGORIES
+
+::: graphnetz.datasets.list_datasets
 
 ## Auditing the catalogue
 
-::: graphnetz.datasets
-    options:
-      members:
-        - validate_loaders
+::: graphnetz.datasets.validate_loaders
 
 ## Netzschleuder access
 
-::: graphnetz.datasets
-    options:
-      members:
-        - Netz
-        - download_all_networks_netz
+::: graphnetz.datasets.Netz
+
+::: graphnetz.datasets.download_all_networks_netz
 
 ## Per-category loaders
 

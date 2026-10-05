@@ -1,83 +1,189 @@
 ---
-title: GraphNetz
+title: graphnetz
 description: A GNN benchmark whose default output is a statistical report, not a leaderboard.
 hide:
-  - navigation
+  - toc
 ---
 
-<div class="gn-hero" markdown="0">
-  <div class="gn-hero__lockup">
-    <!-- Material hides whichever does not match the active scheme, via the
-         #only-light / #only-dark src suffixes. The hero ground follows the
-         scheme, so a single-ink mark would disappear in one of them. -->
-    <img class="gn-hero__logo" src="logo-ink.png#only-light" alt="">
-    <img class="gn-hero__logo" src="logo.png#only-dark" alt="">
-    <div class="gn-hero__word">GraphNetz</div>
-  </div>
-  <div class="gn-hero__kicker">Graph Learning Benchmark</div>
-  <p class="gn-hero__tagline">
-    A GNN benchmark whose default output is a statistical report, not a
-    leaderboard. Sixty-two loaders, four task families, one pipeline, and a
-    report that says when its own evidence is thin.
-  </p>
+<!-- The hero carries the visible title. A real h1 stays for screen readers and
+     search, and stops Material inserting a "Home" heading above the hero. -->
+# graphnetz { .gn-sr-only }
+
+<div class="gn-hero" markdown>
+
+<div class="gn-hero__lockup" markdown="0">
+  <!-- Material hides whichever does not match the active scheme, via the
+       #only-light / #only-dark src suffixes. -->
+  <img class="gn-hero__logo" src="logo-ink.svg#only-light" alt="">
+  <img class="gn-hero__logo" src="logo-light.svg#only-dark" alt="">
+  <div class="gn-hero__word">graphnetz</div>
 </div>
 
-<!-- No markdown="1" on the cells: the spans carry no markdown, and the
-     extension would wrap each pair in a <p>, collapsing the flex column. -->
-<div class="gn-stats">
-  <div class="gn-stat"><span class="gn-stat__n">62</span><span class="gn-stat__l">dataset loaders</span></div>
-  <div class="gn-stat"><span class="gn-stat__n">10</span><span class="gn-stat__l">categories</span></div>
-  <div class="gn-stat"><span class="gn-stat__n">4</span><span class="gn-stat__l">task types</span></div>
-  <div class="gn-stat"><span class="gn-stat__n">6</span><span class="gn-stat__l">architectures</span></div>
+<p class="gn-hero__tagline">
+  Benchmark graph neural networks and get back a statistical report,
+  not a leaderboard.
+</p>
+
+<div class="gn-hero__actions" markdown>
+[Get started](getting-started/quickstart.md){ .md-button .md-button--primary }
+[:fontawesome-brands-github: GitHub](https://github.com/Kleyt0n/graphnetz){ .md-button }
 </div>
 
-## Overview
+</div>
 
-`graphnetz` is a Python library for benchmarking graph neural networks. You
-give it a category, a set of models and a list of seeds; it trains every
-compatible *(task, model, seed)* triple and hands back a **report** rather
-than a table of accuracies.
+## Why graphnetz
 
-The report is the point. It carries a confidence interval for every cell,
-paired model comparisons with multiple-testing correction within each task,
-and rank-based aggregation across tasks. It also grades itself: the same
-seed-paired data answers *could this design have detected a difference at
-all?*, which is the question a non-significant result actually raises.
+Most GNN benchmarks report one accuracy per cell and name a winner. graphnetz
+trains every *(task, model, seed)* triple through one pipeline and answers the
+questions a reviewer actually asks.
 
-## Install
+<div class="grid cards gn-features" markdown>
 
-```bash
-uv add graphnetz                # core
-uv add "graphnetz[ogb]"         # core plus the OGB loaders
-uv add "graphnetz[chem]"        # core plus RDKit, for the molecular loaders
-```
+-   :material-chart-bell-curve:{ .lg } __Intervals on every cell__
 
-Python 3.10 or newer, with `torch` ≥ 2.6 and `torch-geometric` ≥ 2.6. The
-optional extras are listed in
-[Installation](getting-started/installation.md).
+    Mean and Student's *t* confidence interval over paired seeds, so a
+    difference comes with its uncertainty attached.
 
-## Quick start
+    [:octicons-arrow-right-24: Uncertainty](concepts/uncertainty.md)
 
-```python
-from graphnetz import GAT, GCN, GraphSAGE, run_benchmark
+-   :material-scale-balance:{ .lg } __Corrected comparisons__
 
-report = run_benchmark(
-    "social",
-    {"GCN": GCN, "GAT": GAT, "GraphSAGE": GraphSAGE},
-    seeds=range(10),
-    task_type="node_cls",
-)
+    Paired *t*-tests or Wilcoxon signed-rank within each task, Holm-corrected
+    for the number of pairs.
 
-print(report.summary())          # per-cell mean ± Student's t CI
-print(report.pairwise())         # Holm-corrected paired t-tests
-print(report.power())            # what this design could have detected
-report.plot_critical_difference(alpha=0.05)
-report.to_latex("results.tex")   # publication-ready table
-```
+    [:octicons-arrow-right-24: Comparison](concepts/comparison.md)
 
-The [Quickstart](getting-started/quickstart.md) takes this from a fresh
-install to a ten-seed sweep with a LaTeX table and a critical-difference
-diagram.
+-   :material-podium:{ .lg } __Ranks across tasks__
+
+    Friedman omnibus, Nemenyi critical difference, and the Demšar diagram for
+    the "does it win in general?" question.
+
+    [:octicons-arrow-right-24: Comparison](concepts/comparison.md#across-tasks-friedman-and-nemenyi)
+
+-   :material-magnify-scan:{ .lg } __A report that grades itself__
+
+    Minimum detectable effect, observed power and equivalence tests say
+    whether a non-significant result means "tied" or "underpowered".
+
+    [:octicons-arrow-right-24: Adequacy](concepts/adequacy.md)
+
+-   :material-graph-outline:{ .lg } __One pipeline, four task families__
+
+    Node and graph classification, graph regression and link prediction.
+    Adapters let node encoders reach every task without a second code path.
+
+    [:octicons-arrow-right-24: Tasks and metrics](concepts/tasks.md)
+
+-   :material-database-outline:{ .lg } __A catalogue across ten domains__
+
+    PyG built-ins, OGB and the Netzschleuder archive, from citation graphs to
+    power grids, molecules and connectomes.
+
+    [:octicons-arrow-right-24: Datasets](guides/datasets.md)
+
+</div>
+
+## From install to report
+
+=== "Install"
+
+    ```bash
+    uv add graphnetz                # core
+    uv add "graphnetz[ogb]"         # plus the OGB loaders
+    uv add "graphnetz[chem]"        # plus RDKit, for the molecular loaders
+    ```
+
+    Python 3.10 or newer, with `torch` ≥ 2.6 and `torch-geometric` ≥ 2.6. See
+    [Installation](getting-started/installation.md) for the extras.
+
+=== "Run"
+
+    ```python
+    from graphnetz import GAT, GCN, GraphSAGE, run_benchmark
+
+    report = run_benchmark(
+        "social",
+        {"GCN": GCN, "GAT": GAT, "GraphSAGE": GraphSAGE},
+        seeds=range(10),
+        task_type="node_cls",
+    )
+    ```
+
+    Every compatible *(task, model, seed)* triple is trained with the same
+    splits, the same seeding and the same epoch budget.
+
+=== "Read"
+
+    ```python
+    report.summary()       # per-cell mean ± Student's t CI
+    report.pairwise()      # Holm-corrected paired tests within each task
+    report.friedman()      # omnibus test on ranks across tasks
+    report.power()         # what this design could have detected
+    ```
+
+    Every view reads the same `X[task, model, seed]` tensor. Nothing
+    downstream retrains. See [Reading the report](guides/report.md).
+
+=== "Publish"
+
+    ```python
+    report.plot_critical_difference(alpha=0.05)
+    report.to_latex("results.tex")       # booktabs table, row-best in bold
+    report.to_json("report.json")        # reload later with from_json
+    ```
+
+    Figures follow single and double column widths and save as vector output.
+    See [Figures and tables](guides/figures.md).
+
+## How a run works
+
+<div class="gn-steps" markdown>
+
+1.  __Catalogue__
+
+    The category maps to its curated tasks.
+
+2.  __Encoders__
+
+    Models that cannot serve a task are dropped.
+
+3.  __Training__
+
+    Each triple is reseeded and trained.
+
+4.  __Statistics__
+
+    Intervals, paired tests, ranks.
+
+5.  __Report__
+
+    One object holds every view.
+
+</div>
+
+The [benchmark protocol](guides/benchmark.md) covers each stage in full.
+
+## What the evidence says
+
+<div class="gn-evidence" markdown>
+
+<div class="gn-evidence__figure" markdown>
+![Demšar critical-difference diagram over ten categories. Mean ranks: GraphSAGE 2.10, GCN 2.20, GAT 2.80, GraphTransformer 2.90. All four are joined by one clique bar.](img/critical_difference.png#only-light)
+![Demšar critical-difference diagram over ten categories. Mean ranks: GraphSAGE 2.10, GCN 2.20, GAT 2.80, GraphTransformer 2.90. All four are joined by one clique bar.](img/critical_difference_dark.png#only-dark)
+</div>
+
+<div class="gn-evidence__text" markdown>
+Four general-purpose encoders, one dataset from each of ten categories, ten
+seeds per cell. The Friedman test does not reject
+($\chi^2_3 = 3.00$, $p = 0.392$) and all four sit in one clique.
+
+Ten categories are not enough evidence to order these architectures. A
+benchmark that reported only the means would have declared a winner anyway.
+
+[Read the findings :octicons-arrow-right-24:](findings.md){ .md-button }
+</div>
+
+</div>
 
 ## Models
 
@@ -93,12 +199,10 @@ separates them is how a node embedding is computed, not how it is evaluated.
 | [`GraphTransformer`](models/graph-transformer.md) | all four | multi-head transformer convolution | Shi et al., IJCAI 2021 |
 | [`DGI`](models/dgi.md) | *(pre-training utility)* | mutual-information maximisation | Veličković et al., ICLR 2019 |
 
-Four of the six are node-level encoders that never learned about graph
-classification or link prediction. They reach those tasks through
-[adapters](models/adapters.md) the runner attaches automatically, which is
-what makes "the same pipeline for every cell" more than a slogan.
+Bring your own with a decorator, a class attribute or an inline tuple. See
+[Custom models](guides/custom-models.md).
 
-## Documentation
+## Explore the docs
 
 <div class="grid cards" markdown>
 
@@ -109,71 +213,39 @@ what makes "the same pipeline for every cell" more than a slogan.
     Install the right extras, train one model, then run your first multi-seed
     benchmark.
 
-    [:octicons-arrow-right-24: Installation](getting-started/installation.md) ·
-    [Quickstart](getting-started/quickstart.md) ·
-    [Conventions](getting-started/conventions.md)
+    [:octicons-arrow-right-24: Quickstart](getting-started/quickstart.md)
 
 -   :material-lightbulb-outline:{ .lg .middle } __Concepts__
 
     ---
 
-    What the four task families are, where the intervals come from, which
-    correction applies where, and how to tell a tie from an underpowered test.
+    Where the intervals come from, which correction applies where, and how to
+    tell a tie from an underpowered test.
 
-    [:octicons-arrow-right-24: Concepts](concepts/index.md) ·
-    [Uncertainty](concepts/uncertainty.md) ·
-    [Comparison](concepts/comparison.md) ·
-    [Adequacy](concepts/adequacy.md)
+    [:octicons-arrow-right-24: Concepts](concepts/index.md)
 
--   :material-cog-outline:{ .lg .middle } __Guides__
+-   :material-book-open-variant:{ .lg .middle } __Guides__
 
     ---
 
     The five-stage protocol, the dataset catalogue, every view on the report,
-    and how to plug in your own model or dataset.
+    and hyperparameter search.
 
-    [:octicons-arrow-right-24: Benchmark protocol](guides/benchmark.md) ·
-    [Datasets](guides/datasets.md) ·
-    [Reading the report](guides/report.md) ·
-    [Custom models](guides/custom-models.md)
+    [:octicons-arrow-right-24: Benchmark protocol](guides/benchmark.md)
 
--   :material-chart-line-variant:{ .lg .middle } __Findings and reference__
+-   :material-code-braces:{ .lg .middle } __API reference__
 
     ---
 
-    Every number this library claims, including the negative ones, and the
-    full API organised by module.
+    Every public symbol, organised by module, with its docstring and source.
 
-    [:octicons-arrow-right-24: Findings](findings.md) ·
-    [API reference](reference/index.md)
+    [:octicons-arrow-right-24: API reference](reference/index.md)
 
 </div>
 
-## Library layout
-
-| module | contents |
-| --- | --- |
-| [`graphnetz.benchmark`](reference/benchmark.md) | the runner, the task catalogue, the model registry, `BenchmarkReport` |
-| [`graphnetz.datasets`](reference/datasets.md) | 62 loaders across 10 categories, the Netzschleuder client, the catalogue auditor |
-| [`graphnetz.models`](reference/models.md) | GCN, GAT, GIN, GraphSAGE, GraphTransformer, DGI, and the task adapters |
-| [`graphnetz.training`](reference/training.md) | one trainer per task family, each returning a per-epoch history |
-| [`graphnetz.plotting`](reference/plotting.md) | the brand and figure palettes, figure helpers, plot builders |
-
-`BenchmarkReport` is the centre of the library rather than an add-on. The
-runner's only job is to fill in a metric tensor `X[task, model, seed]`;
-everything a user asks of a benchmark — intervals, corrected tests, ranks,
-power, equivalence, LaTeX — is a method on the report reading that same
-tensor. Nothing downstream requires retraining.
-
-## Project
-
-- **Source**: [github.com/Kleyt0n/graphnetz](https://github.com/Kleyt0n/graphnetz)
-- **Package**: [pypi.org/project/graphnetz](https://pypi.org/project/graphnetz/)
-- **License**: MIT
-- **Results**: [every number, including the negative ones](findings.md)
-
-!!! question "Already have a report?"
-    A benchmark should also say when its own evidence is thin.
-    [Adequacy](concepts/adequacy.md) covers the minimum detectable effect,
-    equivalence testing, and how much benchmark breadth a rank ordering would
-    actually need.
+<div class="gn-project" markdown>
+[:fontawesome-brands-github: Source](https://github.com/Kleyt0n/graphnetz)
+[:fontawesome-brands-python: PyPI](https://pypi.org/project/graphnetz/)
+[:material-file-document-outline: Paper](https://arxiv.org/pdf/2605.09099)
+[:material-scale-balance: MIT License](https://github.com/Kleyt0n/graphnetz/blob/main/LICENCE.txt)
+</div>

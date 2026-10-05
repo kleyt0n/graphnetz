@@ -1,6 +1,6 @@
-# Contributing to GraphNetz
+# Contributing to graphnetz
 
-Thanks for your interest in contributing. GraphNetz is a research-grade
+Thanks for your interest in contributing. graphnetz is a research-grade
 benchmarking framework, so the bar for new code is *correctness, statistical
 honesty, and clarity* — in that order.
 

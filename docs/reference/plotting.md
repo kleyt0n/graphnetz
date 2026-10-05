@@ -3,8 +3,8 @@
 Figure helpers and the two palettes:
 
 - [`BRAND_COLORS`][graphnetz.plotting.BRAND_COLORS] is the project's identity
-  palette — a nine-step neutral ramp, light to dark — used by this site, the
-  logo, and now the figures.
+  palette — a nine-step neutral ramp, light to dark — used by the figures. The
+  docs site uses Material's default palette.
 - [`NATURE_COLORS`][graphnetz.plotting.NATURE_COLORS] selects and **orders**
   seven of those steps for **plot series**.
 
@@ -23,31 +23,38 @@ they appear as bar fills stroked in ink. Luminance is a weaker cue than hue, so
 prefer a marker or a direct label over colour alone when a series must be
 identified at a glance.
 
-## Palettes
+## Overview
 
 ::: graphnetz.plotting
     options:
-      members:
-        - BRAND_COLORS
-        - NATURE_COLORS
-        - NATURE_RC
-        - COLUMN_INCHES
+      members: false
+      show_root_heading: false
+      show_root_toc_entry: false
+
+## Palettes
+
+::: graphnetz.plotting.BRAND_COLORS
+
+::: graphnetz.plotting.NATURE_COLORS
+
+::: graphnetz.plotting.NATURE_RC
+
+::: graphnetz.plotting.COLUMN_INCHES
 
 ## Figure helpers
 
-::: graphnetz.plotting
-    options:
-      members:
-        - set_plot_style
-        - figure
-        - save_figure
-        - panel_label
-        - pretty_metric
+::: graphnetz.plotting.set_plot_style
+
+::: graphnetz.plotting.figure
+
+::: graphnetz.plotting.save_figure
+
+::: graphnetz.plotting.panel_label
+
+::: graphnetz.plotting.pretty_metric
 
 ## Plot builders
 
-::: graphnetz.plotting
-    options:
-      members:
-        - plot_history
-        - plot_grouped_bars
+::: graphnetz.plotting.plot_history
+
+::: graphnetz.plotting.plot_grouped_bars
