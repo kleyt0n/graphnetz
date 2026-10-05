@@ -33,7 +33,7 @@ never schedule.
 Unlabelled graphs — the Netzschleuder networks, the synthetic combinatorial
 instances, the Ising lattice — are the majority of the catalogue, and the
 obvious way to score them is a pretext loss such as Deep Graph Infomax.
-GraphNetz does not do that.
+graphnetz does not do that.
 
 A DGI loss is its own metric: there is no held-out signal, so a "better"
 number can always be obtained by a model that reconstructs its own corruption

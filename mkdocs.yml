@@ -1,4 +1,4 @@
-site_name: GraphNetz
+site_name: graphnetz
 site_description: >-
   A large-scale database and benchmark for graph learning: statistically
   rigorous GNN benchmarking whose default output is a statistical report,
@@ -14,26 +14,21 @@ docs_dir: docs
 
 theme:
   name: material
-  # Carbon Black ink: the header is light in the default scheme. The
-  # stylesheet swaps in logo.png (Bright Snow ink) under slate.
-  logo: logo-ink.png
+  # Single-ink mark: the header is the brand blue in both schemes, where the
+  # two-tone mark's blue node would vanish.
+  logo: logo.svg
   favicon: favicon.png
   icon:
     repo: fontawesome/brands/github
-  font:
-    # Google Sans Flex is a variable font with no italic master; Material asks
-    # Google Fonts for italics and the browser synthesises them. Code keeps a
-    # true monospace, which Flex does not provide.
-    text: Google Sans Flex
-    code: IBM Plex Mono
+  # Roboto is loaded by stylesheets/extra.css as a variable font, so the
+  # 500/600/650 weights used for headings and nav render as cut rather than
+  # snapping to the 400/700 pair Material requests by default.
+  font: false
   palette:
-    # primary/accent are `custom`, so Material defers to the palette defined
-    # in stylesheets/extra.css (mirrored from graphnetz.plotting.BRAND_COLORS).
-    #
-    # The "follow system" entry needs the custom colours too: Material renders
-    # the FIRST entry's palette server-side and only swaps to the matching
-    # light/dark entry once its JS runs. Without these, a cold load flashes
-    # Material's default indigo before settling on Bright Snow and Carbon Black.
+    # primary/accent are `custom`, defined in stylesheets/extra.css around the
+    # brand blue #8da9c4. Spelled out on every entry: Material renders the
+    # FIRST entry's palette server-side, so all three must agree or a cold load
+    # flashes Material's indigo before settling on the blue.
     - media: "(prefers-color-scheme)"
       primary: custom
       accent: custom
@@ -65,7 +60,10 @@ theme:
     - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
-    - navigation.sections
+    # Left sidebar: top-level groups collapse, and only the one holding the
+    # current page opens, so the whole site fits one screen of navigation.
+    # Breadcrumbs above the title say where a page sits in that tree.
+    - navigation.path
     - navigation.top
     - navigation.tracking
     - navigation.footer
@@ -84,10 +82,10 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Kleyt0n/graphnetz
-      name: GraphNetz on GitHub
+      name: graphnetz on GitHub
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/graphnetz/
-      name: GraphNetz on PyPI
+      name: graphnetz on PyPI
   generator: false
 
 # Sources that live next to the docs but should not be published: the figure
@@ -211,11 +209,11 @@ nav:
       - Benchmark protocol: guides/benchmark.md
       - Datasets: guides/datasets.md
       - Reading the report: guides/report.md
-      - Custom models: guides/custom-models.md
-      - Custom datasets: guides/custom-datasets.md
       - Hyperparameter search: guides/search.md
       - Figures and tables: guides/figures.md
-      - Contributing: guides/contributing.md
+  - Extending:
+      - Custom models: guides/custom-models.md
+      - Custom datasets: guides/custom-datasets.md
   - Findings: findings.md
   - API reference:
       - reference/index.md
@@ -224,3 +222,4 @@ nav:
       - graphnetz.models: reference/models.md
       - graphnetz.training: reference/training.md
       - graphnetz.plotting: reference/plotting.md
+  - Contributing: guides/contributing.md

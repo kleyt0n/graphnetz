@@ -2,7 +2,7 @@
 
 A benchmark whose numbers move between runs cannot support any of the
 statistics in [Comparison](comparison.md), because the pairing those tests
-rely on would be fictional. This page states exactly what GraphNetz
+rely on would be fictional. This page states exactly what graphnetz
 guarantees, and where the guarantee stops.
 
 ## What gets reseeded, and when

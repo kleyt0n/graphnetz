@@ -1,6 +1,6 @@
 # Models
 
-GraphNetz follows one rule: **a node-level encoder should run on every task
+graphnetz follows one rule: **a node-level encoder should run on every task
 without rewriting code**. Five architectures ship as benchmark models and one
 as a pre-training utility; four of the five are node-level encoders that
 reach graph classification, graph regression and link prediction through

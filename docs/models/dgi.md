@@ -57,7 +57,7 @@ produces representations rather than predictions.
 
 The catalogue is mostly unlabelled — Netzschleuder networks, synthetic
 combinatorial instances, the Ising lattice — so the temptation to score them
-with a pretext loss is real. GraphNetz routes them through `link_pred` on a
+with a pretext loss is real. graphnetz routes them through `link_pred` on a
 held-out edge split instead, which gives a genuine AUC. See
 [Tasks and metrics](../concepts/tasks.md#why-there-is-no-self-supervised-headline).
 

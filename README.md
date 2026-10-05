@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-banner-dark.svg">
-    <img src="assets/logo-banner.svg" alt="GraphNetz" width="320">
+    <img src="assets/logo-banner.svg" alt="graphnetz" width="320">
   </picture>
 </p>
 
@@ -17,12 +17,12 @@
 
 ---
 
-## Why GraphNetz
+## Why graphnetz
 
-Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, GraphNetz turns the usual "train, evaluate, table of accuracies" workflow into a proper statistical report. It gives you confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets via critical-difference diagrams. The point isn't to crown a leaderboard winner. It's to give researchers a way to quantify uncertainty, compare methods fairly, and produce the evidence reviewers actually ask for in graph-learning papers.
+Whether you are proposing a new GNN architecture, testing a model on a new graph domain, or comparing existing methods across graph types, graphnetz turns the usual "train, evaluate, table of accuracies" workflow into a proper statistical report. It gives you confidence intervals for each result, paired model comparisons with multiple-testing correction, and rank-based summaries across datasets via critical-difference diagrams. The point isn't to crown a leaderboard winner. It's to give researchers a way to quantify uncertainty, compare methods fairly, and produce the evidence reviewers actually ask for in graph-learning papers.
 
 
-Most GNN benchmarks report point-estimate accuracies on a handful of citation graphs and declare a winner without confidence intervals, multiple-comparison correction, or rank aggregation across datasets. GraphNetz's default output is a **structured statistical report**, not a raw accuracy table:
+Most GNN benchmarks report point-estimate accuracies on a handful of citation graphs and declare a winner without confidence intervals, multiple-comparison correction, or rank aggregation across datasets. graphnetz's default output is a **structured statistical report**, not a raw accuracy table:
 
 - multi-seed Student's *t* confidence intervals per cell,
 - Holm–Bonferroni paired *t*-tests (or Wilcoxon signed-rank) within each task,
@@ -48,7 +48,7 @@ cd graphnetz
 uv sync --group dev
 ```
 
-GraphNetz requires Python ≥ 3.10, `torch ≥ 2.6`, and `torch-geometric ≥ 2.6`.
+graphnetz requires Python ≥ 3.10, `torch ≥ 2.6`, and `torch-geometric ≥ 2.6`.
 
 ## Quick start
 
@@ -264,11 +264,11 @@ Worked examples live under `examples/`:
 
 ## Citation
 
-If GraphNetz is useful in your work, please cite the accompanying paper:
+If graphnetz is useful in your work, please cite the accompanying paper:
 
 ```bibtex
 @misc{dacosta2026graphnetz,
-  title={GraphNetz: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation}, 
+  title={graphnetz: Statistical Benchmarking of Graph Neural Networks with Paired Tests and Rank Aggregation}, 
   author={Kleyton da Costa and Bernardo Modenesi},
   year={2026},
   eprint={2605.09099},

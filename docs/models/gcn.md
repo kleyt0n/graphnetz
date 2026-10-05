@@ -3,7 +3,7 @@
 Graph Convolutional Network — Kipf & Welling, ICLR 2017
 ([arXiv:1609.02907](https://arxiv.org/abs/1609.02907)).
 
-The reference baseline of the field, and in GraphNetz's own
+The reference baseline of the field, and in graphnetz's own
 [findings](../findings.md) still the model that takes the most categories.
 
 ## What it computes

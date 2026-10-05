@@ -9,7 +9,7 @@ up claiming more than they measured:
 3. a statement of what the design **could** have detected, so a
    non-significant result is not silently read as a tie.
 
-GraphNetz treats all three as the default output. This section covers the
+graphnetz treats all three as the default output. This section covers the
 vocabulary; the [Guides](../guides/benchmark.md) cover the calls.
 
 ## The shape of the data

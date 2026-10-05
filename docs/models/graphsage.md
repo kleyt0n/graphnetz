@@ -3,7 +3,7 @@
 SAmple and aggreGatE — Hamilton, Ying & Leskovec, NeurIPS 2017
 ([arXiv:1706.02216](https://arxiv.org/abs/1706.02216)).
 
-The best mean rank in GraphNetz's own [findings](../findings.md), on a
+The best mean rank in graphnetz's own [findings](../findings.md), on a
 design whose distinguishing feature is that it keeps a node separate from its
 neighbourhood.
 

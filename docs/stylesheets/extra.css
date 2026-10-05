@@ -1,186 +1,104 @@
 /* ==========================================================================
-   GraphNetz docs theme.
+   graphnetz docs theme.
 
-   The neutrals are the project's own, mirrored from
-   graphnetz.plotting.BRAND_COLORS: a nine-step ramp from Bright Snow #F8F9FA
-   to Carbon Black #212529. Those nine are the anchors of the 50-950 ramp
-   below; nothing here invents a neutral, so the site, the logo and the figures
-   cannot drift apart. The figure series palette (NATURE_COLORS) orders the
-   same steps and is not touched by anything in this file.
+   One brand colour, the blue #8DA9C4, set as Material's custom primary. It is
+   a light blue: it carries dark text well (7.2:1 with the ink below) but is
+   too light to be text on white (2.4:1). So the blue itself paints surfaces
+   (header, primary buttons, step discs, the logo's accent node), and text
+   that has to be blue takes a darker step of the same hue:
 
-   The accent is the project's green, the one hue-bearing colour in the
-   identity. It already carries a meaning in the figures -- green is the best
-   rank in a critical-difference diagram -- and that meaning generalises
-   cleanly to "the thing worth looking at", so links, rules and the winning
-   cell in a benchmark table all draw from the same ramp rather than
-   introducing a second hue that would have to be justified separately.
+     blue-300  #AEC2D5   dark-scheme hover
+     blue-400  #8DA9C4   the brand blue; dark-scheme links (6.6:1)
+     blue-600  #496C8D   light-scheme links (5.5:1 on white)
+     blue-700  #3D5A76   light-scheme hover (7.2:1 on white)
+     ink       #111A22   text on the blue
 
-   Contrast decides which step of the accent gets used where. Accent-500
-   (#009A52) is strong enough for a rule, a mark or an underline but not for
-   text, so link text takes accent-600 (5.66:1 on Bright Snow) in light and
-   accent-400 (6.02:1 on Carbon Black) in dark, and accent-500 is kept for the
-   marks.
+   Everything else is Material's default and slate schemes. The project tokens
+   further down are aliases for Material variables, so they follow the scheme
+   switch.
 
    Geometry: one radius token at 6px, and the 1:4 radius-to-size ratio that
    every rounded surface here reuses.
    ========================================================================== */
 
+/* Roboto and Roboto Mono as variable fonts. mkdocs.yml sets `font: false`, so
+   this is the only request; Material reads the two families from
+   --md-text-font and --md-code-font below. */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+
 :root {
-  /* Identity palette: nine neutral steps, lightest to darkest. Mirrored whole
-     from BRAND_COLORS even where a step has no consumer here -- a partial copy
-     is how the site and the figures start to drift. */
-  --gn-50:  #f8f9fa;  /* Bright Snow */
-  --gn-100: #e9ecef;  /* Platinum */
-  --gn-200: #dee2e6;  /* Alabaster Grey */
-  --gn-300: #ced4da;  /* Pale Slate */
-  --gn-400: #adb5bd;  /* Pale Slate 2 */
-  --gn-600: #6c757d;  /* Slate Grey */
-  --gn-700: #495057;  /* Iron Grey */
-  --gn-800: #343a40;  /* Gunmetal */
-  --gn-950: #212529;  /* Carbon Black */
-
-  /* The dark scheme's ground. Carbon Black is the identity's darkest step but
-     it is a dark grey, not a black, and at full-page scale it reads as one --
-     so the dark scheme grounds on true black and uses the ramp above it for
-     the surfaces that have to separate from it. */
-  --gn-black: #000000;
-  --gn-black-raised: #0b0d0e;   /* inline code, the footer meta bar */
-
-  /* Accent, around #009A52 (accent-500). The steps either side of it exist
-     only so that text can clear 4.5:1 in both schemes without changing hue. */
-  --gn-accent-400: #00ba62;
-  --gn-accent-500: #009a52;
-  --gn-accent-600: #00733d;
-  --gn-accent-700: #005c31;
-
+  --md-text-font: "Roboto";
+  --md-code-font: "Roboto Mono";
   --gn-radius: 6px;
 }
 
-/* --- light ----------------------------------------------------------------
-   Keyed on the primary rather than the scheme, so these hold for the light
-   scheme AND for the server-rendered first paint in "follow system" mode. The
-   slate block below overrides them; equal specificity, so source order decides.
-
-   The header takes the page ground and ink text, so Material's primary is the
-   background here and its "bg" token is the text.
-   -------------------------------------------------------------------------- */
-
-[data-md-color-primary="custom"] {
-  --md-primary-fg-color:          var(--gn-50);
-  --md-primary-fg-color--light:   var(--gn-100);
-  --md-primary-fg-color--dark:    var(--gn-200);
-  --md-primary-bg-color:          var(--gn-950);
-  --md-primary-bg-color--light:   rgba(33, 37, 41, 0.62);
-
-  --md-accent-fg-color:           var(--gn-accent-600);
-  --md-accent-fg-color--transparent: rgba(0, 154, 82, 0.1);
-
-  --md-typeset-a-color:           var(--gn-accent-text);
-
-  /* The page ground is Bright Snow, not white: a rendered figure, a code block
-     and the prose around them all sit on one surface. */
-  --md-default-bg-color:          var(--gn-50);
-  --md-default-bg-color--light:   rgba(248, 249, 250, 0.7);
-  --md-default-bg-color--lighter: rgba(248, 249, 250, 0.3);
-  --md-default-bg-color--lightest: rgba(248, 249, 250, 0.12);
-  --md-default-fg-color:          rgba(33, 37, 41, 0.87);
-  --md-default-fg-color--light:   rgba(33, 37, 41, 0.6);
-  --md-default-fg-color--lighter: rgba(33, 37, 41, 0.34);
-  --md-default-fg-color--lightest: rgba(33, 37, 41, 0.13);
-  --md-code-bg-color:             var(--gn-100);
-  --md-code-hl-color:             rgba(0, 154, 82, 0.12);
-
-  --md-footer-bg-color:           var(--gn-950);
-  --md-footer-bg-color--dark:     #15181a;
-
-  --gn-surface:                   var(--gn-100);
-  --gn-border:                    rgba(108, 117, 125, 0.32);
-  --gn-muted:                     var(--gn-700);
-  --gn-strong:                    var(--gn-950);
-
-  --gn-accent:                    var(--gn-accent-500);
-  --gn-accent-text:               var(--gn-accent-600);
-  --gn-rule:                      rgba(0, 154, 82, 0.42);
+:root {
+  --gn-blue-300: #aec2d5;
+  --gn-blue-400: #8da9c4;
+  --gn-blue-600: #496c8d;
+  --gn-blue-700: #3d5a76;
+  --gn-blue-ink: #111a22;
 }
 
-/* --- dark -----------------------------------------------------------------
-   The ramp is inverted around the same two anchors rather than handed to
-   Material's blue-grey slate: Carbon Black becomes the ground, Bright Snow the
-   text.
-   -------------------------------------------------------------------------- */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color:        var(--gn-blue-400);
+  --md-primary-fg-color--light: var(--gn-blue-300);
+  --md-primary-fg-color--dark:  var(--gn-blue-600);
+  --md-primary-bg-color:        var(--gn-blue-ink);
+  --md-primary-bg-color--light: rgba(17, 26, 34, 0.7);
+}
 
-[data-md-color-scheme="slate"] {
-  --md-hue: 210;
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color:              var(--gn-blue-700);
+  --md-accent-fg-color--transparent: rgba(141, 169, 196, 0.14);
+  --md-accent-bg-color:              #ffffff;
+  --md-accent-bg-color--light:       rgba(255, 255, 255, 0.7);
+}
 
-  /* The header and footer take the page ground, so the bar is black too and
-     only its hairline border separates it from the content. */
-  --md-primary-fg-color:          var(--gn-black);
-  --md-primary-fg-color--light:   var(--gn-black-raised);
-  --md-primary-fg-color--dark:    var(--gn-black);
-  --md-primary-bg-color:          var(--gn-50);
-  --md-primary-bg-color--light:   rgba(248, 249, 250, 0.62);
+/* Link text: the darker step on white, the brand blue itself on slate. The
+   doubled attribute outranks Material's own per-scheme assignment. */
+[data-md-color-scheme="default"][data-md-color-primary="custom"] {
+  --md-typeset-a-color: var(--gn-blue-600);
+}
 
-  --md-accent-fg-color:           var(--gn-accent-400);
-  --md-accent-fg-color--transparent: rgba(0, 186, 98, 0.12);
+[data-md-color-scheme="slate"][data-md-color-primary="custom"] {
+  --md-typeset-a-color: var(--gn-blue-400);
+}
 
-  --md-typeset-a-color:           var(--gn-accent-text);
+[data-md-color-scheme="slate"][data-md-color-accent="custom"] {
+  --md-accent-fg-color:  var(--gn-blue-300);
+  --md-accent-bg-color:  var(--gn-blue-ink);
+  --md-accent-bg-color--light: rgba(17, 26, 34, 0.7);
+}
 
-  --md-default-bg-color:          var(--gn-black);
-  --md-default-bg-color--light:   rgba(0, 0, 0, 0.54);
-  --md-default-bg-color--lighter: rgba(0, 0, 0, 0.26);
-  --md-default-bg-color--lightest: rgba(0, 0, 0, 0.07);
-  --md-default-fg-color:          rgba(248, 249, 250, 0.9);
-  --md-default-fg-color--light:   rgba(248, 249, 250, 0.62);
-  --md-default-fg-color--lighter: rgba(248, 249, 250, 0.32);
-  --md-default-fg-color--lightest: rgba(248, 249, 250, 0.14);
-  --md-code-bg-color:             var(--gn-black-raised);
-  --md-code-fg-color:             rgba(248, 249, 250, 0.86);
-  --md-code-hl-color:             rgba(0, 186, 98, 0.16);
-
-  --md-footer-bg-color:           var(--gn-black);
-  --md-footer-bg-color--dark:     var(--gn-black-raised);
-
-  --gn-surface:                   rgba(248, 249, 250, 0.05);
-  --gn-border:                    rgba(248, 249, 250, 0.2);
-  --gn-muted:                     var(--gn-400);
-  --gn-strong:                    var(--gn-50);
-
-  --gn-accent:                    var(--gn-accent-400);
-  --gn-accent-text:               var(--gn-accent-400);
-  --gn-rule:                      rgba(0, 186, 98, 0.45);
+/* Declared on the element carrying the scheme attribute, not on :root:
+   Material's slate values live there, and a custom property resolves its
+   var() references where it is declared. */
+[data-md-color-scheme] {
+  --gn-surface:     var(--md-code-bg-color);
+  --gn-border:      var(--md-default-fg-color--lighter);
+  --gn-hairline:    var(--md-default-fg-color--lightest);
+  --gn-muted:       var(--md-default-fg-color--light);
+  --gn-strong:      var(--md-default-fg-color);
+  --gn-accent:      var(--md-accent-fg-color);
+  --gn-accent-text: var(--md-typeset-a-color);
+  --gn-tint:        color-mix(in srgb, var(--md-primary-fg-color) 8%, transparent);
+  --gn-rule:        color-mix(in srgb, var(--md-typeset-a-color) 40%, transparent);
 }
 
 /* --- typography ---------------------------------------------------------- */
 
-/* Google Sans Flex for text and UI. It is a variable font with no italic
-   master, so browsers synthesise oblique for <em>; that is expected. */
 body,
-.md-typeset,
-.md-nav,
-.md-header,
-.md-footer,
 input,
 button {
-  font-family: "Google Sans Flex", system-ui, -apple-system, "Segoe UI",
-               Roboto, Helvetica, Arial, sans-serif;
-  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Code stays monospace: Google Sans Flex has no fixed-width master. */
-code,
-pre,
-kbd,
-samp,
 .md-typeset code,
 .md-typeset pre,
 .md-typeset kbd,
-.md-clipboard,
-.highlight,
-.linenos,
 .doc-signature {
-  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-feature-settings: normal;
 }
 
@@ -214,11 +132,6 @@ samp,
 
 /* --- header -------------------------------------------------------------- */
 
-.md-header {
-  box-shadow: none;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
-}
-
 .md-header__title {
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -229,18 +142,25 @@ samp,
   width: 1.6rem;
 }
 
-/* mkdocs.yml points theme.logo at the Carbon Black mark, because light is the
-   default scheme. Slate swaps in the Bright Snow file; `content` is the only
-   hook, since the src is written by the theme rather than by the page. */
-[data-md-color-scheme="slate"] .md-header__button.md-logo img {
-  content: url("../logo.png");
+/* Material darkens the search field with translucent black, which reads as a
+   slab on a light header. A translucent white keeps it a field. */
+@media screen and (min-width: 60em) {
+  .md-header .md-search__form {
+    background-color: rgba(255, 255, 255, 0.32);
+  }
+
+  .md-header .md-search__form:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 }
 
-.md-tabs {
-  border-bottom: none;
-}
-
-/* --- navigation ---------------------------------------------------------- */
+/* --- sidebars ------------------------------------------------------------
+   Left: the site tree. Top-level groups collapse, the one holding the current
+   page opens, and its children hang off a hairline guide so the nesting reads
+   at a glance. Right: the page outline, with the section in view marked by
+   the same accent bar the left tree uses for the current page. A hairline on
+   each sidebar's inner edge frames the content column between them.
+   -------------------------------------------------------------------------- */
 
 .md-nav {
   font-size: 0.72rem;
@@ -248,18 +168,6 @@ samp,
 
 .md-nav__title {
   font-weight: 600;
-}
-
-/* Section labels (Getting started / Concepts / Models / Guides). */
-.md-nav__item--section > .md-nav__link,
-.md-nav--primary .md-nav__item--section > label.md-nav__link {
-  color: var(--md-default-fg-color);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.64rem;
-  opacity: 0.8;
-  margin-top: 0.6rem;
 }
 
 .md-nav__link {
@@ -273,6 +181,70 @@ samp,
   font-weight: 600;
 }
 
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    border-right: 1px solid var(--md-default-fg-color--lightest);
+  }
+
+  .md-sidebar--secondary .md-sidebar__scrollwrap {
+    border-left: 1px solid var(--md-default-fg-color--lightest);
+  }
+
+  /* The header already carries the site name; repeating it as the tree's
+     title costs a row and says nothing. The drawer on small screens keeps it. */
+  .md-nav--primary > .md-nav__title {
+    display: none;
+  }
+
+  /* Top-level entries: group labels and the standalone pages beside them. */
+  .md-nav--primary > .md-nav__list > .md-nav__item {
+    margin-top: 0.15rem;
+  }
+
+  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link,
+  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > .md-nav__link {
+    color: var(--md-default-fg-color);
+    font-weight: 600;
+  }
+
+  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link--active,
+  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > .md-nav__link--active {
+    color: var(--gn-accent-text);
+  }
+
+  /* Children of an open group: indented behind a hairline guide. */
+  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list {
+    margin: 0.2rem 0 0.4rem 0.6rem;
+    padding-left: 0;
+    border-left: 1px solid var(--md-default-fg-color--lightest);
+  }
+
+  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list > .md-nav__item {
+    padding-left: 0.6rem;
+  }
+}
+
+/* Current page in the tree: an accent bar laid over the guide line, offset
+   by exactly the item padding set above. */
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list
+    > .md-nav__item > .md-nav__link--active {
+    position: relative;
+  }
+
+  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list
+    > .md-nav__item > .md-nav__link--active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(-0.6rem - 1.5px);
+    width: 2px;
+    border-radius: 1px;
+    background: var(--gn-accent);
+  }
+}
+
 .md-nav--secondary .md-nav__title {
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -280,10 +252,37 @@ samp,
   font-weight: 600;
 }
 
+.md-nav--secondary .md-nav__link {
+  color: var(--md-default-fg-color--light);
+}
+
+.md-nav--secondary .md-nav__link:hover {
+  color: var(--md-default-fg-color);
+}
+
+.md-nav--secondary .md-nav__link--active {
+  color: var(--gn-accent-text);
+  font-weight: 500;
+}
+
+/* --- breadcrumbs ---------------------------------------------------------- */
+
+.md-path {
+  font-size: 0.66rem;
+  margin-bottom: -0.6rem;
+}
+
+.md-path__link {
+  color: var(--md-default-fg-color--light);
+}
+
+.md-path__link:hover {
+  color: var(--gn-accent-text);
+}
+
 /* --- links ----------------------------------------------------------------
    Accent-coloured, underlined at 2px offset with the rule at partial strength
-   going to full on hover. The colour is accent-600 rather than #009A52
-   because this is text and has to clear 4.5:1. Only body prose gets the
+   going to full on hover. Only body prose gets the
    underline: nav, tables of contents and cards are already distinguished by
    position, and underlining them would turn the page into a grid of rules. */
 
@@ -301,30 +300,19 @@ samp,
 
 /* Cards, signposts and figure links carry their own frame; an underline inside
    one reads as a second border. */
-.md-typeset :is(.grid.cards, .gn-signpost, figure) a {
+.md-typeset :is(.grid.cards, .gn-signpost, figure) a:not(.md-button):not(.headerlink) {
   text-decoration: none;
 }
 
 .md-typeset .md-button {
   border-radius: 999px;
-  border-color: var(--gn-border);
 }
 
-.md-typeset .md-button--primary {
-  background: var(--gn-accent-600);
-  border-color: var(--gn-accent-600);
-  color: #ffffff;
-}
-
-.md-typeset .md-button--primary:is(:hover, :focus) {
-  background: var(--gn-accent-700);
-  border-color: var(--gn-accent-700);
-  color: #ffffff;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .md-button--primary {
-  background: var(--gn-accent-600);
-  border-color: var(--gn-accent-600);
+/* Material draws outline buttons in the primary, which is too light to be
+   text on white. Both schemes take the link colour; hover keeps Material's
+   fill. */
+.md-typeset .md-button:not(.md-button--primary):not(:hover):not(:focus) {
+  color: var(--md-typeset-a-color);
 }
 
 /* --- rounded surfaces, at the 1:4 ratio ---------------------------------- */
@@ -380,13 +368,6 @@ samp,
   font-size: 0.76rem;
 }
 
-.md-typeset :is(.note, .info, .abstract) {
-  border-color: var(--gn-border);
-}
-
-.md-typeset :is(.note, .info, .abstract) > :is(.admonition-title, summary) {
-  background: var(--gn-surface);
-}
 
 /* --- code blocks --------------------------------------------------------- */
 
@@ -403,124 +384,236 @@ samp,
   font-variant-ligatures: none;
 }
 
-/* --- home: hero -----------------------------------------------------------
-   No ground of its own: the hero sits directly on the page, and the lockup,
-   kicker and tagline carry it. Nothing here paints a background, so the block
-   inherits --md-default-bg-color in both schemes. */
+/* Visually hidden, still read by assistive tech and indexed by search. */
+.md-typeset .gn-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-.gn-hero {
+/* --- home: hero -----------------------------------------------------------
+   No panel, no wash: the mark, the name, one sentence and two buttons sit
+   straight on the page, and whitespace does the framing.
+   -------------------------------------------------------------------------- */
+
+.md-typeset .gn-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 4rem 0 3.4rem;
+  gap: 1.1rem;
+  padding: 3.6rem 0 3.2rem;
   text-align: center;
 }
 
-/* Mark and wordmark on one line, matching the README banner's lockup. A
-   stacked logo-over-title costs a whole logo's height for no extra meaning. */
+.md-typeset .gn-hero > * {
+  margin: 0;
+}
+
+/* Mark and wordmark on one line, matching the README banner's lockup. */
 .gn-hero__lockup {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
 }
 
-.gn-hero__logo {
-  width: 52px;
-  height: 52px;
+.md-typeset .gn-hero__logo {
+  width: 44px;
+  height: 44px;
   margin: 0;
-  border: none !important;
-  box-shadow: none !important;
+  border: none;
+  box-shadow: none;
 }
 
 .gn-hero__word {
-  font-size: 3rem;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
   line-height: 1;
   color: var(--gn-strong);
 }
 
-.gn-hero__kicker {
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+.md-typeset .gn-hero__tagline {
+  max-width: 24rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
   color: var(--gn-muted);
 }
 
-.gn-hero__tagline {
-  max-width: 34rem;
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--gn-muted);
-}
-
-.gn-hero__actions {
+/* md_in_html wraps the buttons in one <p>; the row is laid out on it. */
+.gn-hero__actions > p {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
+  margin: 0.3rem 0 0;
+}
+
+.md-typeset .gn-hero__actions .md-button {
+  margin: 0;
+  padding: 0.5em 1.4em;
+  font-size: 0.72rem;
 }
 
 .md-typeset .gn-hero + h2 {
-  margin-top: 1.4em;
+  margin-top: 0.6em;
 }
 
 @media screen and (max-width: 44.9375em) {
-  .gn-hero { padding: 2.6rem 0 2.4rem; }
-  .gn-hero__logo { width: 38px; height: 38px; }
-  .gn-hero__lockup { gap: 0.5rem; }
-  .gn-hero__word { font-size: 2.2rem; }
+  .md-typeset .gn-hero { padding: 2.4rem 0 2.2rem; }
+  .md-typeset .gn-hero__logo { width: 34px; height: 34px; }
+  .gn-hero__lockup { gap: 0.45rem; }
+  .gn-hero__word { font-size: 2rem; }
 }
 
-/* --- home: the four scale numbers ---------------------------------------- */
+/* --- home: feature cards --------------------------------------------------
+   Icon in the accent, title on the same line, and the link pinned to the
+   card's foot so a row of cards lines its links up whatever the copy length.
+   -------------------------------------------------------------------------- */
 
-.gn-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  margin: 1.6rem 0 2rem;
-  overflow: hidden;
-  background: var(--md-default-fg-color--lightest);
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: var(--gn-radius);
-}
-
-.gn-stat {
+.md-typeset .gn-features > ul > li {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  padding: 1rem 0.5rem;
-  background: var(--md-default-bg-color);
-  text-align: center;
 }
 
-.gn-stat__n {
-  font-size: 1.7rem;
-  font-weight: 650;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  color: var(--gn-strong);
+.md-typeset .gn-features > ul > li > p:last-child {
+  margin-top: auto;
+  padding-top: 0.4rem;
 }
 
-.gn-stat__l {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+.md-typeset .gn-features .lg {
+  color: var(--gn-accent-text);
+  margin-right: 0.3rem;
+}
+
+/* --- home: the five stages ------------------------------------------------
+   A numbered row joined by a hairline, collapsing to a column on narrow
+   screens. The numbers are the list's own counter, drawn as discs.
+   -------------------------------------------------------------------------- */
+
+.md-typeset .gn-steps > ol {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gn-step;
+}
+
+.md-typeset .gn-steps > ol > li {
+  position: relative;
+  margin: 0;
+  padding-top: 2.2rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  counter-increment: gn-step;
+}
+
+.md-typeset .gn-steps > ol > li > p {
+  margin: 0 0 0.2rem;
+}
+
+.md-typeset .gn-steps > ol > li > p:not(:first-child) {
   color: var(--gn-muted);
 }
 
-/* Four columns of a 1.7rem numeral do not fit a phone without the labels
-   wrapping to three lines. */
+.md-typeset .gn-steps > ol > li::before {
+  content: counter(gn-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.md-typeset .gn-steps > ol > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  left: 1.6rem;
+  right: -0.8rem;
+  height: 1px;
+  background: var(--gn-border);
+}
+
 @media screen and (max-width: 44.9375em) {
-  .gn-stats { grid-template-columns: repeat(2, 1fr); }
-  .gn-stat__n { font-size: 1.45rem; }
+  .md-typeset .gn-steps > ol { grid-template-columns: 1fr; gap: 0.6rem; }
+  .md-typeset .gn-steps > ol > li { padding: 0 0 0 2.4rem; min-height: 1.6rem; }
+  .md-typeset .gn-steps > ol > li:not(:last-child)::after { display: none; }
+}
+
+/* --- home: the evidence panel --------------------------------------------- */
+
+.md-typeset .gn-evidence {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.4rem;
+  align-items: center;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--gn-hairline);
+  border-left: 3px solid var(--gn-accent);
+  border-radius: var(--gn-radius);
+  background: var(--gn-tint);
+}
+
+/* No display value here: Material hides the off-scheme copy with
+   display: none, and setting one would show both. */
+.md-typeset .gn-evidence__figure img {
+  width: 100%;
+  border: none;
+}
+
+.md-typeset .gn-evidence__figure > p {
+  margin: 0;
+}
+
+.md-typeset .gn-evidence__text {
+  font-size: 0.76rem;
+}
+
+.md-typeset .gn-evidence__text > p:first-child {
+  margin-top: 0;
+}
+
+@media screen and (max-width: 59.9375em) {
+  .md-typeset .gn-evidence { grid-template-columns: 1fr; }
+}
+
+/* --- home: project links -------------------------------------------------- */
+
+.md-typeset .gn-project > p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.6rem;
+  margin: 2.4rem 0 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--gn-hairline);
+  font-size: 0.72rem;
+}
+
+.md-typeset .gn-project a {
+  color: var(--gn-muted);
+  text-decoration: none;
+}
+
+.md-typeset .gn-project a:hover {
+  color: var(--gn-accent-text);
 }
 
 /* --- grid cards ---------------------------------------------------------- */
@@ -570,6 +663,7 @@ samp,
 /* Material wraps every table in an inline-block scroll container, which
    shrink-wraps to the content and leaves the callout's ground showing to the
    right. Both the wrapper and the table have to be told to fill the width. */
+.gn-result .md-typeset__scrollwrap,
 .gn-result .md-typeset__table {
   display: block;
   width: 100%;
@@ -583,6 +677,7 @@ samp,
   margin: 0;
   border: none;
   border-radius: 0;
+  background: transparent;
   font-size: 0.73rem;
 }
 

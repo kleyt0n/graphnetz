@@ -1,6 +1,6 @@
 # Uncertainty
 
-A single accuracy is a sample, not a property of a model. GraphNetz never
+A single accuracy is a sample, not a property of a model. graphnetz never
 reports one on its own: every cell in a summary carries an interval over the
 seeds that produced it.
 

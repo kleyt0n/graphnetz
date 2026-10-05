@@ -12,13 +12,19 @@ those runs return.
     quantities that say when those tests are uninformative, and rank
     aggregation across tasks. See [Reading the report](../guides/report.md).
 
-## Running a benchmark
+## Overview
 
 ::: graphnetz.benchmark
     options:
-      members:
-        - run_benchmark
-        - SearchSpace
+      members: false
+      show_root_heading: false
+      show_root_toc_entry: false
+
+## Running a benchmark
+
+::: graphnetz.benchmark.run_benchmark
+
+::: graphnetz.benchmark.SearchSpace
 
 ## The report
 
@@ -27,30 +33,30 @@ The plotting methods (`plot`, `plot_forest`, `plot_pairwise`,
 separate module to keep the statistics and the figure code apart; they are
 part of the public surface and are documented here alongside the rest.
 
-::: graphnetz.benchmark
+::: graphnetz.benchmark.BenchmarkReport
     options:
-      members:
-        - BenchmarkReport
       inherited_members: true
 
 ## Tasks and models
 
-::: graphnetz.benchmark
-    options:
-      members:
-        - Task
-        - ModelSpec
-        - BENCHMARK_TASKS
-        - TASK_TYPES
-        - iter_benchmark_tasks
-        - task_from_dataset
-        - register_task
-        - unregister_task
-        - register_model
+::: graphnetz.benchmark.Task
+
+::: graphnetz.benchmark.ModelSpec
+
+::: graphnetz.benchmark.BENCHMARK_TASKS
+
+::: graphnetz.benchmark.TASK_TYPES
+
+::: graphnetz.benchmark.iter_benchmark_tasks
+
+::: graphnetz.benchmark.task_from_dataset
+
+::: graphnetz.benchmark.register_task
+
+::: graphnetz.benchmark.unregister_task
+
+::: graphnetz.benchmark.register_model
 
 ## Convenience plotting
 
-::: graphnetz.benchmark
-    options:
-      members:
-        - plot_benchmark
+::: graphnetz.benchmark.plot_benchmark

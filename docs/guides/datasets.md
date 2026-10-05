@@ -1,6 +1,6 @@
 # Dataset taxonomy
 
-GraphNetz organises **62 loaders across 10 scientific categories**, each declaring the task types it can serve. The taxonomy is the single source of truth: the curated benchmark, the per-category notebooks, and the documented loader names all derive from `graphnetz.datasets.LOADER_REGISTRY`.
+graphnetz organises **62 loaders across 10 scientific categories**, each declaring the task types it can serve. The taxonomy is the single source of truth: the curated benchmark, the per-category notebooks, and the documented loader names all derive from `graphnetz.datasets.LOADER_REGISTRY`.
 
 ```python
 from graphnetz.datasets import LOADER_REGISTRY, list_datasets

@@ -1,6 +1,6 @@
 # Installation
 
-This page takes you from a clean environment to a working GraphNetz install.
+This page takes you from a clean environment to a working graphnetz install.
 It assumes familiarity with PyTorch and PyG; everything else is covered as
 we go.
 
