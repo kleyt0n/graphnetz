@@ -27,7 +27,12 @@ in that regime.
 
 Candidates are scored on the task's **validation** series. The framework
 **refuses to run** when a task exposes no validation series, rather than
-falling back to the held-out metric.
+falling back to the held-out metric. It also refuses when the metric the
+report would headline *is* that validation series (a custom `graph_reg`
+loader returning a `(train, val)` pair, for instance): selecting and
+reporting on the same split is the same leak by another route. Every
+built-in trainer records a separate held-out series, so this only bites
+custom tasks.
 
 !!! danger "Why the refusal matters"
     A search that peeks at test inflates every downstream statistic — the

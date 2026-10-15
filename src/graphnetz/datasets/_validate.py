@@ -31,6 +31,9 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
+from torch_geometric.data import Data
+
 __all__ = ["LoaderStatus", "validate_loaders"]
 
 LoaderStatus = str
@@ -178,15 +181,31 @@ def _purge_partial_archives(root: str, exc_text: str) -> list[str]:
     return removed
 
 
+_SHAPE_SAMPLE = 500
+"""Graphs inspected per dataset; datasets with more are sampled evenly."""
+
+
 def _shape(ds: Any) -> dict[str, Any]:
-    """Best-effort shape summary that works for PyG datasets and tuples."""
+    """Best-effort shape summary that works for PyG datasets and tuples.
+
+    ``n_graphs`` is the number of graphs: a bare ``Data`` counts as one (its
+    ``len`` is its number of attributes, not graphs). ``n_nodes`` and
+    ``n_edges`` are *means per graph* (exact for a single graph), computed over
+    every graph up to `_SHAPE_SAMPLE` and over an evenly spaced sample beyond
+    that, in which case ``shape_sampled`` is True. Edges count directed
+    ``edge_index`` entries, after the dataset's own transform.
+    """
     if isinstance(ds, tuple):
         ds = ds[0]
     out: dict[str, Any] = {}
-    try:
-        out["n_graphs"] = len(ds)
-    except TypeError:
-        out["n_graphs"] = None
+    single = isinstance(ds, Data)
+    if single:
+        out["n_graphs"] = 1
+    else:
+        try:
+            out["n_graphs"] = len(ds)
+        except TypeError:
+            out["n_graphs"] = None
 
     def _int_attr(name: str) -> int | None:
         try:
@@ -197,16 +216,32 @@ def _shape(ds: Any) -> dict[str, Any]:
     for attr in ("num_features", "num_classes", "num_relations"):
         out[attr] = _int_attr(attr)
     try:
-        data = ds[0]
-        out["n_nodes"] = int(data.num_nodes) if data.num_nodes is not None else None
-        out["n_edges"] = int(data.num_edges) if data.num_edges is not None else None
-        out["has_x"] = getattr(data, "x", None) is not None
-        out["has_y"] = getattr(data, "y", None) is not None
-        out["masks"] = all(hasattr(data, f"{s}_mask") for s in ("train", "val", "test"))
+        first = ds if single else ds[0]
+        out["has_x"] = getattr(first, "x", None) is not None
+        out["has_y"] = getattr(first, "y", None) is not None
+        out["masks"] = all(hasattr(first, f"{s}_mask") for s in ("train", "val", "test"))
+        n = out["n_graphs"] or 1
+        if single or n == 1:
+            graphs = [first]
+        else:
+            idx = range(n) if n <= _SHAPE_SAMPLE else np.linspace(0, n - 1, _SHAPE_SAMPLE).round().astype(int)
+            graphs = [ds[int(i)] for i in idx]
+        nodes = [g.num_nodes for g in graphs]
+        edges = [g.num_edges for g in graphs]
+        out["n_nodes"] = None if None in nodes else _mean(nodes)
+        out["n_edges"] = None if None in edges else _mean(edges)
+        out["shape_sampled"] = len(graphs) < n
     except Exception:
         out.setdefault("n_nodes", None)
         out.setdefault("n_edges", None)
     return out
+
+
+def _mean(values: list[int]) -> float | int:
+    """Integer when every value is equal (single graphs), else a rounded mean."""
+    if len(set(values)) == 1:
+        return int(values[0])
+    return round(float(np.mean(values)), 1)
 
 
 def _call(loader: Callable[..., Any], root: str, seed: int) -> Any:

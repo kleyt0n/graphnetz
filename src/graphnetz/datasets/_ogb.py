@@ -114,8 +114,43 @@ def _ogb_compat() -> Iterator[None]:
         yield
 
 
-def load_ogb_node(name: str, root: str) -> Data:
-    """Return a PyG ``Data`` for an OGB node-property dataset."""
+class SingleGraphDataset:
+    """A one-graph dataset around a PyG ``Data``.
+
+    OGB's node- and link-property datasets are a single large graph. Returning
+    the bare ``Data`` broke every consumer that treats a loader's result as a
+    dataset: ``len(data)`` counts the object's *attributes* rather than its
+    graphs, and ``data[0]`` raises. This wrapper has the dataset shape the
+    benchmark runner and `validate_loaders` expect (``len == 1``,
+    ``ds[0]``, ``num_features``, ``num_classes``) and forwards every other
+    attribute to the graph, so ``ogbn_arxiv(root).x`` keeps working.
+    """
+
+    def __init__(self, data: Data, num_features: int, num_classes: int | None = None) -> None:
+        self._data = data
+        self.num_features = int(num_features)
+        if num_classes is not None:
+            self.num_classes = int(num_classes)
+
+    def __len__(self) -> int:
+        return 1
+
+    def __getitem__(self, idx: int) -> Data:
+        if idx not in (0, -1):
+            raise IndexError(f"single-graph dataset has no index {idx}")
+        return self._data
+
+    def __getattr__(self, name: str) -> Any:
+        if name.startswith("__") or name == "_data":
+            raise AttributeError(name)
+        return getattr(self._data, name)
+
+    def __repr__(self) -> str:
+        return f"SingleGraphDataset({self._data!r})"
+
+
+def load_ogb_node(name: str, root: str) -> SingleGraphDataset:
+    """Return an OGB node-property dataset as a one-graph dataset."""
     try:
         from ogb.nodeproppred import NodePropPredDataset
     except ImportError as exc:
@@ -141,25 +176,28 @@ def load_ogb_node(name: str, root: str) -> Data:
     data.val_mask[split["valid"]] = True
     data.test_mask[split["test"]] = True
 
-    data.num_features = x.size(1)
-    data.num_classes = int(y.max()) + 1
-    return data
+    return SingleGraphDataset(data, num_features=x.size(1), num_classes=int(y.max()) + 1)
 
 
 def load_ogb_graph(name: str, root: str) -> Any:
-    """Return the raw OGB ``GraphPropPredDataset`` for graph-prop tasks."""
+    """Return an OGB graph-property dataset as a PyG ``InMemoryDataset``.
+
+    This is OGB's ``PygGraphPropPredDataset``: it supports the slicing,
+    shuffling and batching the graph-level trainers rely on, which OGB's
+    numpy-backed ``GraphPropPredDataset`` does not.
+    """
     try:
-        from ogb.graphproppred import GraphPropPredDataset
+        from ogb.graphproppred import PygGraphPropPredDataset
     except ImportError as exc:
         msg = f"'{name}' requires the 'ogb' extra. {_OGB_INSTALL_HINT}"
         raise ImportError(msg) from exc
 
     with _ogb_compat():
-        return GraphPropPredDataset(name=name, root=root)
+        return PygGraphPropPredDataset(name=name, root=root)
 
 
-def load_ogb_link(name: str, root: str) -> Data:
-    """Return a single-graph PyG ``Data`` for an OGB link-prop dataset.
+def load_ogb_link(name: str, root: str) -> SingleGraphDataset:
+    """Return an OGB link-property dataset as a one-graph dataset.
 
     The benchmark runner re-splits via ``RandomLinkSplit``; OGB's
     official train/valid/test edge split is not consumed here. For
@@ -183,7 +221,8 @@ def load_ogb_link(name: str, root: str) -> Data:
     data = Data(edge_index=edge_index, num_nodes=num_nodes)
 
     node_feat = graph.get("node_feat")
+    num_features = 0
     if node_feat is not None:
         data.x = torch.from_numpy(node_feat).float()
-        data.num_features = data.x.size(1)
-    return data
+        num_features = data.x.size(1)
+    return SingleGraphDataset(data, num_features=num_features)

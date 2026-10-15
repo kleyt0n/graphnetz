@@ -134,6 +134,7 @@ def train_graph_classification(
     lr: float = 1e-3,
     verbose: bool = False,
     device: torch.device | str | None = "auto",
+    test_loader: DataLoader | None = None,
 ) -> dict[str, list[float]]:
     """Train a graph-level classifier.
 
@@ -142,11 +143,17 @@ def train_graph_classification(
     LRGB ``Peptides-func``, OGB molhiv variants), the loss switches to
     binary cross-entropy with logits and the reported metric is the
     average correctly-classified label fraction.
+
+    With a ``test_loader`` the history also carries ``test_acc``, a held-out
+    series distinct from the ``val_acc`` one, which is what makes
+    ``epoch_selection="best_val"`` and hyperparameter search legitimate.
     """
     dev = _resolve_device(device)
     model = model.to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     history: dict[str, list[float]] = {"train_loss": [], "val_acc": []}
+    if test_loader is not None:
+        history["test_acc"] = []
 
     # Sniff one batch to decide single- vs. multi-label.
     sniff_batch = next(iter(train_loader))
@@ -165,7 +172,11 @@ def train_graph_classification(
             opt.zero_grad()
             out = model(batch)
             if multi_label:
-                loss = F.binary_cross_entropy_with_logits(out, batch.y.float())
+                # Multi-label targets may be partially unlabelled (NaN, e.g.
+                # ogbg-molpcba); only the observed entries enter the loss.
+                target = batch.y.float()
+                observed = ~torch.isnan(target)
+                loss = F.binary_cross_entropy_with_logits(out[observed], target[observed])
             else:
                 loss = F.cross_entropy(out, batch.y.view(-1))
             loss.backward()
@@ -174,22 +185,32 @@ def train_graph_classification(
             n += batch.num_graphs
 
         model.eval()
-        correct = 0.0
-        m = 0
-        with torch.no_grad():
-            for batch in val_loader:
-                batch = batch.to(dev)
-                if multi_label:
-                    pred = (model(batch) > 0).float()
-                    correct += (pred == batch.y.float()).float().mean().item() * batch.num_graphs
-                else:
-                    pred = model(batch).argmax(dim=1)
-                    correct += (pred == batch.y.view(-1)).sum().item()
-                m += batch.num_graphs
+
+        def _accuracy(loader: DataLoader) -> float:
+            correct = 0.0
+            m = 0
+            with torch.no_grad():
+                for batch in loader:
+                    batch = batch.to(dev)
+                    if multi_label:
+                        pred = (model(batch) > 0).float()
+                        target = batch.y.float()
+                        observed = ~torch.isnan(target)
+                        if observed.any():
+                            hit = (pred[observed] == target[observed]).float().mean().item()
+                            correct += hit * batch.num_graphs
+                    else:
+                        pred = model(batch).argmax(dim=1)
+                        correct += (pred == batch.y.view(-1)).sum().item()
+                    m += batch.num_graphs
+            return correct / max(m, 1)
+
         train_loss = total / max(n, 1)
-        val_acc = correct / max(m, 1)
+        val_acc = _accuracy(val_loader)
         history["train_loss"].append(train_loss)
         history["val_acc"].append(val_acc)
+        if test_loader is not None:
+            history["test_acc"].append(_accuracy(test_loader))
         if verbose:
             iterator.set_postfix(loss=f"{train_loss:.4f}", val=f"{val_acc:.4f}")
     return history
@@ -203,12 +224,19 @@ def train_graph_regression(
     lr: float = 1e-3,
     verbose: bool = False,
     device: torch.device | str | None = "auto",
+    test_loader: DataLoader | None = None,
 ) -> dict[str, list[float]]:
-    """Train a graph-level regressor (MSE loss, MAE on val)."""
+    """Train a graph-level regressor (MSE loss, MAE on val).
+
+    With a ``test_loader`` the history also carries ``test_mae`` on a
+    held-out split distinct from the validation one.
+    """
     dev = _resolve_device(device)
     model = model.to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     history: dict[str, list[float]] = {"train_loss": [], "val_mae": []}
+    if test_loader is not None:
+        history["test_mae"] = []
     iterator = tqdm(range(epochs), desc="Epochs", leave=False, disable=not verbose)
     for _ in iterator:
         model.train()
@@ -225,18 +253,24 @@ def train_graph_regression(
             n += batch.num_graphs
 
         model.eval()
-        mae = 0.0
-        m = 0
-        with torch.no_grad():
-            for batch in val_loader:
-                batch = batch.to(dev)
-                out = model(batch).view(-1)
-                mae += (out - batch.y.float().view(-1)).abs().sum().item()
-                m += batch.num_graphs
+
+        def _mae(loader: DataLoader) -> float:
+            mae = 0.0
+            m = 0
+            with torch.no_grad():
+                for batch in loader:
+                    batch = batch.to(dev)
+                    out = model(batch).view(-1)
+                    mae += (out - batch.y.float().view(-1)).abs().sum().item()
+                    m += batch.num_graphs
+            return mae / max(m, 1)
+
         train_loss = total / max(n, 1)
-        val_mae = mae / max(m, 1)
+        val_mae = _mae(val_loader)
         history["train_loss"].append(train_loss)
         history["val_mae"].append(val_mae)
+        if test_loader is not None:
+            history["test_mae"].append(_mae(test_loader))
         if verbose:
             iterator.set_postfix(loss=f"{train_loss:.4f}", mae=f"{val_mae:.4f}")
     return history

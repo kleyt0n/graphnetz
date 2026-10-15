@@ -127,12 +127,13 @@ report.selected_epochs()           # the epoch chosen per (task, model, seed)
 !!! warning "It is not always available, and the framework says so"
 
     Checkpoint selection needs a held-out series *distinct* from the one being
-    selected on. Node classification and both link-prediction routines record
-    validation **and** test metrics per epoch; the graph-level routines record
-    only a validation metric. Asking for `"best_val"` there raises rather than
-    silently selecting and reporting on the same split. Pass `strict=False` to
-    let such tasks fall back to the final epoch — and check
-    `epoch_selection_support()` so you know which ones did.
+    selected on. Every built-in trainer records validation **and** test
+    metrics per epoch. A custom task can still lack one, for example a
+    `graph_reg` loader returning a `(train, val)` pair; asking for
+    `"best_val"` there raises rather than silently selecting and reporting on
+    the same split. Pass `strict=False` to let such tasks fall back to the
+    final epoch, and check `epoch_selection_support()` so you know which ones
+    did.
 
 `selected_epochs()` is the audit surface: an epoch pinned at the last one for
 every seed means selection did nothing, and a wildly varying one means the run

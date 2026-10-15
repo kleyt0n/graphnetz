@@ -303,7 +303,7 @@ def plot_history(
 
 def plot_grouped_bars(
     values: Mapping[str, Mapping[str, float]],
-    errors: Mapping[str, Mapping[str, float]] | None = None,
+    errors: Mapping[str, Mapping[str, float | tuple[float, float]]] | None = None,
     ax: plt.Axes | None = None,
     title: str | None = None,
     ylabel: str = "metric",
@@ -313,7 +313,9 @@ def plot_grouped_bars(
 ) -> tuple[plt.Figure, plt.Axes]:
     """Grouped bar chart from a ``{group: {series: value}}`` mapping.
 
-    Optional ``errors`` of the same shape draws symmetric error bars.
+    Optional ``errors`` of the same shape draws error bars: a float is a
+    symmetric half-width, a ``(minus, plus)`` pair an asymmetric interval
+    such as a percentile bootstrap.
     """
     set_plot_style()
     groups = list(values)
@@ -333,15 +335,16 @@ def plot_grouped_bars(
     for j, s in enumerate(series):
         xs: list[float] = []
         ys: list[float] = []
+        lows: list[float] = []
         es: list[float] = []
         for i, g in enumerate(groups):
             if s in values[g]:
                 xs.append(i + j * width - 0.4 + width / 2)
                 ys.append(values[g][s])
-                if errors is not None and s in errors.get(g, {}):
-                    es.append(errors[g][s])
-                else:
-                    es.append(0.0)
+                err = errors[g][s] if errors is not None and s in errors.get(g, {}) else 0.0
+                lo, hi = err if isinstance(err, tuple) else (err, err)
+                lows.append(float(lo))
+                es.append(float(hi))
         ax.bar(
             xs,
             ys,
@@ -354,8 +357,8 @@ def plot_grouped_bars(
             edgecolor=_INK,
             linewidth=0.5,
         )
-        if any(e > 0 for e in es):
-            ax.errorbar(xs, ys, yerr=es, fmt="none", ecolor=_INK, elinewidth=0.8, capsize=2.0)
+        if any(e > 0 for e in es + lows):
+            ax.errorbar(xs, ys, yerr=[lows, es], fmt="none", ecolor=_INK, elinewidth=0.8, capsize=2.0)
         if annotate:
             # Place the value above the error-bar cap (not the bar top) so
             # the text never collides with the whiskers, rotated upright so

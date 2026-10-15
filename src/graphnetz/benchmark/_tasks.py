@@ -109,6 +109,7 @@ BENCHMARK_TASKS: dict[str, dict[str, list[Task]]] = {
                 lambda root: (
                     physics.zinc(root, subset=True, split="train"),
                     physics.zinc(root, subset=True, split="val"),
+                    physics.zinc(root, subset=True, split="test"),
                 ),
                 epochs=10,
             ),

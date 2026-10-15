@@ -55,6 +55,7 @@ class _ReportPlotsMixin:
         ) -> pd.Series: ...
         def pairwise(self, alpha: float = ..., method: str | None = ...) -> pd.DataFrame: ...
         def _ci_half(self, values: np.ndarray, ci: float, method: str | None = ...) -> float: ...
+        def _ci_errors(self, values: np.ndarray, ci: float, method: str | None = ...) -> tuple[float, float]: ...
 
     # ----- Plotting ----------------------------------------------------------
 
@@ -68,11 +69,11 @@ class _ReportPlotsMixin:
         annotate: bool = True,
         pretty_tasks: Mapping[str, str] | None = None,
     ) -> tuple[plt.Figure, plt.Axes]:
-        """Grouped bar chart of mean ± CI half-width across seeds."""
+        """Grouped bar chart of the seed mean with its CI across seeds."""
         finals = self.final_metrics()
         pretty = dict(pretty_tasks or {})
         values: dict[str, dict[str, float]] = {}
-        errors: dict[str, dict[str, float]] = {}
+        errors: dict[str, dict[str, float | tuple[float, float]]] = {}
         for task, per_task in finals.items():
             label = pretty.get(task, task)
             values[label] = {}
@@ -80,7 +81,7 @@ class _ReportPlotsMixin:
             for model, vals in per_task.items():
                 arr = np.asarray(vals, dtype=float)
                 values[label][model] = float(arr.mean())
-                errors[label][model] = self._ci_half(arr, ci)
+                errors[label][model] = self._ci_errors(arr, ci)
         from graphnetz.plotting import pretty_metric
 
         return plot_grouped_bars(
@@ -169,7 +170,8 @@ class _ReportPlotsMixin:
         for j, model in enumerate(models):
             xs: list[float] = []
             ys: list[float] = []
-            errs: list[float] = []
+            err_lo: list[float] = []
+            err_hi: list[float] = []
             for i, task in enumerate(tasks):
                 if model not in finals[task]:
                     continue
@@ -177,13 +179,15 @@ class _ReportPlotsMixin:
                 xs.append(float(arr.mean()))
                 offset = per_task_offset[task].get(model, slot_positions[j])
                 ys.append(i + offset)
-                errs.append(self._ci_half(arr, ci))
+                minus, plus = self._ci_errors(arr, ci)
+                err_lo.append(minus)
+                err_hi.append(plus)
             if xs:
                 color = NATURE_COLORS[j % len(NATURE_COLORS)]
                 ax.errorbar(
                     xs,
                     ys,
-                    xerr=[errs, errs],
+                    xerr=[err_lo, err_hi],
                     fmt="o",
                     color=color,
                     ecolor=color,
@@ -410,15 +414,15 @@ class _ReportPlotsMixin:
         pretty = dict(pretty_tasks or {})
         # Group comparisons by task so each task reads as a block with a
         # single bold header instead of repeating the task in every label.
-        by_task: dict[str, list[tuple[str, str, float, float, bool]]] = {}
+        by_task: dict[str, list[tuple[str, str, float, tuple[float, float], bool]]] = {}
         for _, row in df.iterrows():
             a = np.asarray(finals[row["task"]][row["model_a"]], dtype=float)
             b = np.asarray(finals[row["task"]][row["model_b"]], dtype=float)
             diff_per_seed = a - b
             mean = float(diff_per_seed.mean())
-            half = self._ci_half(diff_per_seed, ci)
+            err = self._ci_errors(diff_per_seed, ci)
             by_task.setdefault(pretty.get(row["task"], row["task"]), []).append(
-                (row["model_a"], row["model_b"], mean, half, bool(row["significant"]))
+                (row["model_a"], row["model_b"], mean, err, bool(row["significant"]))
             )
 
         n_rows = sum(len(v) for v in by_task.values()) + len(by_task)  # + header rows
@@ -434,12 +438,12 @@ class _ReportPlotsMixin:
         for t_idx, (task_label, comparisons) in enumerate(by_task.items()):
             header_positions.append((y, task_label))
             y += 1.0
-            for ma, mb, mean, half, sig in comparisons:
+            for ma, mb, mean, (minus, plus), sig in comparisons:
                 color = NATURE_COLORS[0] if sig else NATURE_COLORS[2]
                 ax.errorbar(
                     mean,
                     y,
-                    xerr=[[half], [half]],
+                    xerr=[[minus], [plus]],
                     fmt="o" if sig else "s",
                     color=color,
                     ecolor=color,

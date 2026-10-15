@@ -69,15 +69,24 @@ _REGISTRY: dict[type, ModelSpec] = {}
 def register_model(
     cls: type | None = None,
     *,
-    task_type: str | Iterable[str],
+    task_type: str | Iterable[str] | None = None,
+    task_types: str | Iterable[str] | None = None,
     factory: Callable[..., torch.nn.Module] | None = None,
 ) -> Callable[[type], type] | type:
     """Register a model with the benchmark dispatcher.
 
     Usable as a decorator (``@register_model(task_type="node_cls")``) or as a
     plain function (``register_model(MyGNN, task_type={"graph_cls", "graph_reg"})``).
+    Either keyword takes one task-type string or an iterable of them;
+    ``task_types=`` is accepted as an alias so the call can be spelled like
+    the ``task_types`` class attribute.
     """
-    tasks = frozenset({task_type} if isinstance(task_type, str) else task_type)
+    if (task_type is None) == (task_types is None):
+        msg = "register_model() takes exactly one of task_type= or task_types="
+        raise TypeError(msg)
+    spec = task_type if task_type is not None else task_types
+    assert spec is not None
+    tasks = frozenset({spec} if isinstance(spec, str) else spec)
     unknown = tasks - TASK_TYPES
     if unknown:
         msg = f"Unknown task {sorted(unknown)}; allowed: {sorted(TASK_TYPES)}"

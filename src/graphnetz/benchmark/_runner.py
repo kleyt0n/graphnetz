@@ -29,6 +29,79 @@ from graphnetz.training import (
 # Task runner
 # --------------------------------------------------------------------------- #
 
+GRAPH_SPLIT: tuple[float, float, float] = (0.8, 0.1, 0.1)
+"""Train/validation/test fractions for graph-level datasets without a canonical split."""
+
+
+def _three_way_split(ds: Any) -> tuple[Any, Any, Any]:
+    """Shuffle a graph-level dataset and cut it into train/validation/test.
+
+    The shuffle draws from torch's global RNG, which the runner reseeds before
+    every (task, model, seed) triple, so the split changes with the seed but is
+    identical across the models compared at that seed. The held-out third split
+    is what lets ``epoch_selection="best_val"`` and the hyperparameter search
+    select on validation without reporting on the series they selected on.
+    """
+    n = len(ds)
+    if n < 3:
+        msg = f"a graph-level dataset needs at least 3 graphs for a train/val/test split; got {n}"
+        raise ValueError(msg)
+    perm = torch.randperm(n)
+    n_val = max(1, int(round(GRAPH_SPLIT[1] * n)))
+    n_test = max(1, int(round(GRAPH_SPLIT[2] * n)))
+    n_train = n - n_val - n_test
+    train_idx = perm[:n_train]
+    val_idx = perm[n_train : n_train + n_val]
+    test_idx = perm[n_train + n_val :]
+    return ds[train_idx], ds[val_idx], ds[test_idx]
+
+
+def _graph_out_channels(ds: Any) -> int:
+    """Output width of a graph-classification head.
+
+    Multi-label targets (``y`` of shape ``[1, C]`` per graph, e.g.
+    ogbg-molpcba) need one logit per label, while PyG's ``num_classes``
+    counts distinct label *values* there and would report 2.
+    """
+    y = getattr(getattr(ds, "_data", None), "y", None)
+    if y is None:
+        y = getattr(ds[0], "y", None)
+    if y is not None and y.dim() == 2 and y.size(1) > 1:
+        return int(y.size(1))
+    return int(ds.num_classes)
+
+
+def _categorical_vocab(ds: Any) -> list[int] | None:
+    """Per-column vocabulary sizes when node features are integer codes.
+
+    Molecular datasets (OGB ``ogbg-*``, LRGB Peptides) store atoms as rows of
+    categorical ids. Feeding those to a convolution as numbers is meaningless,
+    so the graph-level path embeds them instead. Returns ``None`` for float
+    features.
+    """
+    x = getattr(getattr(ds, "_data", None), "x", None)
+    if x is None:
+        x = getattr(ds[0], "x", None)
+    if x is None or x.is_floating_point():
+        return None
+    codes = x.view(x.size(0), -1)
+    return [int(v) + 1 for v in codes.max(dim=0).values.tolist()]
+
+
+class _CategoricalEncoder(torch.nn.Module):
+    """Sum of one embedding per categorical feature column, then ``inner``."""
+
+    def __init__(self, vocab: list[int], hidden: int, inner: torch.nn.Module) -> None:
+        super().__init__()
+        self.embeds = torch.nn.ModuleList(torch.nn.Embedding(v, hidden) for v in vocab)
+        self.inner = inner
+
+    def forward(self, batch: Any) -> torch.Tensor:
+        codes = batch.x.view(batch.x.size(0), -1).long()
+        batch = batch.clone()
+        batch.x = sum(embed(codes[:, i]) for i, embed in enumerate(self.embeds))
+        return self.inner(batch)
+
 
 def _run_task(
     task_type: Task,
@@ -63,44 +136,67 @@ def _run_task(
         )
 
     if task_type.task_type == "graph_cls":
-        shuffled = ds.shuffle()
-        split = int(0.8 * len(shuffled))
-        train_loader = DataLoader(shuffled[:split], batch_size=32, shuffle=True)
-        val_loader = DataLoader(shuffled[split:], batch_size=32)
-        model = spec.build(shuffled.num_features, hidden, shuffled.num_classes, task_type="graph_cls")
+        train_ds, val_ds, test_ds = _three_way_split(ds)
+        train_loader = DataLoader(train_ds, batch_size=32, shuffle=True)
+        val_loader = DataLoader(val_ds, batch_size=32)
+        test_loader = DataLoader(test_ds, batch_size=32)
+        vocab = _categorical_vocab(ds)
+        out_channels = _graph_out_channels(ds)
+        if vocab is None:
+            model = spec.build(ds.num_features, hidden, out_channels, task_type="graph_cls")
+        else:
+            inner = spec.build(hidden, hidden, out_channels, task_type="graph_cls")
+            model = _CategoricalEncoder(vocab, hidden, inner)
         return train_graph_classification(
-            model, train_loader, val_loader, epochs=epochs, verbose=verbose, device=device, **_opt("lr")
+            model,
+            train_loader,
+            val_loader,
+            epochs=epochs,
+            verbose=verbose,
+            device=device,
+            test_loader=test_loader,
+            **_opt("lr"),
         )
 
     if task_type.task_type == "graph_reg":
-        # Loader may return either a single dataset (used for both train and
-        # held-out -- e.g. synthetic tasks with no canonical split) or a
-        # ``(train_ds, val_ds)`` tuple (real benchmarks like ZINC).
-        if isinstance(ds, tuple):
+        # Loader may return a single dataset (split here 80/10/10, as for
+        # graph classification), a ``(train, val, test)`` triple (real
+        # benchmarks with a canonical split, e.g. ZINC), or a legacy
+        # ``(train, val)`` pair, which records no held-out series.
+        test_ds = None
+        if isinstance(ds, tuple) and len(ds) == 3:
+            train_ds, val_ds, test_ds = ds
+        elif isinstance(ds, tuple) and len(ds) == 2:
             train_ds, val_ds = ds
+        elif isinstance(ds, tuple):
+            msg = f"graph_reg loader returned a tuple of {len(ds)} datasets; expected 2 or 3"
+            raise ValueError(msg)
         else:
-            train_ds = val_ds = ds
+            train_ds, val_ds, test_ds = _three_way_split(ds)
         train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
         val_loader = DataLoader(val_ds, batch_size=64)
-        inner = spec.build(hidden, hidden, 1, task_type="graph_reg")
-
-        class _AtomEmbed(torch.nn.Module):
-            def __init__(self, num_atoms: int = 32) -> None:
-                super().__init__()
-                self.embed = torch.nn.Embedding(num_atoms, hidden)
-                self.inner = inner
-
-            def forward(self, batch: Any) -> torch.Tensor:
-                # Embed only integer atom-type ids (e.g. ZINC); pass-through
-                # any float feature matrix unchanged so we never silently
-                # truncate continuous features via .long().
-                if not batch.x.dtype.is_floating_point:
-                    batch = batch.clone()
-                    batch.x = self.embed(batch.x.view(-1).long())
-                return self.inner(batch)
+        reg_test_loader = DataLoader(test_ds, batch_size=64) if test_ds is not None else None
+        # Integer node features (ZINC atom ids) are embedded, float features
+        # are used as they are. The vocabulary spans every split so an id
+        # first seen at validation or test time still has an embedding.
+        vocabs = [v for v in (_categorical_vocab(d) for d in (train_ds, val_ds, test_ds) if d is not None) if v]
+        if vocabs:
+            vocab = [max(col) for col in zip(*vocabs, strict=False)]
+            reg_model: torch.nn.Module = _CategoricalEncoder(
+                vocab, hidden, spec.build(hidden, hidden, 1, task_type="graph_reg")
+            )
+        else:
+            reg_model = spec.build(train_ds.num_features, hidden, 1, task_type="graph_reg")
 
         return train_graph_regression(
-            _AtomEmbed(), train_loader, val_loader, epochs=epochs, verbose=verbose, device=device, **_opt("lr")
+            reg_model,
+            train_loader,
+            val_loader,
+            epochs=epochs,
+            verbose=verbose,
+            device=device,
+            test_loader=reg_test_loader,
+            **_opt("lr"),
         )
 
     if task_type.task_type == "link_pred":

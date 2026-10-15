@@ -96,8 +96,8 @@ See [Reading the report](https://kleyt0n.github.io/graphnetz/guides/report/).
 | Task | Symbol | Metric |
 |---|---|---|
 | Node classification | `node_cls` | test accuracy |
-| Graph classification | `graph_cls` | validation accuracy |
-| Graph regression | `graph_reg` | validation MAE (lower is better) |
+| Graph classification | `graph_cls` | test accuracy |
+| Graph regression | `graph_reg` | test MAE (lower is better) |
 | Link prediction | `link_pred` | test ROC-AUC |
 
 Unlabelled graphs (Netzschleuder, synthetic combinatorial, Ising lattice)

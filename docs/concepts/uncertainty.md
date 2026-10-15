@@ -64,6 +64,13 @@ Setting `ci_method` on the report changes the default for the plots and the
 LaTeX exports too, so the figure and the table in a paper cannot disagree
 about which interval they show.
 
+The bootstrap interval is reported by its own endpoints, the 2.5th and 97.5th
+percentiles of the resampled means, so it is generally **not symmetric** about
+the mean: `summary()` gives them as `ci_low`/`ci_high`, `to_latex()` prints
+`mean^{+up}_{-down}`, and the plots draw asymmetric error bars. Near a ceiling
+that matters: nine seeds at 1.00 and one at 0.90 give the interval
+[0.97, 1.00], where a symmetric `mean ± half` would claim 1.005.
+
 !!! note "The bootstrap resamples seeds, not test examples"
     It is resampling the same $S$ numbers the *t* interval uses, so it cannot
     manufacture precision that ten runs do not contain. What it drops is the

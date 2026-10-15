@@ -16,7 +16,6 @@ Coverage:
   (collaboration network for link prediction).
 """
 
-from torch_geometric.data import Data
 from torch_geometric.datasets import (
     HeterophilousGraphDataset,
     MovieLens100K,
@@ -25,7 +24,7 @@ from torch_geometric.datasets import (
 )
 
 from graphnetz.datasets._netz import Netz
-from graphnetz.datasets._ogb import load_ogb_link, load_ogb_node
+from graphnetz.datasets._ogb import SingleGraphDataset, load_ogb_link, load_ogb_node
 
 
 def cora(root: str) -> Planetoid:
@@ -98,15 +97,15 @@ def questions(root: str) -> HeterophilousGraphDataset:
     return HeterophilousGraphDataset(root=root, name="Questions")
 
 
-def ogbn_arxiv(root: str) -> Data:
+def ogbn_arxiv(root: str) -> SingleGraphDataset:
     """OGB arXiv citation network (~169 K nodes, 40 subject classes)."""
     return load_ogb_node("ogbn-arxiv", root)
 
 
-def ogbl_collab(root: str) -> Data:
+def ogbl_collab(root: str) -> SingleGraphDataset:
     """OGB collaboration network (~235 K author nodes, 128-d features).
 
-    Returns a single PyG ``Data`` graph; the benchmark runner re-splits
+    Returns a one-graph dataset (`SingleGraphDataset`); the benchmark runner re-splits
     via ``RandomLinkSplit`` rather than using OGB's official edge split.
     """
     return load_ogb_link("ogbl-collab", root)

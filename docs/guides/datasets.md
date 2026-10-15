@@ -18,8 +18,8 @@ report headlines:
 | Symbol | Kind | Default metric | Adapter |
 |---|---|---|---|
 | `node_cls` | Node classification | test accuracy | encoder used directly |
-| `graph_cls` | Graph classification | val accuracy | mean-pool + linear head |
-| `graph_reg` | Graph regression | val MAE | mean-pool + linear head |
+| `graph_cls` | Graph classification | test accuracy | mean-pool + linear head |
+| `graph_reg` | Graph regression | test MAE | mean-pool + linear head |
 | `link_pred` | Link prediction | test ROC-AUC | dot-product (homogeneous) or DistMult (relational) decoder |
 
 !!! note

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,7 @@ from graphnetz.benchmark._stats import (
     _normalized_weights,
     _paired_pvalue,
     _rank_rows,
+    _resolve_ci_bounds,
     _resolve_ci_half,
     _selected_value,
     _selection_reason,
@@ -36,6 +38,13 @@ from graphnetz.benchmark._stats import (
 # --------------------------------------------------------------------------- #
 # Benchmark report
 # --------------------------------------------------------------------------- #
+
+
+def _format_p(p: float) -> str:
+    """Three significant digits, trailing zeros kept: ``0.110``, not ``0.11``."""
+    if pd.isna(p):
+        return "n/a"
+    return f"{float(p):#.3g}"
 
 
 @dataclass
@@ -77,6 +86,33 @@ class BenchmarkReport(_ReportPlotsMixin):
             self.bootstrap_n,
             self.bootstrap_seed,
         )
+
+    def _ci_bounds(
+        self,
+        values: np.ndarray,
+        ci: float,
+        method: str | None = None,
+    ) -> tuple[float, float]:
+        """``(lo, hi)`` of the CI for the mean; asymmetric under the bootstrap."""
+        return _resolve_ci_bounds(
+            values,
+            ci,
+            method or self.ci_method,
+            self.bootstrap_n,
+            self.bootstrap_seed,
+        )
+
+    def _ci_errors(
+        self,
+        values: np.ndarray,
+        ci: float,
+        method: str | None = None,
+    ) -> tuple[float, float]:
+        """``(minus, plus)`` error-bar lengths around the mean."""
+        arr = np.asarray(values, dtype=float)
+        mean = float(arr.mean())
+        lo, hi = self._ci_bounds(arr, ci, method=method)
+        return mean - lo, hi - mean
 
     # ----- Pickle compatibility ---------------------------------------------
 
@@ -240,12 +276,15 @@ class BenchmarkReport(_ReportPlotsMixin):
         epoch_selection: str | None = None,
         strict: bool = True,
     ) -> pd.DataFrame:
-        """Per-(task, model) mean, std, sem, CI half-width and bounds.
+        """Per-(task, model) mean, std, sem and CI bounds.
 
         ``method`` overrides ``self.ci_method`` for this call only; choose
         ``"t"`` for Student's-t intervals (default) or ``"bootstrap"`` for
         percentile-bootstrap intervals (better for non-Gaussian metrics
-        such as Hits@K, MRR, or AUC).
+        such as Hits@K, MRR, or AUC). ``ci_low``/``ci_high`` are the interval's
+        own endpoints: symmetric about the mean for ``"t"``, the percentile
+        quantiles for ``"bootstrap"``, which keep the bootstrap distribution's
+        skew and stay inside the range of the data.
         """
         rows = []
         finals = self.final_metrics(epoch_selection=epoch_selection, strict=strict)
@@ -255,7 +294,7 @@ class BenchmarkReport(_ReportPlotsMixin):
                 mean = float(arr.mean())
                 std = float(arr.std(ddof=1)) if arr.size > 1 else 0.0
                 sem = float(stats.sem(arr)) if arr.size > 1 else 0.0
-                half = self._ci_half(arr, ci, method=method)
+                lo, hi = self._ci_bounds(arr, ci, method=method)
                 rows.append(
                     {
                         "task": task,
@@ -264,8 +303,8 @@ class BenchmarkReport(_ReportPlotsMixin):
                         "mean": mean,
                         "std": std,
                         "sem": sem,
-                        "ci_low": mean - half,
-                        "ci_high": mean + half,
+                        "ci_low": lo,
+                        "ci_high": hi,
                     }
                 )
         return pd.DataFrame(rows).set_index(["task", "model"]).sort_index()
@@ -480,9 +519,10 @@ class BenchmarkReport(_ReportPlotsMixin):
             **This is the only variant whose null distribution the Friedman and
             Nemenyi procedures describe.**
         ``"reliability"``
-            Weight each task by the inverse mean 95 % CI half-width of its
-            cells, so tasks whose seed variance makes their ranking unreliable
-            contribute less.
+            Weight each task by the inverse mean 95 % CI half-width of the
+            cells being ranked (models absent from the rank table, such as a
+            graph-only model on a mixed benchmark, do not count), so tasks
+            whose seed variance makes their ranking unreliable contribute less.
         ``"hierarchical"``
             Average within each group in ``groups`` (e.g. research category),
             then across groups, so a category with many tasks does not
@@ -510,7 +550,8 @@ class BenchmarkReport(_ReportPlotsMixin):
         elif aggregation == "reliability":
             summary = self.summary(epoch_selection=epoch_selection, strict=strict)
             half = (summary["ci_high"] - summary["ci_low"]) / 2.0
-            per_task = half.groupby(level="task").mean()
+            ranked = half[half.index.get_level_values("model").isin(table.columns)]
+            per_task = ranked.groupby(level="task").mean()
             inv = {t: 1.0 / max(float(per_task.get(t, np.nan)), 1e-12) for t in tasks}
             w = _normalized_weights(inv, tasks)
         elif aggregation == "hierarchical":
@@ -520,6 +561,12 @@ class BenchmarkReport(_ReportPlotsMixin):
             sizes: dict[str, int] = {}
             for t in tasks:
                 sizes[groups.get(t, t)] = sizes.get(groups.get(t, t), 0) + 1
+            if all(n == 1 for n in sizes.values()):
+                warnings.warn(
+                    "aggregation='hierarchical' with one task per group is identical to "
+                    "'uniform'; it carries no information beyond the uniform mean ranks.",
+                    stacklevel=2,
+                )
             # Each group contributes equally; tasks share their group's budget.
             w = _normalized_weights({t: 1.0 / sizes[groups.get(t, t)] for t in tasks}, tasks)
         else:
@@ -740,12 +787,11 @@ class BenchmarkReport(_ReportPlotsMixin):
 
     def _best_per_task(self) -> dict[str, str]:
         finals = self.final_metrics()
-        metric = self.metric_name()
-        lower_is_better = metric in _LOWER_IS_BETTER
+        directions = self._task_directions()
         best: dict[str, str] = {}
         for task, per_task in finals.items():
             scored = [(model, float(np.mean(values))) for model, values in per_task.items()]
-            if lower_is_better:
+            if directions.get(task, False):
                 best[task] = min(scored, key=lambda x: x[1])[0]
             else:
                 best[task] = max(scored, key=lambda x: x[1])[0]
@@ -762,9 +808,12 @@ class BenchmarkReport(_ReportPlotsMixin):
         label: str | None = None,
         method: str | None = None,
     ) -> Path:
-        """Booktabs LaTeX table of mean ± CI half-width with bold-best per task.
+        """Booktabs LaTeX table of mean and CI with bold-best per task.
 
         ``method`` overrides ``self.ci_method`` (``"t"`` or ``"bootstrap"``).
+        Student's-t cells read ``mean ± half``; bootstrap cells print the
+        asymmetric offsets to the percentile endpoints,
+        ``mean^{+(hi - mean)}_{-(mean - lo)}``.
         """
         finals = self.final_metrics()
         tasks = sorted(finals)
@@ -792,12 +841,14 @@ class BenchmarkReport(_ReportPlotsMixin):
                     cells.append("--")
                     continue
                 mean = float(values.mean())
-                half = self._ci_half(values, ci, method=method)
-                if bold_best and best.get(task) == model:
-                    cell = rf"$\mathbf{{{mean:.3f} \pm {half:.3f}}}$"
+                minus, plus = self._ci_errors(values, ci, method=method)
+                if (method or self.ci_method) == "bootstrap":
+                    body = rf"{mean:.3f}^{{+{plus:.3f}}}_{{-{minus:.3f}}}"
                 else:
-                    cell = rf"${mean:.3f} \pm {half:.3f}$"
-                cells.append(cell)
+                    body = rf"{mean:.3f} \pm {plus:.3f}"
+                if bold_best and best.get(task) == model:
+                    body = rf"\mathbf{{{body}}}"
+                cells.append(f"${body}$")
             lines.append(f"{model} & " + " & ".join(cells) + r" \\")
         lines.append(r"\bottomrule")
         lines.append(r"\end{tabular}")
@@ -836,8 +887,8 @@ class BenchmarkReport(_ReportPlotsMixin):
         lines.append(r"\midrule")
         for _, row in df.iterrows():
             sig = r"\textbf{*}" if row["significant"] else ""
-            p_raw = "n/a" if pd.isna(row["p_raw"]) else f"{row['p_raw']:.3g}"
-            p_holm = "n/a" if pd.isna(row["p_holm"]) else f"{row['p_holm']:.3g}"
+            p_raw = _format_p(row["p_raw"])
+            p_holm = _format_p(row["p_holm"])
             lines.append(
                 f"{row['task']} & {row['model_a']} vs.\\ {row['model_b']} & "
                 f"${row['mean_diff']:+.3f}$ & {p_raw} & {p_holm} & {sig} \\\\"
