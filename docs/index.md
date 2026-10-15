@@ -2,6 +2,7 @@
 title: graphnetz
 description: A GNN benchmark whose default output is a statistical report, not a leaderboard.
 hide:
+  - navigation
   - toc
 ---
 
@@ -12,20 +13,24 @@ hide:
 <div class="gn-hero" markdown>
 
 <div class="gn-hero__lockup" markdown="0">
-  <!-- Material hides whichever does not match the active scheme, via the
-       #only-light / #only-dark src suffixes. -->
-  <img class="gn-hero__logo" src="logo-ink.svg#only-light" alt="">
-  <img class="gn-hero__logo" src="logo-light.svg#only-dark" alt="">
+  <img class="gn-hero__logo" src="logo-light.svg" alt="">
   <div class="gn-hero__word">graphnetz</div>
 </div>
 
-<p class="gn-hero__tagline">
-  Benchmark graph neural networks and get back a statistical report,
-  not a leaderboard.
-</p>
+Benchmark graph neural networks and get back a statistical report, not a
+leaderboard.
+
+<div class="gn-install" markdown>
+
+```bash
+uv add graphnetz
+```
+
+</div>
 
 <div class="gn-hero__actions" markdown>
 [Get started](getting-started/quickstart.md){ .md-button .md-button--primary }
+[Concepts](concepts/index.md){ .md-button }
 [:fontawesome-brands-github: GitHub](https://github.com/Kleyt0n/graphnetz){ .md-button }
 </div>
 
@@ -241,11 +246,4 @@ Bring your own with a decorator, a class attribute or an inline tuple. See
 
     [:octicons-arrow-right-24: API reference](reference/index.md)
 
-</div>
-
-<div class="gn-project" markdown>
-[:fontawesome-brands-github: Source](https://github.com/Kleyt0n/graphnetz)
-[:fontawesome-brands-python: PyPI](https://pypi.org/project/graphnetz/)
-[:material-file-document-outline: Paper](https://arxiv.org/pdf/2605.09099)
-[:material-scale-balance: MIT License](https://github.com/Kleyt0n/graphnetz/blob/main/LICENCE.txt)
 </div>

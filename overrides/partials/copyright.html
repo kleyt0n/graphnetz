@@ -1,0 +1,8 @@
+<div class="md-copyright">
+  <div class="gn-footer__legal">
+    {% if config.copyright %}<span>{{ config.copyright }}</span>{% endif %}
+    {% for item in config.extra.footer.legal %}
+      <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.name }}</a>
+    {% endfor %}
+  </div>
+</div>
