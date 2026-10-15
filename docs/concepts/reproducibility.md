@@ -99,10 +99,11 @@ report.selected_epochs()              # the epoch chosen per (task, model, seed)
 `"best_val"` takes each run's metric at the epoch that maximised the *paired
 validation* series. What makes it honest is that the reported value comes
 from a split that was not used to choose it — which is also why it is not
-available everywhere. Node classification and both link-prediction routines
-record validation **and** test metrics per epoch; the graph-level routines
-record only a validation metric, so asking for `"best_val"` there raises
-rather than silently selecting and reporting on the same split. Pass
+available everywhere. Every built-in trainer records validation **and** test
+metrics per epoch, but a custom task without a held-out series (a `graph_reg`
+loader returning a `(train, val)` pair, say) cannot be selected, so asking for
+`"best_val"` there raises rather than silently selecting and reporting on the
+same split. Pass
 `strict=False` to let such tasks fall back to the final epoch, and check
 `epoch_selection_support()` to see which ones did.
 

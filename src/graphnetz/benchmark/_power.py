@@ -78,14 +78,25 @@ def seeds_for_effect(
     alpha: float = 0.05,
     power: float = 0.80,
     max_n: int = 10_000,
-) -> int:
+) -> float:
     """Smallest ``n`` whose MDE is at most ``effect``.
 
     The design question in the other direction: "how many seeds would I need
-    to call a difference of this size?"  Returns ``max_n`` if the target is
-    not reached within the search bound.
+    to call a difference of this size?"  The MDE's quantiles depend on ``n``
+    through their degrees of freedom, so there is no closed-form inverse: the
+    search scans ``n = 2, 3, ...`` and recomputes both quantiles at ``n - 1``
+    degrees of freedom each time, holding ``sigma_d`` at its pilot value.
+    ``alpha`` is the per-comparison level; under a Holm-corrected family the
+    returned ``n`` is a lower bound.
+
+    Returns ``max_n`` if the target is not reached within the search bound,
+    ``2`` when the paired differences have zero spread, and NaN when the
+    question is undefined (non-positive ``effect`` or a non-finite
+    ``sigma_d``, e.g. from fewer than two seeds).
     """
-    if effect <= 0 or not np.isfinite(sigma_d) or sigma_d <= 0:
+    if effect <= 0 or not np.isfinite(sigma_d) or sigma_d < 0:
+        return float("nan")
+    if sigma_d == 0:
         return 2
     for n in range(2, max_n + 1):
         if minimum_detectable_effect(sigma_d, n, alpha, power) <= effect:

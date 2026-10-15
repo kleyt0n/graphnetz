@@ -10,8 +10,9 @@ category. The library provides:
 - [`RandomBipartiteMatching`][graphnetz.datasets.combinatorial.RandomBipartiteMatching] / `random_bipartite_matching` —
   bipartite assignment instances with random weights.
 - [`RandomColoring`][graphnetz.datasets.combinatorial.RandomColoring] / `random_coloring` — random Erdos-Renyi graphs
-  for graph-coloring / max-cut experiments.
-- `RandomMaxCut` / `random_maxcut` — alias of RandomColoring.
+  for graph-coloring experiments.
+- [`RandomMaxCut`][graphnetz.datasets.combinatorial.RandomMaxCut] / `random_maxcut` — weighted Erdos-Renyi graphs
+  labelled with a locally optimal max-cut partition.
 """
 
 from __future__ import annotations
@@ -182,7 +183,7 @@ class RandomBipartiteMatching(InMemoryDataset):
 
 
 class RandomColoring(InMemoryDataset):
-    """Random Erdos-Renyi graphs for graph-coloring and max-cut benchmarks."""
+    """Random Erdos-Renyi graphs for graph-coloring benchmarks."""
 
     def __init__(
         self,
@@ -217,8 +218,78 @@ class RandomColoring(InMemoryDataset):
         self.save(data_list, self.processed_paths[0])
 
 
-# Backward-compatible alias: max-cut and coloring share this generator.
-RandomMaxCut = RandomColoring
+def _local_max_cut(weights: torch.Tensor, side: torch.Tensor) -> torch.Tensor:
+    """1-flip local search for max-cut on a dense symmetric weight matrix.
+
+    Flipping node ``v`` changes the cut by the weight it has to its own side
+    minus the weight it has to the other side. The node with the largest
+    positive gain is flipped until none remains, which terminates because the
+    cut strictly increases and is bounded.
+    """
+    side = side.clone()
+    while True:
+        same = (side[:, None] == side[None, :]).float()
+        gain = (weights * same).sum(1) - (weights * (1.0 - same)).sum(1)
+        best = int(gain.argmax())
+        if gain[best] <= 1e-12:
+            return side
+        side[best] = 1 - side[best]
+
+
+class RandomMaxCut(InMemoryDataset):
+    """Weighted Erdos-Renyi graphs with a locally optimal max-cut partition.
+
+    Each graph has symmetric edge weights drawn uniformly from ``[0, 1)``
+    (``edge_attr``), node labels ``y`` giving the side of a cut that no single
+    node flip can improve (1-flip local search from a random partition), and
+    the weight of that cut as ``cut_value``. Unlike coloring, which only needs
+    topology, max-cut is defined on weighted graphs, so the two generators
+    produce different instances.
+    """
+
+    def __init__(
+        self,
+        root: str,
+        num_graphs: int = 128,
+        num_nodes: int = 50,
+        edge_prob: float = 0.12,
+        seed: int = 0,
+    ) -> None:
+        self.num_graphs = num_graphs
+        self.num_nodes = num_nodes
+        self.edge_prob = edge_prob
+        self.seed = seed
+        super().__init__(root)
+        self.load(self.processed_paths[0])
+
+    @property
+    def processed_file_names(self) -> str:
+        return f"maxcut_{self.num_graphs}_{self.num_nodes}_{self.edge_prob}_{self.seed}.pt"
+
+    def process(self) -> None:
+        data_list: list[Data] = []
+        with torch.random.fork_rng():
+            torch.manual_seed(self.seed)
+            n = self.num_nodes
+            for _ in range(self.num_graphs):
+                edge_index = erdos_renyi_graph(n, self.edge_prob, directed=False)
+                upper = edge_index[0] < edge_index[1]
+                w_upper = torch.rand(int(upper.sum()))
+                dense = torch.zeros(n, n)
+                dense[edge_index[0, upper], edge_index[1, upper]] = w_upper
+                dense = dense + dense.T
+                side = _local_max_cut(dense, torch.randint(0, 2, (n,)))
+                cut = dense[side[:, None] != side[None, :]].sum() / 2.0
+                data_list.append(
+                    Data(
+                        x=torch.ones((n, 1)),
+                        edge_index=edge_index,
+                        edge_attr=dense[edge_index[0], edge_index[1]].view(-1, 1),
+                        y=side.long(),
+                        cut_value=cut.view(1),
+                    )
+                )
+        self.save(data_list, self.processed_paths[0])
 
 
 def random_tsp(root: str, **kwargs: int | float) -> RandomTSP:
@@ -241,8 +312,8 @@ def random_coloring(root: str, **kwargs: int | float) -> RandomColoring:
     return RandomColoring(root=root, **kwargs)  # type: ignore[arg-type]
 
 
-def random_maxcut(root: str, **kwargs: int | float) -> RandomColoring:
-    return RandomColoring(root=root, **kwargs)  # type: ignore[arg-type]
+def random_maxcut(root: str, **kwargs: int | float) -> RandomMaxCut:
+    return RandomMaxCut(root=root, **kwargs)  # type: ignore[arg-type]
 
 
 __all__ = [

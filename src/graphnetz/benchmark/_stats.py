@@ -11,11 +11,12 @@ from scipy import stats
 _METRIC_KEYS: tuple[str, ...] = (
     "test_acc",
     "test_auc",
+    "test_mae",
     "val_acc",
     "val_auc",
     "val_mae",
 )
-_LOWER_IS_BETTER: frozenset[str] = frozenset({"val_mae", "train_loss"})
+_LOWER_IS_BETTER: frozenset[str] = frozenset({"test_mae", "val_mae", "train_loss"})
 
 # Reported metric -> the validation metric that may legitimately select its
 # epoch. Only pairs that live on *different* splits appear here: selecting the
@@ -24,6 +25,7 @@ _LOWER_IS_BETTER: frozenset[str] = frozenset({"val_mae", "train_loss"})
 _SELECTION_SOURCE: dict[str, str] = {
     "test_acc": "val_acc",
     "test_auc": "val_auc",
+    "test_mae": "val_mae",
 }
 
 EPOCH_SELECTIONS: frozenset[str] = frozenset({"final", "best_val"})
@@ -52,29 +54,45 @@ def _ci_half_width(values: np.ndarray, ci: float = 0.95) -> float:
     return float(sem * stats.t.ppf((1 + ci) / 2, n - 1))
 
 
+def _bootstrap_ci(
+    values: np.ndarray,
+    ci: float = 0.95,
+    n_resamples: int = 10000,
+    random_state: int = 0,
+) -> tuple[float, float]:
+    """Percentile-bootstrap CI ``(lo, hi)`` for the mean.
+
+    Robust for non-Gaussian metrics (e.g. Hits@K, MRR, AUC) where the
+    Student's-t assumption is poor. The endpoints are the empirical quantiles
+    of the resampled means, so the interval keeps the skew of the bootstrap
+    distribution and never leaves the range of the data: it is generally
+    *not* symmetric about the sample mean.
+    """
+    arr = np.asarray(values, dtype=float).ravel()
+    n = arr.size
+    if n < 2:
+        mean = float(arr.mean()) if n else float("nan")
+        return mean, mean
+    rng = np.random.default_rng(random_state)
+    idx = rng.integers(0, n, size=(n_resamples, n))
+    means = arr[idx].mean(axis=1)
+    alpha = (1.0 - ci) / 2.0
+    lo, hi = np.quantile(means, [alpha, 1.0 - alpha])
+    return float(lo), float(hi)
+
+
 def _bootstrap_ci_half_width(
     values: np.ndarray,
     ci: float = 0.95,
     n_resamples: int = 10000,
     random_state: int = 0,
 ) -> float:
-    """Half-width of a percentile-bootstrap CI for the mean.
+    """Half the width of the percentile-bootstrap CI, ``(hi - lo) / 2``.
 
-    Robust for non-Gaussian metrics (e.g. Hits@K, MRR, AUC) where the
-    Student's-t assumption is poor. Returns ``(hi - lo) / 2`` -- the
-    half-width of a symmetric envelope with the same total width as the
-    percentile interval, so callers reporting ``mean ± half`` recover
-    the bootstrap interval's spread without inflating asymmetric tails.
+    A spread summary only (used, e.g., for reliability weights). It is not a
+    valid ``mean ± half`` interval: see `_bootstrap_ci` for the endpoints.
     """
-    arr = np.asarray(values, dtype=float).ravel()
-    n = arr.size
-    if n < 2:
-        return 0.0
-    rng = np.random.default_rng(random_state)
-    idx = rng.integers(0, n, size=(n_resamples, n))
-    means = arr[idx].mean(axis=1)
-    alpha = (1.0 - ci) / 2.0
-    lo, hi = np.quantile(means, [alpha, 1.0 - alpha])
+    lo, hi = _bootstrap_ci(values, ci, n_resamples, random_state)
     return float((hi - lo) / 2.0)
 
 
@@ -89,6 +107,29 @@ def _resolve_ci_half(
         return _ci_half_width(values, ci)
     if method == "bootstrap":
         return _bootstrap_ci_half_width(values, ci, n_resamples, random_state)
+    msg = f"Unknown CI method: {method!r}; choices: 't', 'bootstrap'"
+    raise ValueError(msg)
+
+
+def _resolve_ci_bounds(
+    values: np.ndarray,
+    ci: float,
+    method: str,
+    n_resamples: int,
+    random_state: int,
+) -> tuple[float, float]:
+    """``(lo, hi)`` of the CI for the mean under ``method``.
+
+    Symmetric about the mean for ``"t"``; the percentile endpoints, generally
+    asymmetric, for ``"bootstrap"``.
+    """
+    arr = np.asarray(values, dtype=float).ravel()
+    if method == "t":
+        mean = float(arr.mean()) if arr.size else float("nan")
+        half = _ci_half_width(arr, ci)
+        return mean - half, mean + half
+    if method == "bootstrap":
+        return _bootstrap_ci(arr, ci, n_resamples, random_state)
     msg = f"Unknown CI method: {method!r}; choices: 't', 'bootstrap'"
     raise ValueError(msg)
 

@@ -10,9 +10,14 @@ wraps the encoder, and which number the report headlines.
 | symbol | kind | default metric | direction | adapter |
 | --- | --- | --- | --- | --- |
 | `node_cls` | node classification | test accuracy | higher is better | encoder used directly |
-| `graph_cls` | graph classification | val accuracy | higher is better | mean-pool + linear head |
-| `graph_reg` | graph regression | val MAE | **lower** is better | mean-pool + linear head |
+| `graph_cls` | graph classification | test accuracy | higher is better | mean-pool + linear head |
+| `graph_reg` | graph regression | test MAE | **lower** is better | mean-pool + linear head |
 | `link_pred` | link prediction | test ROC-AUC | higher is better | dot-product, or DistMult when relational |
+
+Graph-level datasets without a canonical split are shuffled per seed and cut
+80/10/10 into train, validation and test; ZINC uses its own three splits.
+Every family therefore records a validation series *and* a held-out one, which
+is what checkpoint selection and hyperparameter search need.
 
 `TASK_TYPES` is the authoritative set, and
 [`register_model`][graphnetz.benchmark.register_model] rejects anything

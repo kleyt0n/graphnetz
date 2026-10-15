@@ -15,11 +15,10 @@ Inter-bank exposure datasets are typically confidential and have no canonical
 public benchmark.
 """
 
-from torch_geometric.data import Data
 from torch_geometric.datasets import EllipticBitcoinDataset
 
 from graphnetz.datasets._netz import Netz
-from graphnetz.datasets._ogb import load_ogb_node
+from graphnetz.datasets._ogb import SingleGraphDataset, load_ogb_node
 
 
 def product_space(root: str, network_name: str = "SITC") -> Netz:
@@ -48,7 +47,7 @@ def elliptic_bitcoin(root: str) -> EllipticBitcoinDataset:
     return EllipticBitcoinDataset(root=root)
 
 
-def ogbn_products(root: str) -> Data:
+def ogbn_products(root: str) -> SingleGraphDataset:
     """OGB Amazon product co-purchase network (~2.4 M nodes, 47 classes).
 
     Larger than ``ogbn_arxiv`` — full-graph training is feasible on a

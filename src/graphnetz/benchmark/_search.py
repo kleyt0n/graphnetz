@@ -25,7 +25,7 @@ from typing import Any
 
 import numpy as np
 
-from graphnetz.benchmark._stats import _LOWER_IS_BETTER
+from graphnetz.benchmark._stats import _LOWER_IS_BETTER, _auto_metric_key, _selection_reason
 
 __all__ = ["SearchSpace", "select"]
 
@@ -104,6 +104,15 @@ def score(history: Mapping[str, Any]) -> tuple[float, str]:
             f"hyperparameter search needs a validation series to score candidates; "
             f"this task's history has {sorted(history)} and exposes none of {list(_VALIDATION_KEYS)}. "
             f"Scoring on a held-out metric would bias every downstream statistic."
+        )
+        raise ValueError(msg)
+    reported = _auto_metric_key(history)
+    if _selection_reason(history, reported) is not None:
+        msg = (
+            f"hyperparameter search would select on {key!r} and then report {reported!r}, "
+            f"which is the same split or has no held-out counterpart: the selection would leak "
+            f"into every downstream statistic. The task's trainer must record a held-out series "
+            f"(e.g. test_acc next to val_acc) before it can be searched."
         )
         raise ValueError(msg)
     value = float(history[key][-1])
