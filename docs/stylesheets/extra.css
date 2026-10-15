@@ -1,98 +1,293 @@
 /* ==========================================================================
-   graphnetz docs theme.
+   graphnetz docs theme: a grainy blue-hour sky.
 
-   One brand colour, the blue #8DA9C4, set as Material's custom primary. It is
-   a light blue: it carries dark text well (7.2:1 with the ink below) but is
-   too light to be text on white (2.4:1). So the blue itself paints surfaces
-   (header, primary buttons, step discs, the logo's accent node), and text
-   that has to be blue takes a darker step of the same hue:
+   The whole palette is the brand blue #8DA9C4 and its steps, run from the
+   logo's ink to its mist:
 
-     blue-300  #AEC2D5   dark-scheme hover
-     blue-400  #8DA9C4   the brand blue; dark-scheme links (6.6:1)
+     ink       #111A22   night; text on light surfaces
+     deep      #1C2C3C   the step between ink and blue-700
+     blue-700  #3D5A76   light-scheme hover; primary surfaces
      blue-600  #496C8D   light-scheme links (5.5:1 on white)
-     blue-700  #3D5A76   light-scheme hover (7.2:1 on white)
-     ink       #111A22   text on the blue
+     blue-400  #8DA9C4   the brand blue; dark-scheme links (6.6:1 on ink)
+     blue-300  #AEC2D5   dark-scheme hover
+     mist      #F2F5F8   the logo's light ink; the horizon
 
-   Everything else is Material's default and slate schemes. The project tokens
-   further down are aliases for Material variables, so they follow the scheme
-   switch.
-
-   Geometry: one radius token at 6px, and the 1:4 radius-to-size ratio that
-   every rounded surface here reuses.
+   One sky gradient over those stops paints the home hero; a paler wash of it
+   sits behind the header, the tabs and every page, under a film of grain.
+   javascripts/water.js reads the --gn-sky-* stops below to redraw the hero
+   sky in WebGL, so the hero stays in step with this file.
    ========================================================================== */
 
-/* Roboto and Roboto Mono as variable fonts. mkdocs.yml sets `font: false`, so
-   this is the only request; Material reads the two families from
-   --md-text-font and --md-code-font below. */
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+/* --- type ----------------------------------------------------------------
+   Codec Pro, self-hosted from docs/assets/fonts/codec-pro (see the README
+   there). It is a commercial face, so the files are not committed; until
+   they are present, pages fall back to Inter. Code is JetBrains Mono.
+   mkdocs.yml sets `font: false`, so the import below is the only request.
+   -------------------------------------------------------------------------- */
 
-:root {
-  --md-text-font: "Roboto";
-  --md-code-font: "Roboto Mono";
-  --gn-radius: 6px;
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+
+@font-face {
+  font-family: "Codec Pro";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Codec Pro Regular"), local("CodecPro-Regular"),
+    url("../assets/fonts/codec-pro/CodecPro-Regular.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Codec Pro";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local("Codec Pro News"), local("CodecPro-News"),
+    url("../assets/fonts/codec-pro/CodecPro-News.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Codec Pro";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("Codec Pro Bold"), local("CodecPro-Bold"),
+    url("../assets/fonts/codec-pro/CodecPro-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Codec Pro";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Codec Pro ExtraBold"), local("CodecPro-ExtraBold"),
+    url("../assets/fonts/codec-pro/CodecPro-ExtraBold.woff2") format("woff2");
+}
+
+/* --- tokens --------------------------------------------------------------- */
+
 :root {
-  --gn-blue-300: #aec2d5;
-  --gn-blue-400: #8da9c4;
-  --gn-blue-600: #496c8d;
+  --md-text-font: "Codec Pro", "Inter";
+  --md-code-font: "JetBrains Mono";
+
+  --gn-ink: #111a22;
+  --gn-deep: #1c2c3c;
   --gn-blue-700: #3d5a76;
-  --gn-blue-ink: #111a22;
+  --gn-blue-600: #496c8d;
+  --gn-blue-400: #8da9c4;
+  --gn-blue-300: #aec2d5;
+  --gn-mist: #f2f5f8;
+
+  /* The hero sky. water.js reads these seven stops and repeats their
+     positions; change both together. */
+  --gn-sky-0: #111a22;
+  --gn-sky-1: #1c2c3c;
+  --gn-sky-2: #3d5a76;
+  --gn-sky-3: #496c8d;
+  --gn-sky-4: #8da9c4;
+  --gn-sky-5: #aec2d5;
+  --gn-sky-6: #f2f5f8;
+  --gn-sky: linear-gradient(
+    172deg,
+    var(--gn-sky-0) 0%,
+    var(--gn-sky-1) 20%,
+    var(--gn-sky-2) 42%,
+    var(--gn-sky-3) 58%,
+    var(--gn-sky-4) 76%,
+    var(--gn-sky-5) 90%,
+    var(--gn-sky-6) 100%
+  );
+  --gn-horizon: linear-gradient(90deg, var(--gn-blue-700), var(--gn-blue-600), var(--gn-blue-400), var(--gn-blue-300));
+  --gn-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --gn-radius: 14px;
+  --gn-radius-sm: 12px;
 }
 
-[data-md-color-primary="custom"] {
-  --md-primary-fg-color:        var(--gn-blue-400);
-  --md-primary-fg-color--light: var(--gn-blue-300);
-  --md-primary-fg-color--dark:  var(--gn-blue-600);
-  --md-primary-bg-color:        var(--gn-blue-ink);
-  --md-primary-bg-color--light: rgba(17, 26, 34, 0.7);
-}
+/* --- colour schemes ------------------------------------------------------- */
 
-[data-md-color-accent="custom"] {
-  --md-accent-fg-color:              var(--gn-blue-700);
-  --md-accent-fg-color--transparent: rgba(141, 169, 196, 0.14);
-  --md-accent-bg-color:              #ffffff;
-  --md-accent-bg-color--light:       rgba(255, 255, 255, 0.7);
-}
-
-/* Link text: the darker step on white, the brand blue itself on slate. The
-   doubled attribute outranks Material's own per-scheme assignment. */
-[data-md-color-scheme="default"][data-md-color-primary="custom"] {
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #f7f9fb;
+  --md-default-fg-color: #111a22;
+  --md-default-fg-color--light: #44515e;
+  --md-default-fg-color--lighter: #8593a1;
+  --md-default-fg-color--lightest: #e1e8ee;
+  --md-typeset-color: #1b2733;
   --md-typeset-a-color: var(--gn-blue-600);
+  --md-accent-fg-color: var(--gn-blue-700);
+  --md-code-bg-color: #edf1f5;
+  --md-code-fg-color: #1c2c3c;
+  --gn-surface: #ffffff;
+  --gn-border: #e1e8ee;
+  --gn-heading: linear-gradient(100deg, var(--gn-ink) 0%, var(--gn-blue-700) 50%, var(--gn-blue-600) 100%);
+  --gn-page:
+    radial-gradient(ellipse 90% 55% at 85% 105%, #8da9c438, transparent 70%),
+    radial-gradient(ellipse 70% 45% at 10% 100%, #496c8d1f, transparent 70%),
+    linear-gradient(180deg, #d3dfea 0%, #e5ecf2 16%, #f3f6f9 42%, #f7f9fb 70%, #e8eef4 100%);
+  --gn-text: #111a22;
 }
 
+[data-md-color-scheme="slate"] {
+  --md-hue: 210;
+  --md-default-bg-color: #0d141b;
+  --md-default-fg-color: #e8eef4;
+  --md-default-fg-color--light: #b0bdca;
+  --md-default-fg-color--lighter: #73828f;
+  --md-default-fg-color--lightest: #1e2b38;
+  --md-typeset-color: #d5dee7;
+  --md-typeset-a-color: var(--gn-blue-400);
+  --md-accent-fg-color: var(--gn-blue-300);
+  --md-code-bg-color: #152230;
+  --md-code-fg-color: #dde6ee;
+  --md-footer-bg-color: #0a1016;
+  --md-footer-bg-color--dark: #070c11;
+  --gn-surface: #121c26;
+  --gn-border: #1e2b38;
+  --gn-heading: linear-gradient(100deg, var(--gn-mist) 0%, var(--gn-blue-300) 50%, var(--gn-blue-400) 100%);
+  --gn-page:
+    radial-gradient(ellipse 90% 55% at 85% 105%, #8da9c41f, transparent 70%),
+    radial-gradient(ellipse 70% 45% at 10% 100%, #496c8d24, transparent 70%),
+    linear-gradient(180deg, #1f3347 0%, #17273a 16%, #111b25 42%, #0d141b 70%, #0f1720 100%);
+  --gn-text: #e8eef4;
+}
+
+/* Material's slate sets its own link colour on the same element; the doubled
+   attribute outranks it. */
 [data-md-color-scheme="slate"][data-md-color-primary="custom"] {
   --md-typeset-a-color: var(--gn-blue-400);
 }
 
-[data-md-color-scheme="slate"][data-md-color-accent="custom"] {
-  --md-accent-fg-color:  var(--gn-blue-300);
-  --md-accent-bg-color:  var(--gn-blue-ink);
-  --md-accent-bg-color--light: rgba(17, 26, 34, 0.7);
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--gn-blue-700);
+  --md-primary-fg-color--light: var(--gn-blue-600);
+  --md-primary-fg-color--dark: var(--gn-ink);
+  --md-primary-bg-color: var(--gn-mist);
+  --md-primary-bg-color--light: #f2f5f8b3;
 }
 
-/* Declared on the element carrying the scheme attribute, not on :root:
-   Material's slate values live there, and a custom property resolves its
-   var() references where it is declared. */
-[data-md-color-scheme] {
-  --gn-surface:     var(--md-code-bg-color);
-  --gn-border:      var(--md-default-fg-color--lighter);
-  --gn-hairline:    var(--md-default-fg-color--lightest);
-  --gn-muted:       var(--md-default-fg-color--light);
-  --gn-strong:      var(--md-default-fg-color);
-  --gn-accent:      var(--md-accent-fg-color);
-  --gn-accent-text: var(--md-typeset-a-color);
-  --gn-tint:        color-mix(in srgb, var(--md-primary-fg-color) 8%, transparent);
-  --gn-rule:        color-mix(in srgb, var(--md-typeset-a-color) 40%, transparent);
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color--transparent: #8da9c41f;
+  --md-accent-bg-color: #ffffff;
 }
 
-/* --- typography ---------------------------------------------------------- */
+/* --- one grainy sky behind header, tabs and page -------------------------- */
+
+body,
+.md-header,
+.md-tabs {
+  background-color: var(--md-default-bg-color);
+  background-image: var(--gn-grain), var(--gn-page);
+  background-blend-mode: soft-light, normal;
+  background-attachment: fixed;
+  background-size: 240px 240px, cover;
+}
+
+.md-header,
+.md-header--shadow {
+  box-shadow: none;
+}
+
+.md-header,
+.md-tabs {
+  --md-primary-bg-color: var(--gn-text);
+  --md-primary-bg-color--light: color-mix(in srgb, var(--gn-text) 65%, transparent);
+  color: var(--gn-text);
+}
 
 body,
 input,
 button {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* The header logo is two images, one per scheme (overrides/partials/logo.html),
+   so the mark keeps its blue node on both grounds. */
+.md-logo :is(img, svg) {
+  height: 1.6rem;
+  width: 1.6rem;
+}
+
+.md-header__button.md-logo img {
+  height: 1.5rem;
+  width: auto;
+}
+
+[data-md-color-scheme="default"] img.gn-logo--dark,
+[data-md-color-scheme="slate"] img.gn-logo--light {
+  display: none !important;
+}
+
+.md-header__title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-tabs__link {
+  font-weight: 500;
+  opacity: 0.65;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  opacity: 1;
+  color: var(--md-typeset-a-color);
+}
+
+.md-search__form {
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--gn-text) 7%, transparent);
+}
+
+.md-search__form:hover {
+  background-color: color-mix(in srgb, var(--gn-text) 11%, transparent);
+}
+
+.md-search__input,
+.md-search__input::placeholder,
+.md-search__icon {
+  color: var(--gn-text);
+}
+
+.md-search__output {
+  border-radius: 0 0 var(--gn-radius-sm) var(--gn-radius-sm);
+}
+
+/* --- sidebars: plain lists on the same sky -------------------------------- */
+
+.md-nav {
+  font-size: 0.72rem;
+}
+
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: var(--md-typeset-a-color);
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary > .md-nav__title,
+  .md-nav--secondary > .md-nav__title,
+  .md-nav__title,
+  .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
+    color: var(--md-default-fg-color);
+    font-weight: 600;
+  }
+
+  .md-nav--secondary > .md-nav__title {
+    font-weight: 600;
+    color: var(--md-default-fg-color);
+  }
+}
+
+/* --- typography ----------------------------------------------------------- */
+
+.md-typeset {
+  font-size: 0.79rem;
+  line-height: 1.7;
+  font-feature-settings: "kern", "liga", "calt";
 }
 
 .md-typeset code,
@@ -102,286 +297,79 @@ button {
   font-feature-settings: normal;
 }
 
-.md-typeset {
-  font-feature-settings: "kern", "liga", "calt", "tnum";
-  line-height: 1.7;
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  color: var(--md-default-fg-color);
+  font-weight: 650;
+  letter-spacing: -0.025em;
 }
 
 .md-typeset h1 {
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  color: var(--md-default-fg-color);
+  font-size: 2.3em;
+  font-weight: 700;
+  background: var(--gn-heading);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0.8em;
 }
 
-/* A rule under the heading rather than over it: the line belongs to the
-   section it opens, and hanging it above leaves the last paragraph of the
-   previous section sitting on a border it has nothing to do with. */
+.md-typeset h1 .headerlink {
+  display: none;
+}
+
+/* Module names in API page titles: no chip, so the gradient shows through. */
+.md-typeset h1 code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
 .md-typeset h2 {
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  margin-top: 2.2em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  margin-top: 2em;
 }
 
-.md-typeset h3,
-.md-typeset h4 {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-/* --- header -------------------------------------------------------------- */
-
-.md-header__title {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.md-header__button.md-logo :is(img, svg) {
-  height: 1.6rem;
-  width: 1.6rem;
-}
-
-/* Material darkens the search field with translucent black, which reads as a
-   slab on a light header. A translucent white keeps it a field. */
-@media screen and (min-width: 60em) {
-  .md-header .md-search__form {
-    background-color: rgba(255, 255, 255, 0.32);
-  }
-
-  .md-header .md-search__form:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-/* --- sidebars ------------------------------------------------------------
-   Left: the site tree. Top-level groups collapse, the one holding the current
-   page opens, and its children hang off a hairline guide so the nesting reads
-   at a glance. Right: the page outline, with the section in view marked by
-   the same accent bar the left tree uses for the current page. A hairline on
-   each sidebar's inner edge frames the content column between them.
-   -------------------------------------------------------------------------- */
-
-.md-nav {
-  font-size: 0.72rem;
-}
-
-.md-nav__title {
-  font-weight: 600;
-}
-
-.md-nav__link {
-  border-radius: var(--gn-radius);
-  transition: color 125ms;
-}
-
-.md-nav__link--active,
-.md-nav__item .md-nav__link--active {
-  color: var(--gn-accent-text);
-  font-weight: 600;
-}
-
-@media screen and (min-width: 76.25em) {
-  .md-sidebar--primary .md-sidebar__scrollwrap {
-    border-right: 1px solid var(--md-default-fg-color--lightest);
-  }
-
-  .md-sidebar--secondary .md-sidebar__scrollwrap {
-    border-left: 1px solid var(--md-default-fg-color--lightest);
-  }
-
-  /* The header already carries the site name; repeating it as the tree's
-     title costs a row and says nothing. The drawer on small screens keeps it. */
-  .md-nav--primary > .md-nav__title {
-    display: none;
-  }
-
-  /* Top-level entries: group labels and the standalone pages beside them. */
-  .md-nav--primary > .md-nav__list > .md-nav__item {
-    margin-top: 0.15rem;
-  }
-
-  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link,
-  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > .md-nav__link {
-    color: var(--md-default-fg-color);
-    font-weight: 600;
-  }
-
-  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link--active,
-  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container > .md-nav__link--active {
-    color: var(--gn-accent-text);
-  }
-
-  /* Children of an open group: indented behind a hairline guide. */
-  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list {
-    margin: 0.2rem 0 0.4rem 0.6rem;
-    padding-left: 0;
-    border-left: 1px solid var(--md-default-fg-color--lightest);
-  }
-
-  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list > .md-nav__item {
-    padding-left: 0.6rem;
-  }
-}
-
-/* Current page in the tree: an accent bar laid over the guide line, offset
-   by exactly the item padding set above. */
-@media screen and (min-width: 76.25em) {
-  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list
-    > .md-nav__item > .md-nav__link--active {
-    position: relative;
-  }
-
-  .md-nav--primary .md-nav__item--nested > .md-nav > .md-nav__list
-    > .md-nav__item > .md-nav__link--active::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: calc(-0.6rem - 1.5px);
-    width: 2px;
-    border-radius: 1px;
-    background: var(--gn-accent);
-  }
-}
-
-.md-nav--secondary .md-nav__title {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.64rem;
-  font-weight: 600;
-}
-
-.md-nav--secondary .md-nav__link {
-  color: var(--md-default-fg-color--light);
-}
-
-.md-nav--secondary .md-nav__link:hover {
-  color: var(--md-default-fg-color);
-}
-
-.md-nav--secondary .md-nav__link--active {
-  color: var(--gn-accent-text);
-  font-weight: 500;
-}
-
-/* --- breadcrumbs ---------------------------------------------------------- */
-
-.md-path {
-  font-size: 0.66rem;
-  margin-bottom: -0.6rem;
-}
-
-.md-path__link {
-  color: var(--md-default-fg-color--light);
-}
-
-.md-path__link:hover {
-  color: var(--gn-accent-text);
-}
-
-/* --- links ----------------------------------------------------------------
-   Accent-coloured, underlined at 2px offset with the rule at partial strength
-   going to full on hover. Only body prose gets the
-   underline: nav, tables of contents and cards are already distinguished by
-   position, and underlining them would turn the page into a grid of rules. */
-
-.md-typeset a:not(.md-button):not(.headerlink):not(.footnote-backref) {
-  text-decoration: underline;
-  text-decoration-color: var(--gn-rule);
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
-  transition: text-decoration-color 125ms;
-}
-
-.md-typeset a:not(.md-button):not(.headerlink):hover {
-  text-decoration-color: var(--gn-accent);
-}
-
-/* Cards, signposts and figure links carry their own frame; an underline inside
-   one reads as a second border. */
-.md-typeset :is(.grid.cards, .gn-signpost, figure) a:not(.md-button):not(.headerlink) {
+/* Links: no rule at rest, one drawn in from the left on hover. */
+.md-typeset a {
   text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.25s ease, color 0.2s ease;
 }
 
-.md-typeset .md-button {
-  border-radius: 999px;
+.md-typeset a:hover {
+  background-size: 100% 1px;
 }
 
-/* Material draws outline buttons in the primary, which is too light to be
-   text on white. Both schemes take the link colour; hover keeps Material's
-   fill. */
-.md-typeset .md-button:not(.md-button--primary):not(:hover):not(:focus) {
-  color: var(--md-typeset-a-color);
-}
-
-/* --- rounded surfaces, at the 1:4 ratio ---------------------------------- */
-
-.md-typeset :is(pre, .highlight > pre, .highlighttable, .admonition, details,
-                .tabbed-set > .tabbed-content, table:not([class])) {
-  border-radius: var(--gn-radius);
-}
-
-.md-typeset .highlight > pre > code,
-.md-typeset pre > code {
-  border-radius: var(--gn-radius);
+.md-typeset :is(.headerlink, .md-button, .grid.cards a, .doc a, .gn-footer a) {
+  background-image: none;
 }
 
 .md-typeset code {
-  border-radius: 4px;
-  font-size: 0.82em;
+  border-radius: 6px;
+  padding: 0.1em 0.35em;
 }
 
-/* --- tables -------------------------------------------------------------- */
-
-.md-typeset table:not([class]) {
-  border: 1px solid var(--md-default-fg-color--lightest);
-  box-shadow: none;
-  font-size: 0.74rem;
+.md-typeset pre > code {
+  border-radius: var(--gn-radius-sm);
+  padding: 1em 1.2em;
 }
 
-.md-typeset table:not([class]) th {
-  background: var(--gn-surface);
-  color: var(--md-default-fg-color);
-  font-weight: 600;
-  font-size: 0.66rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.md-typeset table:not([class]) td {
-  border-top: 1px solid var(--md-default-fg-color--lightest);
-  vertical-align: top;
-}
-
-.md-typeset table:not([class]) tr:hover {
-  background: var(--md-accent-fg-color--transparent);
-}
-
-/* --- admonitions: hairline, not candy ------------------------------------ */
-
-.md-typeset :is(.admonition, details) {
-  border-width: 1px;
-  border-left-width: 3px;
-  box-shadow: none;
-  font-size: 0.76rem;
-}
-
-
-/* --- code blocks --------------------------------------------------------- */
-
-.md-typeset .highlight {
-  --md-code-bg-color: var(--md-default-bg-color);
-}
-
-.md-typeset .highlight > pre,
-.md-typeset .highlighttable {
-  border: 1px solid var(--md-default-fg-color--lightest);
+.md-typeset :is(.highlight, pre, .highlighttable, .tabbed-set > .tabbed-content) {
+  border-radius: var(--gn-radius-sm);
 }
 
 .md-typeset .highlight code {
   font-variant-ligatures: none;
+}
+
+.md-typeset .md-button {
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.55em 1.4em;
 }
 
 /* Visually hidden, still read by assistive tech and indexed by search. */
@@ -397,86 +385,71 @@ button {
   border: 0;
 }
 
-/* --- home: hero -----------------------------------------------------------
-   No panel, no wash: the mark, the name, one sentence and two buttons sit
-   straight on the page, and whitespace does the framing.
-   -------------------------------------------------------------------------- */
+/* --- tables, admonitions, cards ------------------------------------------- */
 
-.md-typeset .gn-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.1rem;
-  padding: 3.6rem 0 3.2rem;
-  text-align: center;
-}
-
-.md-typeset .gn-hero > * {
-  margin: 0;
-}
-
-/* Mark and wordmark on one line, matching the README banner's lockup. */
-.gn-hero__lockup {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-}
-
-.md-typeset .gn-hero__logo {
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  border: none;
+.md-typeset table:not([class]) {
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius-sm);
+  overflow: hidden;
   box-shadow: none;
-}
-
-.gn-hero__word {
-  font-size: 2.6rem;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1;
-  color: var(--gn-strong);
-}
-
-.md-typeset .gn-hero__tagline {
-  max-width: 24rem;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: var(--gn-muted);
-}
-
-/* md_in_html wraps the buttons in one <p>; the row is laid out on it. */
-.gn-hero__actions > p {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin: 0.3rem 0 0;
-}
-
-.md-typeset .gn-hero__actions .md-button {
-  margin: 0;
-  padding: 0.5em 1.4em;
   font-size: 0.72rem;
 }
 
-.md-typeset .gn-hero + h2 {
-  margin-top: 0.6em;
+.md-typeset table:not([class]) th {
+  background: var(--md-code-bg-color);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-@media screen and (max-width: 44.9375em) {
-  .md-typeset .gn-hero { padding: 2.4rem 0 2.2rem; }
-  .md-typeset .gn-hero__logo { width: 34px; height: 34px; }
-  .gn-hero__lockup { gap: 0.45rem; }
-  .gn-hero__word { font-size: 2rem; }
+.md-typeset table:not([class]) :is(td, th) {
+  border-color: var(--gn-border);
 }
 
-/* --- home: feature cards --------------------------------------------------
-   Icon in the accent, title on the same line, and the link pinned to the
-   card's foot so a row of cards lines its links up whatever the copy length.
-   -------------------------------------------------------------------------- */
+.md-typeset table:not([class]) td {
+  vertical-align: top;
+}
 
+.md-typeset table:not([class]) code {
+  white-space: nowrap;
+}
+
+.md-typeset :is(.admonition, details) {
+  border-radius: var(--gn-radius-sm);
+  border-width: 1px;
+  box-shadow: none;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li,
+.md-typeset .grid > .card {
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+/* On hover a card lifts and its border turns into the horizon. */
+.md-typeset .grid.cards > :is(ul, ol) > li:hover,
+.md-typeset .grid > .card:hover {
+  transform: translateY(-2px);
+  border-color: transparent;
+  background:
+    linear-gradient(var(--gn-surface), var(--gn-surface)) padding-box,
+    var(--gn-horizon) border-box;
+  box-shadow: 0 14px 34px -18px #3d5a7680;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li > hr {
+  margin: 0.6em 0;
+  border-color: var(--gn-border);
+}
+
+.md-typeset .grid.cards :is(.twemoji, .lg) {
+  color: var(--md-typeset-a-color);
+}
+
+/* Feature cards pin their link to the foot, so a row of cards lines its links
+   up whatever the copy length. */
 .md-typeset .gn-features > ul > li {
   display: flex;
   flex-direction: column;
@@ -488,11 +461,198 @@ button {
 }
 
 .md-typeset .gn-features .lg {
-  color: var(--gn-accent-text);
   margin-right: 0.3rem;
 }
 
-/* --- home: the five stages ------------------------------------------------
+/* --- home: the sky hero ---------------------------------------------------- */
+
+.gn-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 0 0 2.5rem;
+  padding: 4.5rem 1.5rem 3.5rem;
+  border-radius: 22px;
+  background: var(--gn-sky);
+  color: var(--gn-mist);
+  text-align: center;
+}
+
+/* A pale sun low on the horizon. */
+.gn-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: -62%;
+  width: 62%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #f2f5f8cc 0%, #aec2d566 24%, #8da9c426 46%, transparent 68%);
+}
+
+.gn-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--gn-grain);
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* The WebGL water from javascripts/water.js, between the sky and the content. */
+.gn-hero .gn-water {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.gn-hero__lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  filter: drop-shadow(0 8px 30px #111a2255);
+}
+
+.md-typeset .gn-hero__logo {
+  width: 64px;
+  height: 64px;
+  margin: 0;
+}
+
+.gn-hero__word {
+  font-size: 3.6rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--gn-mist);
+}
+
+.md-typeset .gn-hero p {
+  margin: 1.4rem auto 0;
+  max-width: 34rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--gn-mist);
+  text-shadow: 0 1px 18px #111a2273;
+}
+
+.md-typeset .gn-hero .gn-hero__actions {
+  margin-top: 1.4rem;
+}
+
+/* md_in_html wraps the buttons in one <p>; the row is laid out on it. */
+.md-typeset .gn-hero .gn-hero__actions > p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin: 0 auto;
+  text-shadow: none;
+}
+
+.md-typeset .gn-hero .md-button {
+  margin: 0;
+  color: var(--gn-mist);
+  border: 1px solid #f2f5f899;
+  background: #111a2240;
+  backdrop-filter: blur(6px);
+}
+
+.md-typeset .gn-hero .md-button--primary {
+  color: var(--gn-ink);
+  background: var(--gn-mist);
+  border-color: var(--gn-mist);
+}
+
+.md-typeset .gn-hero .md-button:hover {
+  color: var(--gn-ink);
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+.md-typeset .gn-hero code {
+  color: var(--gn-mist);
+  background: #111a2255;
+}
+
+/* The install command: a frosted pill with a prompt and a copy button. The
+   prompt hangs off the line span, which is a block, so it stays on the line. */
+.md-typeset .gn-hero .gn-install {
+  margin: 1.8rem auto 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.md-typeset .gn-hero .gn-install :is(.highlight, pre) {
+  margin: 0;
+  border-radius: 999px;
+}
+
+.md-typeset .gn-hero .gn-install pre > code {
+  padding: 0.75em 3.2em 0.75em 1.6em;
+  border-radius: 999px;
+  background: #111a2259;
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px #f2f5f833;
+  color: var(--gn-mist);
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.md-typeset .gn-hero .gn-install pre > code > [id^="__span"]::before {
+  content: "$ ";
+  color: #f2f5f899;
+}
+
+.md-typeset .gn-hero .gn-install code span {
+  color: var(--gn-mist) !important;
+}
+
+.md-typeset .gn-hero .gn-install .md-code__nav {
+  top: 50%;
+  right: 0.5em;
+  transform: translateY(-50%);
+  background: transparent;
+  box-shadow: none;
+}
+
+.md-typeset .gn-hero .gn-install .md-clipboard {
+  position: static;
+  transform: none;
+  background: transparent;
+  border-radius: 999px;
+  color: #f2f5f8b3;
+}
+
+.md-typeset .gn-hero .gn-install .md-clipboard:hover {
+  color: var(--gn-mist);
+}
+
+.md-typeset .gn-hero .gn-install .md-clipboard::after {
+  background-color: currentColor;
+}
+
+@media screen and (max-width: 44.9375em) {
+  .gn-hero {
+    margin: 0 -0.8rem 2rem;
+    border-radius: 0;
+    padding: 3rem 1rem 2.5rem;
+  }
+
+  .md-typeset .gn-hero__logo { width: 44px; height: 44px; }
+  .gn-hero__lockup { gap: 0.6rem; }
+  .gn-hero__word { font-size: 2.5rem; }
+}
+
+/* --- home: the five stages -------------------------------------------------
    A numbered row joined by a hairline, collapsing to a column on narrow
    screens. The numbers are the list's own counter, drawn as discs.
    -------------------------------------------------------------------------- */
@@ -521,7 +681,7 @@ button {
 }
 
 .md-typeset .gn-steps > ol > li > p:not(:first-child) {
-  color: var(--gn-muted);
+  color: var(--md-default-fg-color--light);
 }
 
 .md-typeset .gn-steps > ol > li::before {
@@ -535,8 +695,8 @@ button {
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  background: var(--md-primary-fg-color);
-  color: var(--md-primary-bg-color);
+  background: linear-gradient(135deg, var(--gn-blue-700), var(--gn-blue-600));
+  color: var(--gn-mist);
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -548,7 +708,8 @@ button {
   left: 1.6rem;
   right: -0.8rem;
   height: 1px;
-  background: var(--gn-border);
+  background: var(--gn-horizon);
+  opacity: 0.6;
 }
 
 @media screen and (max-width: 44.9375em) {
@@ -557,7 +718,7 @@ button {
   .md-typeset .gn-steps > ol > li:not(:last-child)::after { display: none; }
 }
 
-/* --- home: the evidence panel --------------------------------------------- */
+/* --- home: the evidence panel ---------------------------------------------- */
 
 .md-typeset .gn-evidence {
   display: grid;
@@ -565,10 +726,9 @@ button {
   gap: 1.4rem;
   align-items: center;
   padding: 1.2rem 1.4rem;
-  border: 1px solid var(--gn-hairline);
-  border-left: 3px solid var(--gn-accent);
+  border: 1px solid var(--gn-border);
   border-radius: var(--gn-radius);
-  background: var(--gn-tint);
+  background: var(--gn-surface);
 }
 
 /* No display value here: Material hides the off-scheme copy with
@@ -594,68 +754,26 @@ button {
   .md-typeset .gn-evidence { grid-template-columns: 1fr; }
 }
 
-/* --- home: project links -------------------------------------------------- */
-
-.md-typeset .gn-project > p {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem 1.6rem;
-  margin: 2.4rem 0 0;
-  padding-top: 1.2rem;
-  border-top: 1px solid var(--gn-hairline);
-  font-size: 0.72rem;
-}
-
-.md-typeset .gn-project a {
-  color: var(--gn-muted);
-  text-decoration: none;
-}
-
-.md-typeset .gn-project a:hover {
-  color: var(--gn-accent-text);
-}
-
-/* --- grid cards ---------------------------------------------------------- */
-
-.md-typeset .grid.cards > :is(ul, ol) > li,
-.md-typeset .grid > .card {
-  border-radius: var(--gn-radius);
-  border-color: var(--md-default-fg-color--lightest);
-  box-shadow: none;
-  transition: border-color 125ms, background-color 125ms;
-}
-
-.md-typeset .grid.cards > :is(ul, ol) > li:hover {
-  border-color: var(--gn-border);
-  background: var(--gn-surface);
-  box-shadow: none;
-}
-
-.md-typeset .grid.cards > :is(ul, ol) > li > hr {
-  margin: 0.6em 0;
-  border-color: var(--md-default-fg-color--lightest);
-}
-
-/* --- signposts: the two-line "what / where" rows ------------------------- */
+/* --- signposts: the two-line "what / where" rows --------------------------- */
 
 .gn-signpost {
   display: block;
   padding: 0.55rem 0.8rem;
   margin: 0.35rem 0;
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-left: 3px solid var(--gn-strong);
-  border-radius: var(--gn-radius);
+  border: 1px solid var(--gn-border);
+  border-left: 3px solid var(--gn-blue-600);
+  border-radius: var(--gn-radius-sm);
   background: var(--gn-surface);
   font-size: 0.76rem;
 }
 
-/* --- result callout: a borderless two-column definition table ------------ */
+/* --- result callout: a borderless two-column definition table -------------- */
 
 .gn-result {
   margin: 1.5rem 0;
-  border-left: 3px solid var(--gn-accent);
-  border-radius: var(--gn-radius);
+  border: 1px solid var(--gn-border);
+  border-left: 3px solid var(--md-accent-fg-color);
+  border-radius: var(--gn-radius-sm);
   background: var(--gn-surface);
   overflow: hidden;
 }
@@ -687,7 +805,7 @@ button {
 
 .md-typeset .gn-result table:not([class]) td {
   border: none;
-  border-top: 1px solid var(--md-default-fg-color--lightest);
+  border-top: 1px solid var(--gn-border);
   padding: 0.5rem 1rem;
   vertical-align: baseline;
 }
@@ -701,22 +819,18 @@ button {
   color: var(--md-default-fg-color--light);
 }
 
-.md-typeset .gn-result table:not([class]) tr:hover {
-  background: none;
-}
-
 @media screen and (max-width: 44.9375em) {
   .md-typeset .gn-result table:not([class]) td:first-child { width: 45%; }
 }
 
-/* --- benchmark tables -----------------------------------------------------
+/* --- benchmark tables ------------------------------------------------------
    The winning cell is accent-coloured, scoped to .gn-bench and never to tables
    generally: bold also marks the aggregate column in the adequacy table and
    the verdicts in the result callout, and neither of those is a "best", so
    colouring every <strong> would assert a winner where there is none. */
 
 .md-typeset .gn-bench table:not([class]) strong {
-  color: var(--gn-accent-text);
+  color: var(--md-typeset-a-color);
 }
 
 /* Material's scroll wrapper is injected by JS only for tables that are direct
@@ -733,16 +847,14 @@ button {
   font-size: 0.66rem;
 }
 
-.md-typeset .gn-wide table:not([class]) th,
-.md-typeset .gn-wide table:not([class]) td {
+.md-typeset .gn-wide table:not([class]) :is(th, td) {
   white-space: nowrap;
   padding: 0.45em 0.5em;
 }
 
 /* The metric columns are the ones under pressure; the two label columns can
    give up their trailing space without becoming harder to read. */
-.md-typeset .gn-wide table:not([class]) th:nth-child(-n + 2),
-.md-typeset .gn-wide table:not([class]) td:nth-child(-n + 2) {
+.md-typeset .gn-wide table:not([class]) :is(th, td):nth-child(-n + 2) {
   padding-right: 0.9em;
 }
 
@@ -754,38 +866,28 @@ button {
 /* The legend word, inked like the cells it describes, so the key is literally
    a sample of the thing rather than a description of it. */
 .md-typeset .gn-win-key {
-  color: var(--gn-accent-text);
+  color: var(--md-typeset-a-color);
   font-weight: 600;
 }
 
-/* --- api reference ------------------------------------------------------- */
+/* --- api reference --------------------------------------------------------- */
 
 .md-typeset .doc-heading {
   scroll-margin-top: 4rem;
 }
 
-.md-typeset h2.doc-heading code,
-.md-typeset h3.doc-heading code,
-.md-typeset h4.doc-heading code {
+.md-typeset .doc-heading code {
   background: none;
   padding: 0;
-  font-size: 0.9em;
-  font-weight: 600;
-  color: inherit;
 }
 
-.md-typeset .doc-symbol-heading,
-.md-typeset .doc-symbol-toc {
-  border-radius: 4px;
-}
-
-.md-typeset .doc-symbol-parameter,
-.md-typeset .doc-symbol-attribute {
-  font-weight: 500;
+.md-typeset .doc-signature,
+.md-typeset .doc-signature > pre {
+  border-radius: var(--gn-radius-sm);
 }
 
 .md-typeset .doc-contents {
-  border-left: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 1px solid var(--gn-border);
   padding-left: 1rem;
   margin-left: 0.1rem;
 }
@@ -794,23 +896,38 @@ button {
   margin-bottom: 1.6rem;
 }
 
-.md-typeset .doc-label {
-  border-radius: 3px;
+.doc-symbol {
+  border-radius: 6px;
 }
 
-.md-typeset .doc-signature > pre {
-  border-radius: var(--gn-radius);
+.doc-symbol-class {
+  color: var(--gn-blue-600) !important;
+  background-color: #496c8d1f !important;
 }
 
-/* --- figures ------------------------------------------------------------- */
+.doc-symbol-function,
+.doc-symbol-method {
+  color: var(--gn-blue-700) !important;
+  background-color: #8da9c42e !important;
+}
+
+[data-md-color-scheme="slate"] .doc-symbol-class {
+  color: var(--gn-blue-400) !important;
+}
+
+[data-md-color-scheme="slate"] :is(.doc-symbol-function, .doc-symbol-method) {
+  color: var(--gn-blue-300) !important;
+}
+
+/* --- figures --------------------------------------------------------------- */
 
 .md-typeset figure {
   margin: 1.4em auto;
 }
 
 .md-typeset figure img {
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: var(--gn-radius);
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius-sm);
 }
 
 .md-typeset figcaption {
@@ -818,36 +935,133 @@ button {
   margin: 0.6em auto 0;
   font-size: 0.7rem;
   line-height: 1.5;
-  color: var(--gn-muted);
+  color: var(--md-default-fg-color--light);
 }
 
 /* The critical-difference figures carry no border, because the dark one is
    saved transparent (_gen_cd_figures.py passes transparent=dark) and sits
-   straight on the black page. A frame would draw a box around nothing. */
+   straight on the page. A frame would draw a box around nothing. */
 .gn-cd {
   max-width: 46rem;
   margin: 1.5rem auto;
 }
 
-/* --- footer -------------------------------------------------------------- */
-
-.md-footer {
-  border-top: 1px solid var(--md-default-fg-color--lightest);
-}
-
-.md-footer-meta {
-  font-size: 0.7rem;
-}
-
-/* --- search -------------------------------------------------------------- */
-
-.md-search__form,
-.md-search__output {
-  border-radius: var(--gn-radius);
-}
-
-/* --- math ---------------------------------------------------------------- */
+/* --- math ------------------------------------------------------------------ */
 
 .md-typeset mjx-container {
   font-size: 1.02em;
 }
+
+/* --- footer: part of the same sky ------------------------------------------ */
+
+.md-footer,
+.md-footer-meta {
+  background: transparent;
+  color: var(--md-default-fg-color--light);
+  --md-footer-fg-color: var(--md-default-fg-color);
+  --md-footer-fg-color--light: var(--md-default-fg-color--light);
+  --md-footer-fg-color--lighter: var(--md-default-fg-color--lighter);
+}
+
+.md-footer-meta.md-typeset {
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+
+.gn-footer {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.6fr) repeat(4, minmax(7rem, 1fr));
+  gap: 2rem 2.4rem;
+  padding: 2.6rem 0.8rem 2rem;
+}
+
+.gn-footer__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--md-default-fg-color) !important;
+  font-size: 0.85rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.gn-footer__home img {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.md-typeset .gn-footer__tagline {
+  margin: 0.8rem 0 0.9rem;
+  max-width: 19rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .gn-footer__install {
+  display: inline-block;
+  padding: 0.35em 0.9em;
+  border-radius: 999px;
+  border: 1px solid var(--gn-border);
+  background: color-mix(in srgb, var(--md-code-bg-color) 70%, transparent);
+  font-size: 0.62rem;
+}
+
+.md-typeset .gn-footer__title {
+  margin: 0.2rem 0 0.7rem;
+  color: var(--md-default-fg-color--lighter);
+  font-size: 0.58rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.md-typeset .gn-footer__column ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset .gn-footer__column ul li {
+  margin: 0 0 0.45rem;
+  margin-inline-start: 0;
+  padding: 0;
+}
+
+.md-typeset .gn-footer__column li::before {
+  display: none;
+}
+
+.md-typeset :is(.gn-footer__column, .gn-footer__legal) a {
+  color: var(--md-default-fg-color--light);
+  transition: color 0.2s ease;
+}
+
+.md-typeset :is(.gn-footer__column, .gn-footer__legal) a:hover {
+  color: var(--md-typeset-a-color);
+}
+
+.md-footer-meta__inner.gn-footer__bar {
+  align-items: center;
+  border-top: 1px solid var(--gn-border);
+  padding: 0.4rem 0.2rem 0.8rem;
+}
+
+.gn-footer__bar .md-copyright {
+  color: var(--md-default-fg-color--lighter);
+}
+
+.gn-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.2rem;
+}
+
+@media screen and (max-width: 59.9375em) {
+  .gn-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gn-footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+

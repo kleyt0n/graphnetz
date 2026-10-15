@@ -8,25 +8,27 @@ site_url: https://kleyt0n.github.io/graphnetz/
 repo_name: Kleyt0n/graphnetz
 repo_url: https://github.com/Kleyt0n/graphnetz
 edit_uri: edit/main/docs/
-copyright: MIT License
+copyright: © 2026 Kleyton da Costa
 
 docs_dir: docs
 
 theme:
   name: material
-  # Single-ink mark: the header is the brand blue in both schemes, where the
-  # two-tone mark's blue node would vanish.
-  logo: logo.svg
+  # overrides/ holds the footer (link columns from `extra.footer`) and a logo
+  # partial that swaps the two-tone mark per scheme: ink on the light sky,
+  # mist on the dark one.
+  custom_dir: overrides
+  logo: logo-ink.svg
   favicon: favicon.png
   icon:
     repo: fontawesome/brands/github
-  # Roboto is loaded by stylesheets/extra.css as a variable font, so the
-  # 500/600/650 weights used for headings and nav render as cut rather than
-  # snapping to the 400/700 pair Material requests by default.
+  # Fonts are declared in stylesheets/extra.css: Codec Pro (self-hosted, see
+  # docs/assets/fonts/codec-pro) with Inter as the fallback, and JetBrains
+  # Mono for code.
   font: false
   palette:
-    # primary/accent are `custom`, defined in stylesheets/extra.css around the
-    # brand blue #8da9c4. Spelled out on every entry: Material renders the
+    # primary/accent are `custom`, defined in stylesheets/extra.css on the
+    # brand blue scale. Spelled out on every entry: Material renders the
     # FIRST entry's palette server-side, so all three must agree or a cold load
     # flashes Material's indigo before settling on the blue.
     - media: "(prefers-color-scheme)"
@@ -60,10 +62,9 @@ theme:
     - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
-    # Left sidebar: top-level groups collapse, and only the one holding the
-    # current page opens, so the whole site fits one screen of navigation.
-    # Breadcrumbs above the title say where a page sits in that tree.
-    - navigation.path
+    # Top-level groups are tabs under the header; the left sidebar lists only
+    # the pages of the tab in view.
+    - navigation.tabs
     - navigation.top
     - navigation.tracking
     - navigation.footer
@@ -76,6 +77,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/mathjax.js
+  - javascripts/water.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 extra:
@@ -87,6 +89,43 @@ extra:
       link: https://pypi.org/project/graphnetz/
       name: graphnetz on PyPI
   generator: false
+  # Read by overrides/partials/footer.html and copyright.html.
+  footer:
+    tagline: >-
+      Benchmark graph neural networks and get back a statistical report, not a
+      leaderboard.
+    install: uv add graphnetz
+    columns:
+      - title: Learn
+        links:
+          - {name: Installation, url: getting-started/installation/}
+          - {name: Quickstart, url: getting-started/quickstart/}
+          - {name: Conventions, url: getting-started/conventions/}
+          - {name: Concepts, url: concepts/}
+          - {name: Findings, url: findings/}
+      - title: Guides
+        links:
+          - {name: Benchmark protocol, url: guides/benchmark/}
+          - {name: Datasets, url: guides/datasets/}
+          - {name: Reading the report, url: guides/report/}
+          - {name: Hyperparameter search, url: guides/search/}
+          - {name: Figures and tables, url: guides/figures/}
+      - title: Models
+        links:
+          - {name: All models, url: models/}
+          - {name: GCN, url: models/gcn/}
+          - {name: GAT, url: models/gat/}
+          - {name: GraphSAGE, url: models/graphsage/}
+          - {name: Custom models, url: guides/custom-models/}
+      - title: Project
+        repo: true
+        links:
+          - {name: API reference, url: reference/}
+          - {name: Contributing, url: guides/contributing/}
+          - {name: Paper, url: "https://arxiv.org/pdf/2605.09099"}
+          - {name: PyPI, url: "https://pypi.org/project/graphnetz/"}
+    legal:
+      - {name: Released under the MIT License, url: "https://github.com/Kleyt0n/graphnetz/blob/main/LICENCE.txt"}
 
 # Sources that live next to the docs but should not be published: the figure
 # generator is run by hand and its output is committed beside it.
