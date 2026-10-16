@@ -1,0 +1,17 @@
+{
+  "alpha": 0.05,
+  "k": 4,
+  "n": 10,
+  "friedman_chi2": 3.0,
+  "friedman_p": 0.3916,
+  "friedman_rejected": false,
+  "critical_difference": 1.4832,
+  "mean_ranks": {
+    "GraphSAGE": 2.1,
+    "GCN": 2.2,
+    "GAT": 2.8,
+    "GraphTransformer": 2.9
+  },
+  "max_rank_gap": 0.8,
+  "single_clique": true
+}

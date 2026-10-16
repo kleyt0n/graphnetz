@@ -1,0 +1,43 @@
+category,dataset,model,task_type,metric,mean,ci_half,ci_low,ci_high
+Combinatorial,TSP-random,GCN,link_pred,test_auc,0.864037,0.024805,0.839232,0.888842
+Combinatorial,TSP-random,GAT,link_pred,test_auc,0.832375,0.027936,0.804439,0.860311
+Combinatorial,TSP-random,GraphSAGE,link_pred,test_auc,0.889840,0.022903,0.866936,0.912743
+Combinatorial,TSP-random,GraphTransformer,link_pred,test_auc,0.872102,0.019400,0.852703,0.891502
+Biology,MUTAG,GCN,graph_cls,val_acc,0.705263,0.060057,0.645206,0.765320
+Biology,MUTAG,GAT,graph_cls,val_acc,0.636842,0.038478,0.598364,0.675320
+Biology,MUTAG,GraphSAGE,graph_cls,val_acc,0.700000,0.060319,0.639681,0.760319
+Biology,MUTAG,GraphTransformer,graph_cls,val_acc,0.721053,0.050357,0.670696,0.771410
+Biology,MUTAG,GIN,graph_cls,val_acc,0.847368,0.044194,0.803175,0.891562
+Social,Cora,GCN,node_cls,test_acc,0.810500,0.001401,0.809099,0.811901
+Social,Cora,GAT,node_cls,test_acc,0.796600,0.009467,0.787133,0.806067
+Social,Cora,GraphSAGE,node_cls,test_acc,0.799000,0.004332,0.794668,0.803332
+Social,Cora,GraphTransformer,node_cls,test_acc,0.792300,0.003664,0.788636,0.795964
+Knowledge,FB15k-237,GCN,link_pred,test_auc,0.674653,0.007884,0.666770,0.682537
+Knowledge,FB15k-237,GAT,link_pred,test_auc,0.522885,0.007731,0.515155,0.530616
+Knowledge,FB15k-237,GraphSAGE,link_pred,test_auc,0.572031,0.026765,0.545267,0.598796
+Knowledge,FB15k-237,GraphTransformer,link_pred,test_auc,0.537186,0.008295,0.528890,0.545481
+Infrastructure,Euroroad,GCN,link_pred,test_auc,0.523912,0.018990,0.504923,0.542902
+Infrastructure,Euroroad,GAT,link_pred,test_auc,0.592868,0.022439,0.570429,0.615306
+Infrastructure,Euroroad,GraphSAGE,link_pred,test_auc,0.539626,0.027505,0.512121,0.567130
+Infrastructure,Euroroad,GraphTransformer,link_pred,test_auc,0.518656,0.041993,0.476663,0.560649
+Finance,Board-directors,GCN,link_pred,test_auc,0.967619,0.006965,0.960654,0.974584
+Finance,Board-directors,GAT,link_pred,test_auc,0.988708,0.002176,0.986532,0.990884
+Finance,Board-directors,GraphSAGE,link_pred,test_auc,0.901050,0.012205,0.888845,0.913255
+Finance,Board-directors,GraphTransformer,link_pred,test_auc,0.853449,0.015347,0.838103,0.868796
+Computing,Internet AS,GCN,link_pred,test_auc,0.966868,0.001132,0.965736,0.968001
+Computing,Internet AS,GAT,link_pred,test_auc,0.654802,0.013248,0.641554,0.668050
+Computing,Internet AS,GraphSAGE,link_pred,test_auc,0.745434,0.012643,0.732791,0.758077
+Computing,Internet AS,GraphTransformer,link_pred,test_auc,0.597760,0.067680,0.530080,0.665440
+Vision,MNIST-superpixels,GCN,graph_cls,val_acc,0.105000,0.011028,0.093972,0.116028
+Vision,MNIST-superpixels,GAT,graph_cls,val_acc,0.106333,0.011760,0.094573,0.118093
+Vision,MNIST-superpixels,GraphSAGE,graph_cls,val_acc,0.120333,0.020953,0.099381,0.141286
+Vision,MNIST-superpixels,GraphTransformer,graph_cls,val_acc,0.141667,0.027402,0.114265,0.169069
+Vision,MNIST-superpixels,GIN,graph_cls,val_acc,0.272667,0.048671,0.223995,0.321338
+Physics,Ising-lattice,GCN,link_pred,test_auc,0.675583,0.030028,0.645555,0.705611
+Physics,Ising-lattice,GAT,link_pred,test_auc,0.615544,0.033892,0.581652,0.649437
+Physics,Ising-lattice,GraphSAGE,link_pred,test_auc,0.629739,0.019879,0.609860,0.649618
+Physics,Ising-lattice,GraphTransformer,link_pred,test_auc,0.620255,0.018147,0.602108,0.638402
+Security,9/11 terrorists,GCN,link_pred,test_auc,0.684889,0.096335,0.588554,0.781224
+Security,9/11 terrorists,GAT,link_pred,test_auc,0.737778,0.064638,0.673139,0.802416
+Security,9/11 terrorists,GraphSAGE,link_pred,test_auc,0.730222,0.092585,0.637637,0.822807
+Security,9/11 terrorists,GraphTransformer,link_pred,test_auc,0.703556,0.081100,0.622455,0.784656
