@@ -1,0 +1,100 @@
+{
+  "seeds": 10,
+  "sesoi": 0.01,
+  "planetoid": {
+    "epoch_selection": {
+      "n_comparisons": 18,
+      "significant_final": 11,
+      "significant_best_val": 7,
+      "flipped": 4,
+      "tasks_selectable": 3,
+      "tasks_total": 3,
+      "largest_reversal": {
+        "task": "pubmed",
+        "comparison": "GAT vs GCN",
+        "mean_diff_final": -0.0386,
+        "p_holm_final": 0.0013085629781129343,
+        "mean_diff_best_val": -0.0102,
+        "p_holm_best_val": 0.05263239215343343
+      }
+    },
+    "power": {
+      "n_comparisons": 18,
+      "median_mde": 0.013708560320977007,
+      "n_detectable": 11,
+      "n_undetectable": 7,
+      "median_seeds_for_0.01": 17,
+      "median_seeds_for_0.005": 62
+    },
+    "equivalence": {
+      "margin": 0.01,
+      "different": 11,
+      "equivalent": 0,
+      "trivial": 0,
+      "undetermined": 7,
+      "n_comparisons": 18
+    }
+  },
+  "breadth": {
+    "capacity": {
+      "k": 4,
+      "n_current": 10,
+      "cd_current": 1.4832311854364133,
+      "max_rank_gap": 0.7999999999999998,
+      "n_for_observed_gap": 35
+    },
+    "stability": {
+      "n_boot": 10000,
+      "order": [
+        "GraphSAGE",
+        "GCN",
+        "GAT",
+        "GraphTransformer"
+      ],
+      "order_stability": 0.1557,
+      "gap_observed": 0.8,
+      "critical_difference": 1.4832,
+      "gap_quantiles": {
+        "0.025": 0.5,
+        "0.25": 0.9,
+        "0.5": 1.1,
+        "0.75": 1.4,
+        "0.975": 2.0
+      },
+      "gap_exceeds_cd_frac": 0.2234,
+      "max_jackknife_shift": 0.2111,
+      "separation": {
+        "GAT vs GCN": 0.095,
+        "GAT vs GraphSAGE": 0.05,
+        "GAT vs GraphTransformer": 0.0277,
+        "GCN vs GraphSAGE": 0.0006,
+        "GCN vs GraphTransformer": 0.1133,
+        "GraphSAGE vs GraphTransformer": 0.0354
+      }
+    },
+    "aggregation": {
+      "uniform": {
+        "GraphSAGE": 2.1,
+        "GCN": 2.2,
+        "GAT": 2.8,
+        "GraphTransformer": 2.9
+      },
+      "reliability": {
+        "GCN": 1.7558,
+        "GraphSAGE": 2.133,
+        "GAT": 2.7918,
+        "GraphTransformer": 3.3193
+      },
+      "hierarchical": {
+        "GraphSAGE": 2.1,
+        "GCN": 2.2,
+        "GAT": 2.8,
+        "GraphTransformer": 2.9
+      },
+      "order_preserved": {
+        "reliability": false,
+        "hierarchical": true
+      }
+    }
+  }
+}

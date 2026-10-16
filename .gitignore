@@ -7,7 +7,15 @@ build/
 dist/
 .claude
 .opencode
-paper/
+# Paper reproduction pipeline: code, cached metric tensors and summary CSVs are
+# tracked; regenerated outputs, raw datasets and throwaway runs are not.
+paper/*
+!paper/experiments/
+paper/experiments/validate/
+paper/experiments/_data/
+paper/experiments/_artifacts/smoke/
+paper/experiments/_artifacts/cache_smoke/
+paper/experiments/_artifacts/*.bak
 
 # uv / venv
 .venv/

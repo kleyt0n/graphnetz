@@ -1,0 +1,346 @@
+{
+  "_comment": "Values as published in the LoG 2026 camera-ready (github.com/kleyt0n/paper-graphnetz): Table 2 (cross-category sweep), Section 3.4 (across-task ranking), Section 3.6 and Table 4 (Planetoid sweep), Table 11 (catalogue). Produced with torch 2.11.0 / torch-geometric 2.7.0 on CPU. Used by `run.py verify`.",
+  "protocol": {
+    "seeds": 10,
+    "hidden_channels": 64,
+    "alpha": 0.05,
+    "ci": 0.95
+  },
+  "breadth": [
+    {
+      "category": "Combinatorial",
+      "dataset": "TSP-random",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.864,
+          0.025
+        ],
+        "GAT": [
+          0.832,
+          0.028
+        ],
+        "GraphSAGE": [
+          0.89,
+          0.023
+        ],
+        "GraphTransformer": [
+          0.872,
+          0.019
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Biology",
+      "dataset": "MUTAG",
+      "task_type": "graph_cls",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.705,
+          0.06
+        ],
+        "GAT": [
+          0.637,
+          0.038
+        ],
+        "GraphSAGE": [
+          0.7,
+          0.06
+        ],
+        "GraphTransformer": [
+          0.721,
+          0.05
+        ],
+        "GIN": [
+          0.847,
+          0.044
+        ]
+      }
+    },
+    {
+      "category": "Social",
+      "dataset": "Cora",
+      "task_type": "node_cls",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.811,
+          0.001
+        ],
+        "GAT": [
+          0.797,
+          0.009
+        ],
+        "GraphSAGE": [
+          0.799,
+          0.004
+        ],
+        "GraphTransformer": [
+          0.792,
+          0.004
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Knowledge",
+      "dataset": "FB15k-237",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.675,
+          0.008
+        ],
+        "GAT": [
+          0.523,
+          0.008
+        ],
+        "GraphSAGE": [
+          0.572,
+          0.027
+        ],
+        "GraphTransformer": [
+          0.537,
+          0.008
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Infrastructure",
+      "dataset": "Euroroad",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.524,
+          0.019
+        ],
+        "GAT": [
+          0.593,
+          0.022
+        ],
+        "GraphSAGE": [
+          0.54,
+          0.028
+        ],
+        "GraphTransformer": [
+          0.519,
+          0.042
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Finance",
+      "dataset": "Board-directors",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.968,
+          0.007
+        ],
+        "GAT": [
+          0.989,
+          0.002
+        ],
+        "GraphSAGE": [
+          0.901,
+          0.012
+        ],
+        "GraphTransformer": [
+          0.853,
+          0.015
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Computing",
+      "dataset": "Internet AS",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.967,
+          0.001
+        ],
+        "GAT": [
+          0.655,
+          0.013
+        ],
+        "GraphSAGE": [
+          0.745,
+          0.013
+        ],
+        "GraphTransformer": [
+          0.598,
+          0.068
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Vision",
+      "dataset": "MNIST-superpixels",
+      "task_type": "graph_cls",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.105,
+          0.011
+        ],
+        "GAT": [
+          0.106,
+          0.012
+        ],
+        "GraphSAGE": [
+          0.12,
+          0.021
+        ],
+        "GraphTransformer": [
+          0.142,
+          0.027
+        ],
+        "GIN": [
+          0.273,
+          0.049
+        ]
+      }
+    },
+    {
+      "category": "Physics",
+      "dataset": "Ising-lattice",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.676,
+          0.03
+        ],
+        "GAT": [
+          0.616,
+          0.034
+        ],
+        "GraphSAGE": [
+          0.63,
+          0.02
+        ],
+        "GraphTransformer": [
+          0.62,
+          0.018
+        ],
+        "GIN": null
+      }
+    },
+    {
+      "category": "Security",
+      "dataset": "9/11 terrorists",
+      "task_type": "link_pred",
+      "direction": "higher",
+      "cells": {
+        "GCN": [
+          0.685,
+          0.096
+        ],
+        "GAT": [
+          0.738,
+          0.065
+        ],
+        "GraphSAGE": [
+          0.73,
+          0.093
+        ],
+        "GraphTransformer": [
+          0.704,
+          0.081
+        ],
+        "GIN": null
+      }
+    }
+  ],
+  "headline": {
+    "k": 4,
+    "n": 10,
+    "friedman_chi2": 3.0,
+    "friedman_p": 0.392,
+    "critical_difference": 1.483,
+    "mean_ranks": {
+      "GraphSAGE": 2.1,
+      "GCN": 2.2,
+      "GAT": 2.8,
+      "GraphTransformer": 2.9
+    },
+    "max_rank_gap": 0.8,
+    "single_clique": true
+  },
+  "planetoid": {
+    "tasks": {
+      "cora": {
+        "GCN": [
+          0.811,
+          0.001
+        ],
+        "GAT": [
+          0.795,
+          0.01
+        ],
+        "GraphSAGE": [
+          0.799,
+          0.004
+        ],
+        "GraphTransformer": [
+          0.792,
+          0.004
+        ]
+      },
+      "citeseer": {
+        "GCN": [
+          0.683,
+          0.002
+        ],
+        "GAT": [
+          0.655,
+          0.013
+        ],
+        "GraphSAGE": [
+          0.683,
+          0.012
+        ],
+        "GraphTransformer": [
+          0.7,
+          0.006
+        ]
+      },
+      "pubmed": {
+        "GCN": [
+          0.791,
+          0.002
+        ],
+        "GAT": [
+          0.752,
+          0.015
+        ],
+        "GraphSAGE": [
+          0.767,
+          0.002
+        ],
+        "GraphTransformer": [
+          0.759,
+          0.006
+        ]
+      }
+    },
+    "n_significant_t": 11,
+    "n_significant_wilcoxon": 10,
+    "n_disagreements": 1
+  },
+  "catalog": {
+    "total_loaders": 62
+  }
+}

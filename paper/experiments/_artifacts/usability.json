@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "GraphNetz": {
+      "file": "with_graphnetz.py",
+      "effective_lines": 9,
+      "total_lines": 22,
+      "decisions": 0,
+      "imports": [
+        "graphnetz"
+      ],
+      "n_imports": 1
+    },
+    "PyTorch Geometric + scipy": {
+      "file": "with_pyg.py",
+      "effective_lines": 122,
+      "total_lines": 167,
+      "decisions": 12,
+      "imports": [
+        "matplotlib",
+        "numpy",
+        "scipy",
+        "torch",
+        "torch_geometric"
+      ],
+      "n_imports": 5
+    }
+  },
+  "line_ratio": 13.6,
+  "decisions_avoided": 12
+}
